@@ -47,8 +47,7 @@
     </target>
 
     <target name="clean" description="Flush staging directory">
-        <delete dir="${main.build.dir}" />
-        <delete dir="${test.build.dir}" />
+        <delete dir="build" />
         <delete file="${projectName}.jar" />
     </target>
 
