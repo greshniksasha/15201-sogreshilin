@@ -1,0 +1,7 @@
+!*.DS_Store
+!*.idea
+!hamcresp/*
+!junit/*
+!lab1/src/*
+!lab1/test/*
+!lab1/build.xml
