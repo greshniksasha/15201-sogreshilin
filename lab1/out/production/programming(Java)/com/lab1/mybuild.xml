@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<project name="programming(Java)" default="main" basedir=".">
+    <description>
+        Description of my project
+    </description>
+
+    <property name="projectName"
+
+
+</project>
