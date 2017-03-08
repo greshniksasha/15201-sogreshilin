@@ -9,21 +9,9 @@ import java.io.FileReader;
 
 public class Main {
 
-    public static void printUsage() {
-        try {
-            BufferedReader reader = new BufferedReader(new FileReader("src/com/lab1/readme.txt"));
-            String line = "";
-            while ((line = reader.readLine()) != null) {
-                System.out.println(line);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
     public static void main(String[] args) {
         if (args.length < 2) {
-            printUsage();
+            StatisticsSerializer.printUsage();
             return;
         }
         try {
