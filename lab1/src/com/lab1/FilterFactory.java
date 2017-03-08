@@ -4,6 +4,7 @@ import com.lab1.Filter.Filter;
 import com.lab1.FilterSerializer.*;
 
 
+import javax.sound.midi.Soundbank;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
@@ -23,11 +24,10 @@ public class FilterFactory {
     public static Filter create (String config) {
         char filterType = config.charAt(0);
         String filterParameter = config.substring(1);
-
         if (!factoryMap.containsKey(filterType)) {
-            throw new InvalidFilterException(config);
+            System.err.println("Invalid symbol used in configuration file : " + config);
+            System.exit(1);
         }
-
         try {
             Class c = Class.forName(factoryMap.get(filterType));
             Method m = c.getMethod("parseFilter", String.class);

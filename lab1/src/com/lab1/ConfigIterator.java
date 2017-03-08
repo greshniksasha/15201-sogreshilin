@@ -9,11 +9,13 @@ public class ConfigIterator implements Iterator<String> {
     private String lastReadLine;
 
     public ConfigIterator(String configFileName) {
+        FileReader configFile = null;
         try {
-            configReader = new BufferedReader(new FileReader(configFileName));
+            configFile = new FileReader(configFileName);
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            throw new NoSuchFile(configFileName);
         }
+        configReader = new BufferedReader(configFile);
     }
 
     @Override

@@ -27,6 +27,9 @@ public class Controller {
 
     public void collectStatisticsOf(File dir) {
         File[] files = dir.listFiles();
+        if (files == null) {
+            throw new NoSuchDirectory(dir.getAbsolutePath());
+        }
         for (File file : files) {
             if (file.isDirectory()) {
                 collectStatisticsOf(file);
