@@ -8,18 +8,23 @@ public class NotFilter implements Filter {
 
     private Filter filter;
 
-    public NotFilter(String filterConfig) {
-        FilterFactory factory = new FilterFactory();
-        if (filterConfig.charAt(0) == '(') {
-            filter = factory.create(filterConfig.substring(1, filterConfig.length() - 1));
-        } else {
-            filter = factory.create(filterConfig);
-        }
+    public NotFilter(Filter filter) {
+        this.filter = filter;
+    }
+
+    @Override
+    public int hashCode() {
+        return filter.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return (obj instanceof NotFilter && this.hashCode() == obj.hashCode());
     }
 
     @Override
     public String toString() {
-        return "~(" + filter.toString() + ")";
+        return "!(" + filter.toString() + ")";
     }
 
     @Override

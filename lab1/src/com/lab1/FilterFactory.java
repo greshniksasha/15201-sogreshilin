@@ -1,7 +1,10 @@
 package com.lab1;
 
-import com.lab1.Filter.*;
+import com.lab1.Filter.Filter;
+import com.lab1.FilterSerializer.*;
 
+
+import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -9,16 +12,15 @@ public class FilterFactory {
     private static final Map<Character, String> factoryMap;
     static {
         factoryMap = new HashMap<Character, String>();
-        factoryMap.put('.', ExtensionFilter.class.getName());
-        factoryMap.put('<', LessTimeFilter.class.getName());
-        factoryMap.put('>', GreaterTimeFilter.class.getName());
-        factoryMap.put('&', AndFilter.class.getName());
-        factoryMap.put('|', OrFilter.class.getName());
-        factoryMap.put('~', NotFilter.class.getName());
+        factoryMap.put('.', ExtensionFilterSerializer.class.getName());
+        factoryMap.put('<', LessTimeFilterSerializer.class.getName());
+        factoryMap.put('>', GreaterTimeFilterSerializer.class.getName());
+        factoryMap.put('&', AndFilterSerializer.class.getName());
+        factoryMap.put('|', OrFilterSerializer.class.getName());
+        factoryMap.put('!', NotFilterSerializer.class.getName());
     }
 
     public static Filter create (String config) {
-        Filter filter;
         char filterType = config.charAt(0);
         String filterParameter = config.substring(1);
 
@@ -27,9 +29,9 @@ public class FilterFactory {
         }
 
         try {
-            filter = (Filter)Class.forName(factoryMap.get(filterType))
-                    .getConstructor(String.class).newInstance(filterParameter);
-            return filter;
+            Class c = Class.forName(factoryMap.get(filterType));
+            Method m = c.getMethod("parseFilter", String.class);
+            return (Filter)m.invoke(null, filterParameter);
         } catch (Exception e) {
             e.printStackTrace();
         }

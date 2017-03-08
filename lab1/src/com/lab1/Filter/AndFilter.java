@@ -2,12 +2,26 @@ package com.lab1.Filter;
 
 import java.io.File;
 
-public class AndFilter extends AgregateFilter {
+public class AndFilter implements Filter {
 
     private Filter[] filters;
 
-    public AndFilter(String filterConfigs) {
-        filters = parse(filterConfigs);
+    public AndFilter(Filter[] filters) {
+        this.filters = filters;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = 0;
+        for (Filter filter : filters) {
+            result = 37 * result + filter.hashCode();
+        }
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return (obj instanceof AndFilter && this.hashCode() == obj.hashCode());
     }
 
     @Override

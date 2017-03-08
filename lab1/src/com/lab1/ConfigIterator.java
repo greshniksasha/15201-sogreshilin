@@ -21,7 +21,7 @@ public class ConfigIterator implements Iterator<String> {
         try {
             lastReadLine = configReader.readLine();
             if (lastReadLine != null) {
-                lastReadLine = lastReadLine.trim();
+                lastReadLine = lastReadLine.replaceAll("^\\s+", "").replaceAll("\\s+$", "").replaceAll("\\s+", " ");
             }
         } catch (IOException e) {
             e.printStackTrace();

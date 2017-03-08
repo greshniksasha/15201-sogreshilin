@@ -25,12 +25,12 @@ public class ControllerTest {
         expected.put(".txt", 15);
         expected.put(".h", 20);
         expected.put(".c", 30);
-        expected.put("&(|(.txt .h .c) ~(.txt))", 50);
-        expected.put("&(|(.txt .h .c) ~(.h))", 45);
-        expected.put("&(|(.txt .h .c) ~(|(.txt .c)))", 20);
-        expected.put("&(|(.txt .h .c) >(01.01.1970 00:00:00))", 65);
-        expected.put("&(|(.txt .h .c) <(01.01.1970 00:00:00))", 0);
-        expected.put("&(|(.txt .h .c) ~(&(|(.txt .h .c) <(01.01.1970 00:00:00))))", 65);
+        expected.put("&(|(.txt .h .c) !(.txt))", 50);
+        expected.put("&(|(.txt .h .c) !(.h))", 45);
+        expected.put("&(|(.txt .h .c) !(|(.txt .c)))", 20);
+        expected.put("&(|(.txt .h .c) >0)", 65);
+        expected.put("&(|(.txt .h .c) <0)", 0);
+        expected.put("&(|(.txt .h .c) !(&(|(.txt .h .c) <0)))", 65);
 
         Statistics stat = controller.getStatistics();
         Filter[] filters = controller.getFilters();

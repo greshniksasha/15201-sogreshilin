@@ -17,6 +17,14 @@ public class Controller {
         stat = new Statistics();
     }
 
+    public Statistics getStatistics() {
+        return stat;
+    }
+
+    public Filter[] getFilters() {
+        return filters;
+    }
+
     public void collectStatisticsOf(File dir) {
         File[] files = dir.listFiles();
         for (File file : files) {
@@ -30,24 +38,6 @@ public class Controller {
                 }
             }
         }
-    }
-
-    public void printStatistics() {
-        System.out.println("Total : " + stat.getLineCount() + " lines in " + stat.getFileCount() + " files");
-        System.out.println("------------------------------------------------------------");
-        Map<Filter, Statistics.Record> sortedStat = stat.sortByValue();
-        for (Map.Entry<Filter, Statistics.Record> entry : sortedStat.entrySet()) {
-            System.out.println(entry.getKey().toString() + " : " + entry.getValue().getLineCount() +
-                    " lines in " + entry.getValue().getFileCount() + " files");
-        }
-    }
-
-    public Statistics getStatistics() {
-        return stat;
-    }
-
-    public Filter[] getFilters() {
-        return filters;
     }
 
 }

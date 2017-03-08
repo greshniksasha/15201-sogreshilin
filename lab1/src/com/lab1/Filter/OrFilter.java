@@ -6,12 +6,26 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-public class OrFilter extends AgregateFilter {
+public class OrFilter implements Filter {
 
     private Filter[] filters;
 
-    public OrFilter(String filterConfigs) {
-        filters = parse(filterConfigs);
+    public OrFilter(Filter[] filters) {
+        this.filters = filters;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = 0;
+        for (Filter filter : filters) {
+            result = 37 * result + filter.hashCode();
+        }
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return (obj instanceof OrFilter && this.hashCode() == obj.hashCode());
     }
 
     @Override

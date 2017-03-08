@@ -14,12 +14,24 @@ public class FilterParserTest {
 
     @Test
     public void parse() throws Exception {
+
+        Filter[] andArray = {
+                new NotFilter(new ExtensionFilter("hpp")),
+                new LessTimeFilter(853718400)
+        };
+        Filter[] orArray = {
+                new ExtensionFilter("cpp"),
+                new ExtensionFilter("cc"),
+                new ExtensionFilter("hpp"),
+                new ExtensionFilter("h"),
+                new NotFilter(new LessTimeFilter(853718400))
+        };
         Filter[] expectedFilters = {
                 new ExtensionFilter("cpp"),
-                new NotFilter(".hpp"),
-                new LessTimeFilter("(20.01.1997 00:00:00)"),
-                new AndFilter("(~.hpp <(20.01.1997 00:00:00))"),
-                new OrFilter("(.cpp .cc .hpp .h ~<(20.01.1997 00:00:00))")
+                new NotFilter(new ExtensionFilter("hpp")),
+                new LessTimeFilter(853718400),
+                new AndFilter(andArray),
+                new OrFilter(orArray)
         };
 
         Filter[] filters = FilterParser.parse(fileName);

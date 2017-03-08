@@ -1,5 +1,7 @@
 package com.lab1;
 
+import com.lab1.Filter.Filter;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -20,14 +22,14 @@ public class Main {
     }
 
     public static void main(String[] args) {
+        if (args.length < 2) {
+            printUsage();
+            return;
+        }
         try {
-            if (args.length < 2) {
-                printUsage();
-                return;
-            }
             Controller controller = new Controller(args[0]);
             controller.collectStatisticsOf(new File(args[1]));
-            controller.printStatistics();
+            StatisticsSerializer.printStatistics(controller.getStatistics());
         } catch (RuntimeException e) {
             e.printStackTrace();
         }

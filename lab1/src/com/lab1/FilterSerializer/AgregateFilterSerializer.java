@@ -1,13 +1,17 @@
-package com.lab1.Filter;
+package com.lab1.FilterSerializer;
 
+import com.lab1.Filter.Filter;
 import com.lab1.FilterFactory;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class AgregateFilter implements Filter {
+/**
+ * Created by Alexander on 08/03/2017.
+ */
+public class AgregateFilterSerializer {
 
-    private String[] splitConfigs(String configsString) {
+    private static String[] splitConfigs(String configsString) {
         List<String> configs = new ArrayList<String>();
         configsString += ' ';
         String config = "";
@@ -28,12 +32,11 @@ public abstract class AgregateFilter implements Filter {
         return configs.toArray(new String[configs.size()]);
     }
 
-    protected Filter[] parse(String filterConfigs) {
-        FilterFactory factory = new FilterFactory();
+    protected static Filter[] parse(String s) {
         List<Filter> filtersList = new ArrayList<Filter>();
-        String[] configs = splitConfigs(filterConfigs.substring(1, filterConfigs.length() - 1));
+        String[] configs = splitConfigs(s.substring(1, s.length() - 1));
         for (String config : configs) {
-            filtersList.add(factory.create(config));
+            filtersList.add(FilterFactory.create(config));
         }
         return filtersList.toArray(new Filter[filtersList.size()]);
     }

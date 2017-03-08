@@ -1,0 +1,6 @@
+             |(.cpp              .hpp)
+&(.cpp !<1)
+.cpp
+|(.cpp           .hpp)
+|(.hpp .cpp)
+.cpp
