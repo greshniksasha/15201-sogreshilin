@@ -2,11 +2,12 @@ package com.lab1;
 
 import com.lab1.Filter.Filter;
 
+import java.io.FileNotFoundException;
 import java.util.*;
 
 public class FilterParser {
 
-    public static Filter[] parse(String fileName) {
+    public static Filter[] parse(String fileName) throws FilterCreateException, FileNotFoundException {
         List<Filter> filtersList = new ArrayList<Filter>();
 
         for (ConfigIterator it = new ConfigIterator(fileName); it.hasNext(); ) {

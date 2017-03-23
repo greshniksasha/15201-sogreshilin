@@ -17,7 +17,7 @@
         <javac srcdir="${main.src.dir}" destdir="${main.build.dir}" includeantruntime="false" />
     </target>
 
-    <target name="test-compile" depends="compile">
+    <target name="test-compile" depends="compile, dist">
         <mkdir dir="${test.build.dir}" />
         <javac srcdir="${test.src.dir}" classpath="${projectName}.jar:../junit/junit-4.11.jar" destdir="${test.build.dir}" includeantruntime="false" />
     </target>

@@ -4,7 +4,8 @@ import java.io.File;
 
 public class AndFilter implements Filter {
 
-    private Filter[] filters;
+    public static final char prefix = '&';
+    private final Filter[] filters;
 
     public AndFilter(Filter[] filters) {
         this.filters = filters;
@@ -12,7 +13,7 @@ public class AndFilter implements Filter {
 
     @Override
     public int hashCode() {
-        int result = 0;
+        int result = prefix;
         for (Filter filter : filters) {
             result = 37 * result + filter.hashCode();
         }
@@ -26,7 +27,7 @@ public class AndFilter implements Filter {
 
     @Override
     public String toString() {
-        String res = "&(";
+        String res = prefix + "(";
         for (Filter filter : filters) {
             res += (filter.toString() + " ");
         }

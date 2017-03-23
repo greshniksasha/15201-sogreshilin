@@ -4,6 +4,7 @@ import java.io.File;
 
 public class ExtensionFilter implements Filter {
 
+    public static final char prefix = '.';
     private String extension;
 
     public ExtensionFilter(String extension) {
@@ -12,7 +13,7 @@ public class ExtensionFilter implements Filter {
 
     @Override
     public int hashCode() {
-        return extension.hashCode();
+        return prefix + 37 * extension.hashCode();
     }
 
     @Override
@@ -22,7 +23,7 @@ public class ExtensionFilter implements Filter {
 
     @Override
     public String toString() {
-        return "." + extension;
+        return prefix + extension;
     }
 
     @Override

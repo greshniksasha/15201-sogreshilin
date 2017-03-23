@@ -6,9 +6,9 @@ import com.lab1.Filter.LessTimeFilter;
 /**
  * Created by Alexander on 08/03/2017.
  */
-public class LessTimeFilterSerializer {
+public class LessTimeFilterSerializer implements FilterSerializer {
 
-    public static Filter parseFilter(String s) {
+    public Filter readFilter(String s) {
         return new LessTimeFilter(Long.parseLong(s));
     }
 

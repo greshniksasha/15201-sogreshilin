@@ -8,13 +8,9 @@ public class ConfigIterator implements Iterator<String> {
     private BufferedReader configReader;
     private String lastReadLine;
 
-    public ConfigIterator(String configFileName) {
+    public ConfigIterator(String configFileName) throws FileNotFoundException {
         FileReader configFile = null;
-        try {
-            configFile = new FileReader(configFileName);
-        } catch (FileNotFoundException e) {
-            throw new NoSuchFile(configFileName);
-        }
+        configFile = new FileReader(configFileName);
         configReader = new BufferedReader(configFile);
     }
 
@@ -22,11 +18,15 @@ public class ConfigIterator implements Iterator<String> {
     public boolean hasNext() {
         try {
             lastReadLine = configReader.readLine();
-            if (lastReadLine != null) {
-                lastReadLine = lastReadLine.replaceAll("^\\s+", "").replaceAll("\\s+$", "").replaceAll("\\s+", " ");
-            }
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println(e.getMessage());
+        }
+        if (lastReadLine != null) {
+            lastReadLine = lastReadLine
+                    .replaceAll("^\\s+|\\s+$", "")
+                    .replaceAll("\\s+", " ")
+                    .replaceAll(" {0,}\\( ", "(")
+                    .replaceAll(" \\)", ")");
         }
         return lastReadLine != null;
     }

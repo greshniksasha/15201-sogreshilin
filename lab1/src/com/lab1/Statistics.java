@@ -2,10 +2,7 @@ package com.lab1;
 
 import com.lab1.Filter.Filter;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.*;
 
 public class Statistics {
@@ -35,7 +32,7 @@ public class Statistics {
         linesInGeneral = 0;
     }
 
-    public void add(Filter filter, File file) {
+    public void add(Filter filter, File file) throws CountLinesException {
         if (!checkedFiles.contains(file)) {
             checkedFiles.add(file);
             ++filesInGeneral;
@@ -60,16 +57,17 @@ public class Statistics {
 
     public int getFileCount() { return filesInGeneral; }
 
-    public int countLinesIn(File file) {
+    public int countLinesIn(File file) throws CountLinesException {
         int linesCount = 0;
+        BufferedReader reader = null;
         try {
-            BufferedReader reader = new BufferedReader(new FileReader(file));
+            reader = new BufferedReader(new FileReader(file));
             while (reader.readLine() != null) {
-                linesCount++;
+              linesCount++;
             }
             reader.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new CountLinesException("Could not open the file : " + file.getAbsolutePath());
         }
         return linesCount;
     }
@@ -77,7 +75,6 @@ public class Statistics {
     public TreeMap<Filter, Record> sortByValue() {
         Comparator<Filter> comparator = new ValueComparator(stat);
         TreeMap<Filter, Record> result = new TreeMap<Filter, Record>(comparator);
-
         result.putAll(stat);
         return result;
     }

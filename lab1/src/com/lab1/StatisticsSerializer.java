@@ -2,6 +2,7 @@ package com.lab1;
 
 import com.lab1.Filter.Filter;
 
+import javax.print.PrintException;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.util.Map;
@@ -11,7 +12,7 @@ import java.util.Map;
  */
 public class StatisticsSerializer {
 
-    public static void printUsage() {
+    public static void printUsage() throws PrintException {
         try {
             BufferedReader reader = new BufferedReader(new FileReader("src/com/lab1/readme.txt"));
             String line = "";
@@ -19,7 +20,7 @@ public class StatisticsSerializer {
                 System.out.println(line);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new PrintException("Cannot print usage", e);
         }
     }
 

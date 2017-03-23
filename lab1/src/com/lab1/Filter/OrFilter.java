@@ -8,7 +8,8 @@ import java.util.List;
 
 public class OrFilter implements Filter {
 
-    private Filter[] filters;
+    public static final char prefix = '|';
+    private final Filter[] filters;
 
     public OrFilter(Filter[] filters) {
         this.filters = filters;
@@ -16,7 +17,7 @@ public class OrFilter implements Filter {
 
     @Override
     public int hashCode() {
-        int result = 0;
+        int result = prefix;
         for (Filter filter : filters) {
             result = 37 * result + filter.hashCode();
         }
@@ -30,7 +31,7 @@ public class OrFilter implements Filter {
 
     @Override
     public String toString() {
-        String res = "|(";
+        String res = prefix + "(";
         for (Filter filter : filters) {
             res += (filter.toString() + " ");
         }

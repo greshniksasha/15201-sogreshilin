@@ -1,5 +1,5 @@
 
-                    Lines of Code, app.
+                       Lines of Code
 ------------------------------------------------------------
 This utility counts all lines of code in specific directory
     and all its subdirectories. Configuration file pathname

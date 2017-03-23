@@ -6,6 +6,7 @@ import java.io.File;
 
 public class NotFilter implements Filter {
 
+    public static final char prefix = '!';
     private Filter filter;
 
     public NotFilter(Filter filter) {
@@ -14,7 +15,7 @@ public class NotFilter implements Filter {
 
     @Override
     public int hashCode() {
-        return filter.hashCode();
+        return prefix + 37 * filter.hashCode();
     }
 
     @Override
@@ -24,7 +25,7 @@ public class NotFilter implements Filter {
 
     @Override
     public String toString() {
-        return "!(" + filter.toString() + ")";
+        return prefix + "(" + filter.toString() + ")";
     }
 
     @Override

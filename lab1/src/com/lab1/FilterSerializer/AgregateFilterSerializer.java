@@ -1,6 +1,7 @@
 package com.lab1.FilterSerializer;
 
 import com.lab1.Filter.Filter;
+import com.lab1.FilterCreateException;
 import com.lab1.FilterFactory;
 
 import java.util.ArrayList;
@@ -32,7 +33,7 @@ public class AgregateFilterSerializer {
         return configs.toArray(new String[configs.size()]);
     }
 
-    protected static Filter[] parse(String s) {
+    protected static Filter[] parse(String s) throws FilterCreateException {
         List<Filter> filtersList = new ArrayList<Filter>();
         String[] configs = splitConfigs(s.substring(1, s.length() - 1));
         for (String config : configs) {

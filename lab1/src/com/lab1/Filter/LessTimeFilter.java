@@ -7,6 +7,7 @@ import java.util.Date;
 
 public class LessTimeFilter implements Filter {
 
+    public static final char prefix = '<';
     private Long lastModified;
 
     public LessTimeFilter(long lastModified) {
@@ -15,7 +16,7 @@ public class LessTimeFilter implements Filter {
 
     @Override
     public int hashCode() {
-        return lastModified.hashCode();
+        return prefix + 37 * lastModified.hashCode();
     }
 
     @Override
@@ -25,7 +26,7 @@ public class LessTimeFilter implements Filter {
 
     @Override
     public String toString() {
-        return "<" + lastModified;
+        return prefix + lastModified.toString();
     }
 
     @Override

@@ -6,9 +6,9 @@ import com.lab1.Filter.GreaterTimeFilter;
 /**
  * Created by Alexander on 08/03/2017.
  */
-public class GreaterTimeFilterSerializer {
+public class GreaterTimeFilterSerializer implements FilterSerializer {
 
-    public static Filter parseFilter(String s) {
+    public Filter readFilter(String s) {
         return new GreaterTimeFilter(Long.parseLong(s));
     }
 

@@ -7,6 +7,7 @@ import java.util.Date;
 
 public class GreaterTimeFilter implements Filter {
 
+    public static final char prefix = '>';
     private Long lastModified;
 
     public GreaterTimeFilter(long lastModified) {
@@ -15,7 +16,7 @@ public class GreaterTimeFilter implements Filter {
 
     @Override
     public int hashCode() {
-        return lastModified.hashCode();
+        return prefix + 37 * lastModified.hashCode();
     }
 
     @Override
@@ -24,7 +25,9 @@ public class GreaterTimeFilter implements Filter {
     }
 
     @Override
-    public String toString() { return ">" + lastModified; }
+    public String toString() {
+        return prefix + lastModified.toString();
+    }
 
     @Override
     public boolean check(File file) {
