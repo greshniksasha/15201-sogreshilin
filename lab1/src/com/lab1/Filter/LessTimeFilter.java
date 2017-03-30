@@ -7,11 +7,15 @@ import java.util.Date;
 
 public class LessTimeFilter implements Filter {
 
-    public static final char prefix = '<';
+    private static final char prefix = '<';
     private Long lastModified;
 
     public LessTimeFilter(long lastModified) {
         this.lastModified = lastModified;
+    }
+
+    public Long getLastModified() {
+        return lastModified;
     }
 
     @Override

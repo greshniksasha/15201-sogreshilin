@@ -24,13 +24,23 @@ public class StatisticsSerializer {
         }
     }
 
-    public static void printStatistics(Statistics stat) {
-        System.out.println("Total : " + stat.getLineCount() + " lines in " + stat.getFileCount() + " files");
-        System.out.println("------------------------------------------------------------");
+    public static void printStatistics(Statistics stat) throws FilterSerializeException, FilterNullPointerException {
+
+        Factory factory = new Factory();
         Map<Filter, Statistics.Record> sortedStat = stat.sortByValue();
+
+        System.out.println(
+                "Total : " + stat.getLineCount() +
+                        " lines in " + stat.getFileCount() +
+                        " files");
+        System.out.println("------------------------------------------------------------");
+
         for (Map.Entry<Filter, Statistics.Record> entry : sortedStat.entrySet()) {
-            System.out.println(entry.getKey().toString() + " : " + entry.getValue().getLineCount() +
-                    " lines in " + entry.getValue().getFileCount() + " files");
+            System.out.println(
+                    factory.create(entry.getKey()).serialize(entry.getKey()) +
+                            " : " + entry.getValue().getLineCount() +
+                            " lines in " + entry.getValue().getFileCount() +
+                            " files");
         }
     }
 

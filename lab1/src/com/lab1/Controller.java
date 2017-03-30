@@ -15,7 +15,10 @@ public class Controller {
     private Filter[] filters;
     private Statistics stat;
 
-    public Controller(String configName) throws FilterCreateException, FileNotFoundException {
+    public Controller(String configName) throws FilterCreateException, FileNotFoundException, FilterNullPointerException {
+        if (configName == null) {
+            throw new FilterNullPointerException("Empty configuration file name");
+        }
         filters = FilterParser.parse(configName);
         stat = new Statistics();
     }

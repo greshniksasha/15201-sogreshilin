@@ -7,8 +7,12 @@ import java.util.Date;
 
 public class GreaterTimeFilter implements Filter {
 
-    public static final char prefix = '>';
+    private static final char prefix = '>';
     private Long lastModified;
+
+    public Long getLastModified() {
+        return lastModified;
+    }
 
     public GreaterTimeFilter(long lastModified) {
         this.lastModified = lastModified;

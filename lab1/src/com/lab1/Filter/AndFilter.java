@@ -4,11 +4,15 @@ import java.io.File;
 
 public class AndFilter implements Filter {
 
-    public static final char prefix = '&';
+    private static final char prefix = '&';
     private final Filter[] filters;
 
     public AndFilter(Filter[] filters) {
         this.filters = filters;
+    }
+
+    public Filter[] getFilters() {
+        return filters;
     }
 
     @Override

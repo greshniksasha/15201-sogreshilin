@@ -1,8 +1,9 @@
 package com.lab1.FilterSerializer;
 
+import com.lab1.Factory;
 import com.lab1.Filter.Filter;
 import com.lab1.FilterCreateException;
-import com.lab1.FilterFactory;
+import com.lab1.FilterNullPointerException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,11 +34,11 @@ public class AgregateFilterSerializer {
         return configs.toArray(new String[configs.size()]);
     }
 
-    protected static Filter[] parse(String s) throws FilterCreateException {
+    protected static Filter[] parse(String s) throws FilterCreateException, FilterNullPointerException {
         List<Filter> filtersList = new ArrayList<Filter>();
         String[] configs = splitConfigs(s.substring(1, s.length() - 1));
         for (String config : configs) {
-            filtersList.add(FilterFactory.create(config));
+            filtersList.add(Factory.create(config));
         }
         return filtersList.toArray(new Filter[filtersList.size()]);
     }

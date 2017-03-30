@@ -18,15 +18,18 @@ public class ConfigIterator implements Iterator<String> {
     public boolean hasNext() {
         try {
             lastReadLine = configReader.readLine();
+            if (lastReadLine != null) {
+                lastReadLine = lastReadLine
+                        .replaceAll("^\\s+|\\s+$", "")
+                        .replaceAll("\\s+", " ")
+                        .replaceAll(" {0,}\\( ", "(")
+                        .replaceAll(" \\)", ")");
+                while (lastReadLine.isEmpty()) {
+                    lastReadLine = configReader.readLine();
+                }
+            }
         } catch (IOException e) {
             System.out.println(e.getMessage());
-        }
-        if (lastReadLine != null) {
-            lastReadLine = lastReadLine
-                    .replaceAll("^\\s+|\\s+$", "")
-                    .replaceAll("\\s+", " ")
-                    .replaceAll(" {0,}\\( ", "(")
-                    .replaceAll(" \\)", ")");
         }
         return lastReadLine != null;
     }

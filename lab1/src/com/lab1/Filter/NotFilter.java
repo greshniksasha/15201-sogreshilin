@@ -1,16 +1,18 @@
 package com.lab1.Filter;
 
-import com.lab1.FilterFactory;
-
 import java.io.File;
 
 public class NotFilter implements Filter {
 
-    public static final char prefix = '!';
+    private static final char prefix = '!';
     private Filter filter;
 
     public NotFilter(Filter filter) {
         this.filter = filter;
+    }
+
+    public Filter getFilter() {
+        return filter;
     }
 
     @Override

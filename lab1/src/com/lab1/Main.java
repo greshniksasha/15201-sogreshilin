@@ -1,5 +1,7 @@
 package com.lab1;
 
+import com.lab1.Filter.AndFilter;
+import com.lab1.Filter.ExtensionFilter;
 import com.lab1.Filter.Filter;
 
 import java.io.BufferedReader;
@@ -19,6 +21,7 @@ public class Main {
             controller.collectStatisticsOf(new File(args[1]));
             StatisticsSerializer.printStatistics(controller.getStatistics());
         } catch (Exception e) {
+            e.printStackTrace();
             System.out.println(e.getMessage());
         }
         return;

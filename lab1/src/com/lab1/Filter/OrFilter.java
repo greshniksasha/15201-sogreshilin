@@ -1,18 +1,18 @@
 package com.lab1.Filter;
 
-import com.lab1.FilterFactory;
-
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 
 public class OrFilter implements Filter {
 
-    public static final char prefix = '|';
+    private static final char prefix = '|';
     private final Filter[] filters;
 
     public OrFilter(Filter[] filters) {
         this.filters = filters;
+    }
+
+    public Filter[] getFilters() {
+        return filters;
     }
 
     @Override

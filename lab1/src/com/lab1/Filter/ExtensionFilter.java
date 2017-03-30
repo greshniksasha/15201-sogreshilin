@@ -4,8 +4,12 @@ import java.io.File;
 
 public class ExtensionFilter implements Filter {
 
-    public static final char prefix = '.';
+    private static final char prefix = '.';
     private String extension;
+
+    public String getExtension() {
+        return extension;
+    }
 
     public ExtensionFilter(String extension) {
         this.extension = extension;
@@ -28,10 +32,10 @@ public class ExtensionFilter implements Filter {
 
     @Override
     public boolean check(File file) {
-        return getExtension(file).equals(extension);
+        return getFileExtension(file).equals(extension);
     }
 
-    private String getExtension(File file) {
+    private String getFileExtension(File file) {
         String extention = "";
         String fileName = file.getAbsolutePath();
         int lastDotIndex = fileName.lastIndexOf('.');
