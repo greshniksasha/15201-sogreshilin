@@ -1,5 +1,7 @@
 package com.lab1.Filter;
 
+import com.lab1.FilterNullPointerException;
+
 import java.io.File;
 
 public class AndFilter implements Filter {
@@ -7,7 +9,10 @@ public class AndFilter implements Filter {
     private static final char prefix = '&';
     private final Filter[] filters;
 
-    public AndFilter(Filter[] filters) {
+    public AndFilter(Filter[] filters) throws FilterNullPointerException {
+        if (filters == null) {
+            throw new FilterNullPointerException("Cannot make AndFilter from null");
+        }
         this.filters = filters;
     }
 

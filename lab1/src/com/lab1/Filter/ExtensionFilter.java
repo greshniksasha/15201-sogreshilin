@@ -1,5 +1,7 @@
 package com.lab1.Filter;
 
+import com.lab1.FilterNullPointerException;
+
 import java.io.File;
 
 public class ExtensionFilter implements Filter {
@@ -11,7 +13,10 @@ public class ExtensionFilter implements Filter {
         return extension;
     }
 
-    public ExtensionFilter(String extension) {
+    public ExtensionFilter(String extension) throws FilterNullPointerException {
+        if (extension == null) {
+            throw new FilterNullPointerException("Cannot make ExtensionFilter from null");
+        }
         this.extension = extension;
     }
 

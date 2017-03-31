@@ -1,5 +1,7 @@
 package com.lab1.Filter;
 
+import com.lab1.FilterNullPointerException;
+
 import java.io.File;
 
 public class NotFilter implements Filter {
@@ -7,7 +9,10 @@ public class NotFilter implements Filter {
     private static final char prefix = '!';
     private Filter filter;
 
-    public NotFilter(Filter filter) {
+    public NotFilter(Filter filter) throws FilterNullPointerException {
+        if (filter == null) {
+            throw new FilterNullPointerException("Cannot make NotFilter from null");
+        }
         this.filter = filter;
     }
 

@@ -1,5 +1,7 @@
 package com.lab1.Filter;
 
+import com.lab1.FilterNullPointerException;
+
 import java.io.File;
 
 public class OrFilter implements Filter {
@@ -7,7 +9,10 @@ public class OrFilter implements Filter {
     private static final char prefix = '|';
     private final Filter[] filters;
 
-    public OrFilter(Filter[] filters) {
+    public OrFilter(Filter[] filters) throws FilterNullPointerException {
+        if (filters == null) {
+            throw new FilterNullPointerException("Cannot make OrFilter from null");
+        }
         this.filters = filters;
     }
 

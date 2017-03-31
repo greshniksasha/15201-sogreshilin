@@ -3,6 +3,7 @@ package com.lab1.FilterSerializer;
 import com.lab1.Filter.ExtensionFilter;
 import com.lab1.Filter.Filter;
 import com.lab1.FilterCreateException;
+import com.lab1.FilterNullPointerException;
 import com.lab1.FilterSerializeException;
 
 /**
@@ -16,7 +17,7 @@ public class ExtensionFilterSerializer implements FilterSerializer {
         return prefix;
     }
 
-    public Filter readFilter(String s) throws FilterCreateException {
+    public Filter readFilter(String s) throws FilterCreateException, FilterNullPointerException {
         if (s.lastIndexOf(' ') != -1) {
             throw new FilterCreateException("Could not parse the substring : ." + s);
         }
