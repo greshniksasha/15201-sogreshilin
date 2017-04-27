@@ -1,7 +1,7 @@
 /**
  * Created by Alexander on 07/04/2017.
  */
-public class Car {
+public class Car implements Item {
     private static final IdGenerator idGenerator = new IdGenerator();
     private Body body;
     private Engine engine;

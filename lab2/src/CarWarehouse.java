@@ -1,29 +1,21 @@
 /**
- * Created by Alexander on 09/04/2017.
+ * Created by Alexander on 07/04/2017.
  */
-public class CarWarehouse {
-    private BlockingQueue<Car> queue;
+
+public class CarWarehouse extends Warehouse<Car> {
     private CarWarehouseController controller;
 
     public CarWarehouse(int size) {
-        queue = new BlockingQueue<Car>(size);
+        super(size);
     }
 
     public void setController(CarWarehouseController controller) {
         this.controller = controller;
     }
 
-    public void put(Car car) throws InterruptedException {
-        queue.enqueue(car);
-    }
-
     public Car get() throws InterruptedException {
-        Car car = queue.dequeue();
+        Car car = super.get();
         controller.notifyController();
         return car;
-    }
-
-    public int placesLeft() {
-        return queue.getSize() - queue.getElementsNo();
     }
 }

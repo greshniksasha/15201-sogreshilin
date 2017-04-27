@@ -1,7 +1,7 @@
 /**
  * Created by Alexander on 06/04/2017.
  */
-public class Engine {
+public class Engine implements Item {
     public static final IdGenerator idGenerator = new IdGenerator();
     private long id;
 

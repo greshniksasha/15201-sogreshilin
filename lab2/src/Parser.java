@@ -1,3 +1,4 @@
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import org.apache.log4j.Logger;
 
 import java.io.FileInputStream;
@@ -22,6 +23,7 @@ public class Parser {
     public long bodySupplierTimeout;
     public long accessorySupplierTimeout;
     public long dealerTimeout;
+    public Boolean logSales;
 
     public static final Logger log = Logger.getLogger(Assembly.class);
 
@@ -41,6 +43,7 @@ public class Parser {
             bodySupplierTimeout = Long.parseLong(properties.getProperty("BODY_SUPPLIER_TIMEOUT"));
             accessorySupplierTimeout = Long.parseLong(properties.getProperty("ACCESSORY_SUPPLIER_TIMEOUT"));
             dealerTimeout = Long.parseLong(properties.getProperty("DEALER_TIMEOUT"));
+            logSales = Boolean.parseBoolean(properties.getProperty("LOG_SALES"));
         } catch (FileNotFoundException e) {
             log.error("Config file not found : ", e);
             System.exit(-1);

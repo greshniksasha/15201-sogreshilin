@@ -1,5 +1,4 @@
 import java.util.LinkedList;
-import java.util.PriorityQueue;
 import java.util.Queue;
 
 /**
@@ -7,16 +6,18 @@ import java.util.Queue;
  */
 public class BlockingQueue<Type> {
 
-    private final int size;
+    private final int capacity;
     private Queue<Type> queue;
     private Object lock = new Object();
 
     public int getSize() {
-        return size;
+        return queue.size();
     }
 
+    public int getCapacity() { return capacity; }
+
     public BlockingQueue(int size) {
-        this.size = size;
+        this.capacity = size;
         queue =  new LinkedList<>();
     }
 
@@ -26,7 +27,7 @@ public class BlockingQueue<Type> {
 
     public void enqueue(Type element) throws InterruptedException {
         synchronized (lock) {
-            while (queue.size() == size) {
+            while (queue.size() == capacity) {
                 lock.wait();
             }
             queue.add(element);

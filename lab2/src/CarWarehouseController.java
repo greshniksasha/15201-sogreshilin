@@ -24,9 +24,10 @@ public class CarWarehouseController {
         }
     }
 
-    public void control() {
+    public Thread getThread() {
         Thread thread = new Thread(new ControllerRunnable());
-        thread.start();
+        thread.setName("CarWarehouseController");
+        return thread;
     }
 
     class ControllerRunnable implements Runnable {
@@ -35,7 +36,8 @@ public class CarWarehouseController {
             try {
                 while (true) {
                     synchronized (lock) {
-                        for (int i = 0; i < warehouse.placesLeft(); ++i) {
+                        int carsNeeded = warehouse.getCapacity() - warehouse.getSize() - assembly.getWorkerCount();
+                        for (int i = 0; i < carsNeeded; ++i) {
                             assembly.makeCar();
                         }
                         lock.wait();
@@ -43,7 +45,7 @@ public class CarWarehouseController {
                 }
             } catch (InterruptedException e) {
                 log.error("Car warehouse controller interrupted : ", e);
-                System.exit(-1);
+                System.exit(0);
             }
         }
     }

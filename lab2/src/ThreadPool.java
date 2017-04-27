@@ -23,6 +23,10 @@ public class ThreadPool {
         queue.enqueue(task);
     }
 
+    public int getSize() {
+        return queue.getSize();
+    }
+
     class ThreadPoolRunnable implements Runnable {
         @Override
         public void run() {

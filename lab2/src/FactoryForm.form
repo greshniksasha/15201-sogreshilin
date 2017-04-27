@@ -2,110 +2,342 @@
 <form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="FactoryForm">
   <grid id="27dc6" binding="factoryRootPanel" layout-manager="BorderLayout" hgap="0" vgap="0">
     <constraints>
-      <xy x="20" y="20" width="500" height="400"/>
+      <xy x="20" y="20" width="771" height="372"/>
     </constraints>
     <properties/>
     <border type="none"/>
     <children>
-      <grid id="eb280" binding="leftLabelPanel" layout-manager="GridLayoutManager" row-count="5" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+      <grid id="42002" binding="bottomLabelPannel" layout-manager="GridLayoutManager" row-count="1" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+        <margin top="0" left="0" bottom="0" right="0"/>
+        <constraints border-constraint="South"/>
+        <properties/>
+        <border type="none"/>
+        <children>
+          <component id="cac24" class="javax.swing.JButton" binding="startButton">
+            <constraints>
+              <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <text value="Start"/>
+            </properties>
+          </component>
+          <component id="ef0d0" class="javax.swing.JButton" binding="resetButton">
+            <constraints>
+              <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <text value="Reset"/>
+            </properties>
+          </component>
+        </children>
+      </grid>
+      <grid id="d7e37" binding="itemsCountLabel" layout-manager="GridLayoutManager" row-count="5" column-count="8" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
         <margin top="0" left="0" bottom="0" right="0"/>
         <constraints border-constraint="West"/>
         <properties/>
         <border type="none"/>
         <children>
-          <component id="cc891" class="javax.swing.JLabel" binding="timeouts">
+          <component id="799a9" class="javax.swing.JLabel" binding="timeoutsLabel">
             <constraints>
-              <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="4" fill="0" indent="0" use-parent-layout="false"/>
+              <grid row="0" column="0" row-span="1" col-span="3" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
-              <horizontalAlignment value="2"/>
-              <horizontalTextPosition value="2"/>
-              <text value="Timeouts"/>
+              <text value="Timeouts, ms:"/>
             </properties>
           </component>
-          <component id="2ba78" class="javax.swing.JLabel" binding="suppliers">
+          <component id="b06e5" class="javax.swing.JLabel">
             <constraints>
-              <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="4" fill="0" indent="0" use-parent-layout="false"/>
+              <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false">
+                <preferred-size width="77" height="16"/>
+              </grid>
             </constraints>
             <properties>
-              <horizontalAlignment value="2"/>
-              <horizontalTextPosition value="2"/>
-              <text value="Suppliers"/>
+              <text value="EngineSupplier"/>
             </properties>
           </component>
-          <component id="a4ed8" class="javax.swing.JLabel" binding="body">
+          <component id="5fd36" class="javax.swing.JLabel">
             <constraints>
-              <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="4" fill="0" indent="0" use-parent-layout="false"/>
+              <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false">
+                <preferred-size width="77" height="16"/>
+              </grid>
             </constraints>
             <properties>
-              <horizontalAlignment value="2"/>
-              <horizontalTextPosition value="2"/>
-              <text value="Body :"/>
+              <text value="BodySupplier"/>
             </properties>
           </component>
-          <component id="f33e4" class="javax.swing.JLabel" binding="accessory">
+          <component id="863b3" class="javax.swing.JLabel">
             <constraints>
-              <grid row="3" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="4" fill="0" indent="0" use-parent-layout="false"/>
+              <grid row="3" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false">
+                <preferred-size width="77" height="16"/>
+              </grid>
             </constraints>
             <properties>
-              <horizontalAlignment value="2"/>
-              <horizontalTextPosition value="2"/>
-              <text value="Accessory :"/>
+              <text value="AccessorySupplier"/>
             </properties>
           </component>
-          <component id="e057d" class="javax.swing.JLabel" binding="engine">
+          <component id="d54c1" class="javax.swing.JLabel">
             <constraints>
-              <grid row="4" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="4" fill="0" indent="0" use-parent-layout="false"/>
+              <grid row="4" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false">
+                <preferred-size width="77" height="16"/>
+              </grid>
             </constraints>
             <properties>
-              <horizontalAlignment value="2"/>
-              <horizontalTextPosition value="2"/>
-              <text value="Engine :"/>
+              <text value="Dealer"/>
             </properties>
           </component>
-        </children>
-      </grid>
-      <grid id="42002" binding="bottomLabelPannel" layout-manager="GridLayoutManager" row-count="1" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
-        <margin top="0" left="0" bottom="0" right="0"/>
-        <constraints border-constraint="South"/>
-        <properties/>
-        <border type="none"/>
-        <children/>
-      </grid>
-      <grid id="396c9" binding="rightLabelPanel" custom-create="true" layout-manager="GridLayoutManager" row-count="4" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
-        <margin top="0" left="0" bottom="0" right="0"/>
-        <constraints border-constraint="East"/>
-        <properties/>
-        <border type="none"/>
-        <children>
-          <vspacer id="1dfb4">
+          <component id="b0356" class="javax.swing.JSlider" binding="dealerTimeoutSlider">
             <constraints>
-              <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="6" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
+              <grid row="4" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+                <preferred-size width="99" height="29"/>
+              </grid>
             </constraints>
-          </vspacer>
-          <component id="42546" class="javax.swing.JTextField" binding="bodySupplierTimeout">
+            <properties>
+              <inverted value="false"/>
+              <majorTickSpacing value="1000"/>
+              <maximum value="10000"/>
+              <minorTickSpacing value="1"/>
+              <paintLabels value="false"/>
+              <paintTicks value="false"/>
+              <paintTrack value="true"/>
+              <snapToTicks value="false"/>
+              <valueIsAdjusting value="false"/>
+            </properties>
+          </component>
+          <component id="71fd9" class="javax.swing.JSlider" binding="accessorySupplierTimeoutSlider">
             <constraints>
-              <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
-                <preferred-size width="150" height="-1"/>
+              <grid row="3" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+                <preferred-size width="99" height="29"/>
+              </grid>
+            </constraints>
+            <properties>
+              <inverted value="false"/>
+              <majorTickSpacing value="1000"/>
+              <maximum value="10000"/>
+              <minorTickSpacing value="1"/>
+              <paintLabels value="false"/>
+              <paintTicks value="false"/>
+              <paintTrack value="true"/>
+              <snapToTicks value="false"/>
+              <valueIsAdjusting value="false"/>
+            </properties>
+          </component>
+          <component id="56371" class="javax.swing.JSlider" binding="bodySupplierTimeoutSlider">
+            <constraints>
+              <grid row="2" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+                <preferred-size width="99" height="29"/>
+              </grid>
+            </constraints>
+            <properties>
+              <inverted value="false"/>
+              <majorTickSpacing value="1000"/>
+              <maximum value="10000"/>
+              <minorTickSpacing value="1"/>
+              <paintLabels value="false"/>
+              <paintTicks value="false"/>
+              <paintTrack value="true"/>
+              <snapToTicks value="false"/>
+              <valueIsAdjusting value="false"/>
+            </properties>
+          </component>
+          <component id="54f9b" class="javax.swing.JSlider" binding="engineSupplierTimeoutSlider">
+            <constraints>
+              <grid row="1" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+                <preferred-size width="99" height="29"/>
+              </grid>
+            </constraints>
+            <properties>
+              <majorTickSpacing value="1000"/>
+              <maximum value="10000"/>
+              <paintLabels value="false"/>
+              <paintTicks value="false"/>
+              <paintTrack value="true"/>
+              <snapToTicks value="false"/>
+              <valueIsAdjusting value="true"/>
+            </properties>
+          </component>
+          <component id="558e4" class="javax.swing.JTextField" binding="engineSupplierTimeoutTextField">
+            <constraints>
+              <grid row="1" column="2" row-span="1" col-span="2" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+                <preferred-size width="57" height="26"/>
               </grid>
             </constraints>
             <properties/>
           </component>
-          <component id="ec55c" class="javax.swing.JTextField" binding="accessorySupplierTimeout">
+          <component id="442d5" class="javax.swing.JTextField" binding="bodySupplierTimeoutTextField">
             <constraints>
-              <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
-                <preferred-size width="150" height="-1"/>
+              <grid row="2" column="2" row-span="1" col-span="2" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+                <preferred-size width="57" height="26"/>
               </grid>
             </constraints>
             <properties/>
           </component>
-          <component id="228aa" class="javax.swing.JTextField" binding="engineSupplierTimeout">
+          <component id="37c9c" class="javax.swing.JTextField" binding="accessorySupplierTimeoutTextField">
             <constraints>
-              <grid row="3" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
-                <preferred-size width="150" height="-1"/>
+              <grid row="3" column="2" row-span="1" col-span="2" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+                <preferred-size width="57" height="26"/>
               </grid>
             </constraints>
             <properties/>
+          </component>
+          <component id="10cc8" class="javax.swing.JTextField" binding="dealerTimeoutTextField">
+            <constraints>
+              <grid row="4" column="2" row-span="1" col-span="2" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+                <preferred-size width="57" height="26"/>
+              </grid>
+            </constraints>
+            <properties/>
+          </component>
+          <component id="5d300" class="javax.swing.JLabel">
+            <constraints>
+              <grid row="0" column="5" row-span="1" col-span="2" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <text value="Warehouses, items:"/>
+            </properties>
+          </component>
+          <component id="19685" class="javax.swing.JLabel">
+            <constraints>
+              <grid row="1" column="5" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <text value="Engine"/>
+            </properties>
+          </component>
+          <component id="48e20" class="javax.swing.JLabel">
+            <constraints>
+              <grid row="2" column="5" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <text value="Body"/>
+            </properties>
+          </component>
+          <component id="d562d" class="javax.swing.JLabel">
+            <constraints>
+              <grid row="3" column="5" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <text value="Accessory"/>
+            </properties>
+          </component>
+          <component id="f47ba" class="javax.swing.JLabel">
+            <constraints>
+              <grid row="4" column="5" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <text value="Car"/>
+            </properties>
+          </component>
+          <component id="9f3a0" class="javax.swing.JLabel" binding="bodyWarehouseSizeLabel">
+            <constraints>
+              <grid row="2" column="6" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <text value="0"/>
+            </properties>
+          </component>
+          <component id="ede6d" class="javax.swing.JLabel" binding="engineWarehouseSizeLabel">
+            <constraints>
+              <grid row="1" column="6" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <text value="0"/>
+            </properties>
+          </component>
+          <component id="d56ed" class="javax.swing.JLabel" binding="accessoryWarehouseSizeLabel">
+            <constraints>
+              <grid row="3" column="6" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <text value="0"/>
+            </properties>
+          </component>
+          <component id="416a3" class="javax.swing.JLabel" binding="carWarehouseSizeLabel">
+            <constraints>
+              <grid row="4" column="6" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <text value="0"/>
+            </properties>
+          </component>
+          <component id="42455" class="javax.swing.JLabel" binding="bodyWarehouseCapacityLabel">
+            <constraints>
+              <grid row="2" column="7" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <text value="Label"/>
+            </properties>
+          </component>
+          <component id="32dc8" class="javax.swing.JLabel" binding="engineWarehouseCapacityLabel">
+            <constraints>
+              <grid row="1" column="7" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <text value="Label"/>
+            </properties>
+          </component>
+          <component id="c1aea" class="javax.swing.JLabel" binding="accessoryWarehouseCapacityLabel">
+            <constraints>
+              <grid row="3" column="7" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <text value="Label"/>
+            </properties>
+          </component>
+          <component id="26c56" class="javax.swing.JLabel" binding="carWarehouseCapacityLabel">
+            <constraints>
+              <grid row="4" column="7" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <text value="Label"/>
+            </properties>
+          </component>
+          <component id="738fa" class="javax.swing.JLabel" binding="Items">
+            <constraints>
+              <grid row="0" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <text value="Items"/>
+            </properties>
+          </component>
+          <component id="11df7" class="javax.swing.JLabel" binding="enginesCountLabel">
+            <constraints>
+              <grid row="1" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <text value="0"/>
+            </properties>
+          </component>
+          <component id="95eca" class="javax.swing.JLabel" binding="bodiesCountLabel">
+            <constraints>
+              <grid row="2" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <text value="0"/>
+            </properties>
+          </component>
+          <component id="65fca" class="javax.swing.JLabel" binding="accessoriesCountLabel">
+            <constraints>
+              <grid row="3" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <text value="0"/>
+            </properties>
+          </component>
+          <component id="fc8fb" class="javax.swing.JLabel" binding="totalCarsSoldLabel">
+            <constraints>
+              <grid row="4" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <text value="0"/>
+            </properties>
+          </component>
+          <component id="124ec" class="javax.swing.JCheckBox" binding="logSalesCheckbox">
+            <constraints>
+              <grid row="0" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <text value="LogSales"/>
+            </properties>
           </component>
         </children>
       </grid>

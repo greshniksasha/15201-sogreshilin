@@ -33,6 +33,30 @@ public class Assembly {
         this.pool = new ThreadPool(workerCount, queueSize);
     }
 
+    public Warehouse<Body> getBodyWarehouse() {
+        return bodyWarehouse;
+    }
+
+    public Warehouse<Engine> getEngineWarehouse() {
+        return engineWarehouse;
+    }
+
+    public Warehouse<Accessory> getAccessoryWarehouse() {
+        return accessoryWarehouse;
+    }
+
+    public CarWarehouse getCarWarehouse() {
+        return carWarehouse;
+    }
+
+    public ThreadPool getPool() {
+        return pool;
+    }
+
+    public int getWorkerCount() {
+        return pool.getSize();
+    }
+
     public void makeCar() {
         try {
             pool.addTask(new AssemblyRunnable());
@@ -51,10 +75,10 @@ public class Assembly {
                 Accessory accessory = accessoryWarehouse.get();
                 Car car = new Car(body, engine, accessory);
                 carWarehouse.put(car);
-                log.info("put  car #" + car.getId() +
-                         " with body #" + car.getBody().getId() +
-                         ", motor #" + car.getEngine().getId() +
-                         ", accessory #" + car.getAccessory().getId());
+//                log.info("put  car #" + car.getId() +
+//                         " with body #" + car.getBody().getId() +
+//                         ", motor #" + car.getEngine().getId() +
+//                         ", accessory #" + car.getAccessory().getId());
             } catch (InterruptedException e) {
                 log.error("Creating new car exception : ", e);
                 System.exit(-1);
