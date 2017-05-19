@@ -7,5 +7,5 @@ import java.util.List;
 public interface Observable {
     public void addObserver(Observer observer);
     public void removeObserver(Observer observer);
-    public abstract void notifyObservers();
+    public void notifyObservers();
 }

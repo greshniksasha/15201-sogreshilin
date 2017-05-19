@@ -1,6 +1,18 @@
 import com.sun.xml.internal.bind.v2.runtime.reflect.Accessor;
+
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.ChartPanel;
+import org.jfree.chart.JFreeChart;
+import org.jfree.chart.axis.CategoryAxis;
+import org.jfree.chart.axis.CategoryLabelPositions;
+import org.jfree.chart.axis.NumberAxis;
+import org.jfree.chart.plot.CategoryPlot;
+import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.chart.renderer.category.BarRenderer;
+import org.jfree.data.category.CategoryDataset;
+import org.jfree.data.category.DefaultCategoryDataset;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -44,6 +56,10 @@ public class FactoryForm extends JFrame {
     private JLabel accessoriesCountLabel;
     private JLabel bodiesCountLabel;
     private JCheckBox logSalesCheckbox;
+    private JPanel enginePanel;
+    private JPanel bodyPanel;
+    private JPanel accessoryPanel;
+    private JPanel dealerPanel;
 
     private AssemblyController assemblyController;
     private Assembly assembly;
@@ -83,6 +99,75 @@ public class FactoryForm extends JFrame {
 //                FactoryForm.this.dispose();
 //            }
 //        });
+
+//        CategoryDataset dataset = createDataset();
+//        JFreeChart chart = createChart(dataset);
+//        final ChartPanel chartPanel = new ChartPanel(chart);
+//        chartPanel.setPreferredSize(new Dimension(250, 270));
+//        setContentPane(chartPanel);
+
+    }
+
+    private JFreeChart createChart(CategoryDataset dataset) {
+        JFreeChart chart = ChartFactory.createBarChart(
+                "engine_warehouse",
+                "time",
+                "elements",
+                dataset,
+                PlotOrientation.VERTICAL,
+                false,
+                false,
+                false
+        );
+        chart.setBackgroundPaint(Color.white);
+
+        // get a reference to the plot for further customisation...
+        final CategoryPlot plot = chart.getCategoryPlot();
+        plot.setBackgroundPaint(Color.lightGray);
+        plot.setDomainGridlinePaint(Color.white);
+        plot.setRangeGridlinePaint(Color.white);
+
+        // set the range axis to display integers only...
+        final NumberAxis rangeAxis = (NumberAxis)plot.getRangeAxis();
+        rangeAxis.setStandardTickUnits(NumberAxis.createIntegerTickUnits());
+
+        // disable bar outlines...
+        final BarRenderer renderer = (BarRenderer) plot.getRenderer();
+        renderer.setDrawBarOutline(false);
+
+        // set up gradient paints for series...
+        final GradientPaint gp0 = new GradientPaint(
+                0.0f, 0.0f, Color.blue,
+                0.0f, 0.0f, Color.lightGray
+        );
+        final GradientPaint gp1 = new GradientPaint(
+                0.0f, 0.0f, Color.green,
+                0.0f, 0.0f, Color.lightGray
+        );
+        final GradientPaint gp2 = new GradientPaint(
+                0.0f, 0.0f, Color.red,
+                0.0f, 0.0f, Color.lightGray
+        );
+        renderer.setSeriesPaint(0, gp0);
+        renderer.setSeriesPaint(1, gp1);
+        renderer.setSeriesPaint(2, gp2);
+
+        final CategoryAxis domainAxis = plot.getDomainAxis();
+        domainAxis.setCategoryLabelPositions(
+                CategoryLabelPositions.createUpRotationLabelPositions(Math.PI / 6.0)
+        );
+        // OPTIONAL CUSTOMISATION COMPLETED.
+        return chart;
+    }
+
+    private CategoryDataset createDataset() {
+        DefaultCategoryDataset dataset = new DefaultCategoryDataset();
+        dataset.addValue(1, "First", "Category-1");
+        dataset.addValue(2, "First", "Category-2");
+        dataset.addValue(3, "First", "Category-3");
+        dataset.addValue(4, "First", "Category-4");
+        dataset.addValue(5, "First", "Category-5");
+        return dataset;
     }
 
     private void setTotalItemsSuppliedListeners() {
@@ -196,28 +281,40 @@ public class FactoryForm extends JFrame {
 
     private void setSupplierTimeoutSliders() {
         engineSupplierTimeoutSlider.addChangeListener(e -> {
+            JSlider source = (JSlider)e.getSource();
             int val = engineSupplierTimeoutSlider.getValue();
             engineSupplierTimeoutTextField.setText(String.valueOf(val));
-            engineSupplier.setTimeout(val);
+            if (!source.getValueIsAdjusting()) {
+                engineSupplier.setTimeout(val);
+            }
         });
 
         bodySupplierTimeoutSlider.addChangeListener(e -> {
+            JSlider source = (JSlider)e.getSource();
             int val = bodySupplierTimeoutSlider.getValue();
             bodySupplierTimeoutTextField.setText(String.valueOf(val));
-            bodySupplier.setTimeout(val);
+            if (!source.getValueIsAdjusting()) {
+                bodySupplier.setTimeout(val);
+            }
         });
 
         accessorySupplierTimeoutSlider.addChangeListener(e -> {
+            JSlider source = (JSlider)e.getSource();
             int val = accessorySupplierTimeoutSlider.getValue();
             accessorySupplierTimeoutTextField.setText(String.valueOf(val));
-            accessorySuppliers.setTimeout(val);
+            if (!source.getValueIsAdjusting()) {
+                accessorySuppliers.setTimeout(val);
+            }
         });
 
         dealerTimeoutSlider.addChangeListener(e -> {
+            JSlider source = (JSlider)e.getSource();
             int val = dealerTimeoutSlider.getValue();
             dealerTimeoutTextField.setText(String.valueOf(val));
-            for (Dealer dealer : dealers) {
-                dealer.setTimeout(val);
+            if (!source.getValueIsAdjusting()) {
+                for (Dealer dealer : dealers) {
+                    dealer.setTimeout(val);
+                }
             }
         });
     }
