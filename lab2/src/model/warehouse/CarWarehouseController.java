@@ -47,8 +47,8 @@ public class CarWarehouseController implements Runnable {
                 }
             }
         } catch (InterruptedException e) {
-            log.error("model.item.Car warehouse controller interrupted : ", e);
-            System.exit(0);
+            log.trace(Thread.currentThread().getName() + " stopped");
+            return;
         }
     }
 

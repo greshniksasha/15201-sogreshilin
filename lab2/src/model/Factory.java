@@ -1,10 +1,9 @@
 package model;
 
-import model.item.Body;
-import model.item.Engine;
-import model.supplier.AccessorySupplier;
-import model.supplier.BodySupplier;
-import model.supplier.EngineSupplier;
+import model.contractor.AccessorySupplier;
+import model.contractor.BodySupplier;
+import model.contractor.Dealer;
+import model.contractor.EngineSupplier;
 import model.warehouse.CarWarehouseController;
 
 /**
@@ -72,6 +71,9 @@ public class Factory {
             thread.interrupt();
         }
         for (Thread thread : dealerThreads) {
+            thread.interrupt();
+        }
+        for (Thread thread : assembly.getPool().getThreads()) {
             thread.interrupt();
         }
     }

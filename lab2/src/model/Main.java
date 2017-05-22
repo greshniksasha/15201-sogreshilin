@@ -3,10 +3,12 @@ package model;
 import model.item.Accessory;
 import model.item.Body;
 import model.item.Engine;
-import model.supplier.AccessorySupplier;
-import model.supplier.BodySupplier;
-import model.supplier.EngineSupplier;
+import model.contractor.AccessorySupplier;
+import model.contractor.BodySupplier;
+import model.contractor.Dealer;
+import model.contractor.EngineSupplier;
 import model.warehouse.CarWarehouse;
+import model.warehouse.CarWarehouseController;
 import model.warehouse.Warehouse;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -52,21 +54,23 @@ public class Main {
     }
 
     public static void main(String[] args) {
-//        prepare();
-//        Assembly assembly = new Assembly(threadPoolSize, taskQueueSize);
-//        assembly.setAccessoryWarehouse(accessoryWarehouse);
-//        assembly.setBodyWarehouse(bodyWarehouse);
-//        assembly.setEngineWarehouse(engineWarehouse);
-//        assembly.setCarWarehouse(carWarehouse);
-//
-//        CarWarehouseController carWarehouseController = new CarWarehouseController(carWarehouse);
-//        carWarehouseController.setAssembly(assembly);
-//        carWarehouse.setController(carWarehouseController);
-//
-//        Factory factory = new Factory(bodySupplier, engineSupplier, accessorySupplier, accessorySupplierCount, assembly, dealer, dealerCount, carWarehouseController);
+        prepare();
+        Assembly assembly = new Assembly(threadPoolSize, taskQueueSize);
+        assembly.setAccessoryWarehouse(accessoryWarehouse);
+        assembly.setBodyWarehouse(bodyWarehouse);
+        assembly.setEngineWarehouse(engineWarehouse);
+        assembly.setCarWarehouse(carWarehouse);
+
+        CarWarehouseController carWarehouseController = new CarWarehouseController(carWarehouse);
+        carWarehouseController.setAssembly(assembly);
+        carWarehouse.setController(carWarehouseController);
+
+        Factory factory = new Factory(bodySupplier, engineSupplier, accessorySupplier, accessorySupplierCount, assembly, dealer, dealerCount, carWarehouseController);
+//        factory.getBodySupplier().getThread().start();
+
+        FactoryForm form = new FactoryForm(factory);
+        form.setVisible(true);
 //        FactoryForm form = new FactoryForm(factory);
 //        form.setVisible(true);
-        FactoryForm form = new FactoryForm();
-        form.setVisible(true);
     }
 }

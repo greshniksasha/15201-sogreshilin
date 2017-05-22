@@ -1,4 +1,4 @@
-package model;
+package model.contractor;
 
 import model.item.Car;
 import model.warehouse.CarWarehouse;
@@ -11,27 +11,26 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * Created by Alexander on 09/04/2017.
  */
-public class Dealer {
+public class Dealer extends Contractor {
 
     private static AtomicInteger idGenerator = new AtomicInteger(0);
-    private static AtomicInteger soldCarsCounter = new AtomicInteger(0);
+    private static AtomicInteger transactionCounter = new AtomicInteger(0);
 
     private CarWarehouse warehouse;
-    private long timeout;
+    private int timeout;
     private long id;
 
     private final Object lock;
-    private List<SoldCarsCounterObserver> observers = new ArrayList<>();
     private static final Logger log = Logger.getLogger(Dealer.class);
 
-    public void setTimeout(long timeout) {
+    public void setTimeout(int timeout) {
         synchronized (lock) {
             this.timeout = timeout;
             lock.notify();
         }
     }
 
-    public Dealer(CarWarehouse warehouse, long timeout) {
+    public Dealer(CarWarehouse warehouse, int timeout) {
         this.warehouse = warehouse;
         this.timeout = timeout;
         this.id = idGenerator.getAndIncrement();
@@ -40,17 +39,17 @@ public class Dealer {
 
     public Thread getThread() {
         Thread thread = new Thread(new DealerRunnable());
-        thread.setName("model.Dealer-" + id);
+        thread.setName("Dealer-" + id);
         return thread;
     }
 
     private void incrementSoldCarsCounter() {
-        int soldCars = soldCarsCounter.incrementAndGet();
-        notifySoldCarsCounterObserver(soldCars);
+        int soldCars = transactionCounter.incrementAndGet();
+        notifyTransactionCounterObserver(soldCars);
     }
 
 
-    public long getTimeout() {
+    public int getTimeout() {
         return timeout;
     }
 
@@ -63,9 +62,9 @@ public class Dealer {
                     incrementSoldCarsCounter();
                     log.info(Thread.currentThread().getName() +
                             " : Auto <" + car.getId() + ">" +
-                            " (model.item.Body <" + car.getBody().getId() + ">" +
+                            " (Body <" + car.getBody().getId() + ">" +
                             ", Motor <" + car.getEngine().getId() + ">" +
-                            ", model.item.Accessory <" + car.getAccessory().getId() + ">)");
+                            ", Accessory <" + car.getAccessory().getId() + ">)");
                     synchronized (lock) {
                         if (timeout > 0) {
                             lock.wait(timeout);
@@ -73,25 +72,11 @@ public class Dealer {
                     }
                 }
             } catch (InterruptedException e) {
-                log.error("Dealing interrupted : ", e);
-                System.exit(0);
+                log.trace(Thread.currentThread().getName() + " stopped");
+                return;
             }
 
         }
-    }
-
-    public void addSoldCarsCounterObserver(SoldCarsCounterObserver observer) {
-        observers.add(observer);
-    }
-
-    private void notifySoldCarsCounterObserver(int count) {
-        for (SoldCarsCounterObserver observer : observers) {
-            observer.carSold(count);
-        }
-    }
-
-    public interface SoldCarsCounterObserver {
-        void carSold(int count);
     }
 
 }

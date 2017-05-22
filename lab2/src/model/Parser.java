@@ -23,10 +23,10 @@ public class Parser {
     public int accessorySupplierCount;
     public int dealerCount;
 
-    public long engineSupplierTimeout;
-    public long bodySupplierTimeout;
-    public long accessorySupplierTimeout;
-    public long dealerTimeout;
+    public int engineSupplierTimeout;
+    public int bodySupplierTimeout;
+    public int accessorySupplierTimeout;
+    public int dealerTimeout;
 
     public Boolean logSales;
 
@@ -44,10 +44,10 @@ public class Parser {
             accessorySupplierCount = Integer.parseInt(properties.getProperty("ACCESSORY_SUPPLIER_COUNT"));
             dealerCount = Integer.parseInt(properties.getProperty("DEALER_COUNT"));
             threadPoolSize = Integer.parseInt(properties.getProperty("WORKER_COUNT"));
-            engineSupplierTimeout = Long.parseLong(properties.getProperty("ENGINE_SUPPLIER_TIMEOUT"));
-            bodySupplierTimeout = Long.parseLong(properties.getProperty("BODY_SUPPLIER_TIMEOUT"));
-            accessorySupplierTimeout = Long.parseLong(properties.getProperty("ACCESSORY_SUPPLIER_TIMEOUT"));
-            dealerTimeout = Long.parseLong(properties.getProperty("DEALER_TIMEOUT"));
+            engineSupplierTimeout = Integer.parseInt(properties.getProperty("ENGINE_SUPPLIER_TIMEOUT"));
+            bodySupplierTimeout = Integer.parseInt(properties.getProperty("BODY_SUPPLIER_TIMEOUT"));
+            accessorySupplierTimeout = Integer.parseInt(properties.getProperty("ACCESSORY_SUPPLIER_TIMEOUT"));
+            dealerTimeout = Integer.parseInt(properties.getProperty("DEALER_TIMEOUT"));
             logSales = Boolean.parseBoolean(properties.getProperty("LOG_SALES"));
         } catch (FileNotFoundException e) {
             log.error("Config file not found : ", e);

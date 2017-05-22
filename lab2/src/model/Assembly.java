@@ -82,13 +82,13 @@ public class Assembly {
                 Accessory accessory = accessoryWarehouse.get();
                 Car car = new Car(body, engine, accessory);
                 carWarehouse.put(car);
-//                log.info("put  car #" + car.getId() +
-//                         " with body #" + car.getBody().getId() +
-//                         ", motor #" + car.getEngine().getId() +
-//                         ", accessory #" + car.getAccessory().getId());
+                log.info("put  car #" + car.getId() +
+                         " with body #" + car.getBody().getId() +
+                         ", motor #" + car.getEngine().getId() +
+                         ", accessory #" + car.getAccessory().getId());
             } catch (InterruptedException e) {
-                log.error("Creating new car exception : ", e);
-                System.exit(-1);
+                log.trace(Thread.currentThread().getName() + " stopped");
+                return;
             }
         }
     }

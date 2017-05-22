@@ -1,59 +1,47 @@
-package model.supplier;
+package model.contractor;
 
 import model.item.Accessory;
 import model.warehouse.Warehouse;
 import org.apache.log4j.Logger;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class AccessorySupplier implements Runnable {
+public class AccessorySupplier extends Contractor implements Runnable {
 
     private Warehouse<Accessory> warehouse;
-    private long timeout;
-    private static AtomicInteger itemsSuppliedCounter = new AtomicInteger(0);
-    private List<ItemsSuppliedCounterObserver> observers = new ArrayList<>();
+    private int timeout;
+    private static AtomicInteger transactionCounter = new AtomicInteger(0);
     private final Object lock = new Object();
 
     private static final Logger log = Logger.getLogger(AccessorySupplier.class);
     private static AtomicInteger threadId = new AtomicInteger(0);
 
-    public AccessorySupplier(Warehouse<Accessory> warehouse, long timeout) {
+    public AccessorySupplier(Warehouse<Accessory> warehouse, int timeout) {
         this.warehouse = warehouse;
         this.timeout = timeout;
     }
 
-    public long getTimeout() {
+    public int getTimeout() {
         return timeout;
     }
 
-    public void setTimeout(long timeout) {
+    public void setTimeout(int timeout) {
         synchronized (lock) {
             this.timeout = timeout;
             lock.notify();
         }
+        log.trace("Accessory contractor timeout changed to " + timeout);
     }
 
     private void incrementItemsSuppliedCounter() {
-        int soldCars = itemsSuppliedCounter.incrementAndGet();
-        notifyItemsSuppliedCounterObserver(soldCars);
+        int soldCars = transactionCounter.incrementAndGet();
+        notifyTransactionCounterObserver(soldCars);
     }
 
     public Thread getThread() {
         Thread thread = new Thread(this);
         thread.setName(this.toString() + threadId.getAndIncrement());
         return thread;
-    }
-
-    public void addItemsSuppliedCounterObserver(ItemsSuppliedCounterObserver observer) {
-        observers.add(observer);
-    }
-
-    private void notifyItemsSuppliedCounterObserver(int totalItemsSupplied) {
-        for (ItemsSuppliedCounterObserver observer : observers) {
-            observer.itemSupplied(totalItemsSupplied);
-        }
     }
 
     @Override
@@ -63,8 +51,8 @@ public class AccessorySupplier implements Runnable {
                 Accessory accessory = new Accessory();
                 warehouse.put(accessory);
                 incrementItemsSuppliedCounter();
-                        log.info(Thread.currentThread().getName() +
-                                " : Accessory <" + accessory.getId() + ">");
+                log.info(Thread.currentThread().getName() +
+                        " : Accessory <" + accessory.getId() + ">");
                 synchronized (lock) {
                     if (timeout > 0) {
                         lock.wait(timeout);
@@ -72,8 +60,8 @@ public class AccessorySupplier implements Runnable {
                 }
             }
         } catch (InterruptedException e) {
-            log.error("Supplying interrupted : ", e);
-            System.exit(-1);
+            log.trace(Thread.currentThread().getName() + " stopped");
+            return;
         }
     }
 
