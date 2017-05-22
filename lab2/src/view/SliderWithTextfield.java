@@ -1,3 +1,5 @@
+package view;
+
 import javax.swing.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -8,7 +10,6 @@ import java.util.List;
 public class SliderWithTextfield {
     List<ValueChangedHandler> handlers = new ArrayList<>();
     JTextField textField;
-
 
     public SliderWithTextfield() {
         textField.addActionListener((e) -> {

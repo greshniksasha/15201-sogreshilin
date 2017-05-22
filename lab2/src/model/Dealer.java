@@ -1,23 +1,27 @@
+package model;
+
+import model.item.Car;
+import model.warehouse.CarWarehouse;
 import org.apache.log4j.Logger;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Created by Alexander on 09/04/2017.
  */
-public class Dealer implements Observable {
+public class Dealer {
 
-    private static IdGenerator idGenerator = new IdGenerator();
-    private static int soldCounter = 0;
+    private static AtomicInteger idGenerator = new AtomicInteger(0);
+    private static AtomicInteger soldCarsCounter = new AtomicInteger(0);
 
     private CarWarehouse warehouse;
     private long timeout;
     private long id;
 
     private final Object lock;
-    private List<Observer> observers;
+    private List<SoldCarsCounterObserver> observers = new ArrayList<>();
     private static final Logger log = Logger.getLogger(Dealer.class);
 
     public void setTimeout(long timeout) {
@@ -30,43 +34,21 @@ public class Dealer implements Observable {
     public Dealer(CarWarehouse warehouse, long timeout) {
         this.warehouse = warehouse;
         this.timeout = timeout;
-        this.id = idGenerator.createID();
-        this.observers = new LinkedList<>();
+        this.id = idGenerator.getAndIncrement();
         this.lock = new Object();
-
     }
 
     public Thread getThread() {
         Thread thread = new Thread(new DealerRunnable());
-        thread.setName("Dealer-" + id);
+        thread.setName("model.Dealer-" + id);
         return thread;
     }
 
-    private synchronized void incrementSoldCounter() {
-        ++soldCounter;
-        notifyObservers();
+    private void incrementSoldCarsCounter() {
+        int soldCars = soldCarsCounter.incrementAndGet();
+        notifySoldCarsCounterObserver(soldCars);
     }
 
-    public int getSoldCounter() {
-        return soldCounter;
-    }
-
-    @Override
-    public void addObserver(Observer observer) {
-        observers.add(observer);
-    }
-
-    @Override
-    public void removeObserver(Observer observer) {
-        observers.remove(observer);
-    }
-
-    @Override
-    public void notifyObservers() {
-        for (Observer observer : observers) {
-            observer.setChanges();
-        }
-    }
 
     public long getTimeout() {
         return timeout;
@@ -78,12 +60,12 @@ public class Dealer implements Observable {
             try {
                 while(true) {
                     Car car = warehouse.get();
-                    incrementSoldCounter();
+                    incrementSoldCarsCounter();
                     log.info(Thread.currentThread().getName() +
                             " : Auto <" + car.getId() + ">" +
-                            " (Body <" + car.getBody().getId() + ">" +
+                            " (model.item.Body <" + car.getBody().getId() + ">" +
                             ", Motor <" + car.getEngine().getId() + ">" +
-                            ", Accessory <" + car.getAccessory().getId() + ">)");
+                            ", model.item.Accessory <" + car.getAccessory().getId() + ">)");
                     synchronized (lock) {
                         if (timeout > 0) {
                             lock.wait(timeout);
@@ -97,5 +79,20 @@ public class Dealer implements Observable {
 
         }
     }
+
+    public void addSoldCarsCounterObserver(SoldCarsCounterObserver observer) {
+        observers.add(observer);
+    }
+
+    private void notifySoldCarsCounterObserver(int count) {
+        for (SoldCarsCounterObserver observer : observers) {
+            observer.carSold(count);
+        }
+    }
+
+    public interface SoldCarsCounterObserver {
+        void carSold(int count);
+    }
+
 }
 

@@ -1,6 +1,5 @@
-/**
- * Created by Alexander on 27/04/2017.
- */
+package model.item;
+
 public interface Item {
     public long getId();
 }

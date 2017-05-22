@@ -1,4 +1,5 @@
-import com.sun.org.apache.xpath.internal.operations.Bool;
+package model;
+
 import org.apache.log4j.Logger;
 
 import java.io.FileInputStream;
@@ -15,14 +16,18 @@ public class Parser {
     public int bodyWarehouseSize;
     public int accessoryWarehouseSize;
     public int carWarehouseSize;
+
     public int taskQueueSize;
+    public int threadPoolSize;
+
     public int accessorySupplierCount;
     public int dealerCount;
-    public int workerCount;
+
     public long engineSupplierTimeout;
     public long bodySupplierTimeout;
     public long accessorySupplierTimeout;
     public long dealerTimeout;
+
     public Boolean logSales;
 
     public static final Logger log = Logger.getLogger(Assembly.class);
@@ -38,7 +43,7 @@ public class Parser {
             taskQueueSize = Integer.parseInt(properties.getProperty("TASK_QUEUE_SIZE"));
             accessorySupplierCount = Integer.parseInt(properties.getProperty("ACCESSORY_SUPPLIER_COUNT"));
             dealerCount = Integer.parseInt(properties.getProperty("DEALER_COUNT"));
-            workerCount = Integer.parseInt(properties.getProperty("WORKER_COUNT"));
+            threadPoolSize = Integer.parseInt(properties.getProperty("WORKER_COUNT"));
             engineSupplierTimeout = Long.parseLong(properties.getProperty("ENGINE_SUPPLIER_TIMEOUT"));
             bodySupplierTimeout = Long.parseLong(properties.getProperty("BODY_SUPPLIER_TIMEOUT"));
             accessorySupplierTimeout = Long.parseLong(properties.getProperty("ACCESSORY_SUPPLIER_TIMEOUT"));

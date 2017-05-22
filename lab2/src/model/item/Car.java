@@ -1,8 +1,12 @@
+package model.item;
+
+import java.util.concurrent.atomic.AtomicLong;
+
 /**
  * Created by Alexander on 07/04/2017.
  */
 public class Car implements Item {
-    private static final IdGenerator idGenerator = new IdGenerator();
+    private static final AtomicLong idGenerator = new AtomicLong(0);
     private Body body;
     private Engine engine;
     private Accessory accessory;
@@ -28,6 +32,6 @@ public class Car implements Item {
         this.body = body;
         this.engine = engine;
         this.accessory = accessory;
-        this.id = idGenerator.createID();
+        this.id = idGenerator.getAndIncrement();
     }
 }

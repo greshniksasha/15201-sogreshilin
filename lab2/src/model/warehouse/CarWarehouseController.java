@@ -1,9 +1,12 @@
+package model.warehouse;
+
+import model.Assembly;
 import org.apache.log4j.Logger;
 
 /**
  * Created by Alexander on 07/04/2017.
  */
-public class CarWarehouseController {
+public class CarWarehouseController implements Runnable {
     private Assembly assembly;
     private CarWarehouse warehouse;
     private final Object lock = new Object();
@@ -25,29 +28,29 @@ public class CarWarehouseController {
     }
 
     public Thread getThread() {
-        Thread thread = new Thread(new ControllerRunnable());
+        Thread thread = new Thread(this);
         thread.setName("CarWarehouseController");
         return thread;
     }
 
-    class ControllerRunnable implements Runnable {
-        @Override
-        public void run() {
-            try {
-                while (true) {
-                    synchronized (lock) {
-                        int carsNeeded = warehouse.getCapacity() - warehouse.getSize() - assembly.getWorkerCount();
-                        for (int i = 0; i < carsNeeded; ++i) {
-                            assembly.makeCar();
-                        }
-                        lock.wait();
+
+    @Override
+    public void run() {
+        try {
+            while (true) {
+                synchronized (lock) {
+                    int carsNeeded = warehouse.getCapacity() - warehouse.getSize() - assembly.getPoolSize();
+                    for (int i = 0; i < carsNeeded; ++i) {
+                        assembly.makeCar();
                     }
+                    lock.wait();
                 }
-            } catch (InterruptedException e) {
-                log.error("Car warehouse controller interrupted : ", e);
-                System.exit(0);
             }
+        } catch (InterruptedException e) {
+            log.error("model.item.Car warehouse controller interrupted : ", e);
+            System.exit(0);
         }
     }
+
 
 }

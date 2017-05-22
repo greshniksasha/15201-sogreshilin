@@ -1,3 +1,7 @@
+package model.warehouse;
+
+import model.item.Car;
+
 /**
  * Created by Alexander on 07/04/2017.
  */

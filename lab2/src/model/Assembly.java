@@ -1,11 +1,12 @@
-import org.apache.log4j.Logger;
-import org.apache.log4j.spi.LoggerFactory;
-import sun.jvm.hotspot.utilities.Assert;
+package model;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.Properties;
+import model.item.Accessory;
+import model.item.Body;
+import model.item.Car;
+import model.item.Engine;
+import model.warehouse.CarWarehouse;
+import model.warehouse.Warehouse;
+import org.apache.log4j.Logger;
 
 /**
  * Created by Alexander on 07/04/2017.
@@ -19,18 +20,24 @@ public class Assembly {
 
     public static final Logger log = Logger.getLogger(Assembly.class);
 
-    public Assembly(Warehouse<Body> bodyWarehouse,
-                    Warehouse<Engine> engineWarehouse,
-                    Warehouse<Accessory> accessoryWarehouse,
-                    CarWarehouse carWarehouse,
-                    int workerCount,
-                    int queueSize) {
-        this.bodyWarehouse = bodyWarehouse;
-        this.engineWarehouse = engineWarehouse;
-        this.accessoryWarehouse = accessoryWarehouse;
-        this.carWarehouse = carWarehouse;
-
+    public Assembly(int workerCount, int queueSize) {
         this.pool = new ThreadPool(workerCount, queueSize);
+    }
+
+    public void setBodyWarehouse(Warehouse<Body> bodyWarehouse) {
+        this.bodyWarehouse = bodyWarehouse;
+    }
+
+    public void setEngineWarehouse(Warehouse<Engine> engineWarehouse) {
+        this.engineWarehouse = engineWarehouse;
+    }
+
+    public void setAccessoryWarehouse(Warehouse<Accessory> accessoryWarehouse) {
+        this.accessoryWarehouse = accessoryWarehouse;
+    }
+
+    public void setCarWarehouse(CarWarehouse carWarehouse) {
+        this.carWarehouse = carWarehouse;
     }
 
     public Warehouse<Body> getBodyWarehouse() {
@@ -53,20 +60,20 @@ public class Assembly {
         return pool;
     }
 
-    public int getWorkerCount() {
+    public int getPoolSize() {
         return pool.getSize();
     }
 
     public void makeCar() {
         try {
-            pool.addTask(new AssemblyRunnable());
+            pool.addTask(new MakeCar());
         } catch (InterruptedException e) {
             log.error("Adding task to the pool exception : ", e);
             System.exit(-1);
         }
     }
 
-    class AssemblyRunnable implements Runnable {
+    class MakeCar implements Runnable {
         @Override
         public void run() {
             try {

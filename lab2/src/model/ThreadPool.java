@@ -1,3 +1,5 @@
+package model;
+
 import org.apache.log4j.Logger;
 
 /**
@@ -7,7 +9,7 @@ public class ThreadPool {
 
     private BlockingQueue<Runnable> queue;
     private Thread [] pool;
-    private static final Logger log = Logger.getLogger(Supplier.class);
+    private static final Logger log = Logger.getLogger(ThreadPool.class);
 
     public ThreadPool(int threadCount, int queueSize) {
         pool = new Thread[threadCount];
