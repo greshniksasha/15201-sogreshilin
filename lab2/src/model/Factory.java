@@ -58,14 +58,14 @@ public class Factory {
     public void start() {
         bodySupplierThread.start();
         engineSupplierThread.start();
-        carWarehouseControllerThread.start();
         for (Thread thread : accessorySupplierThreads) {
             thread.start();
         }
-        for (Thread thread : dealerThreads) {
+        for (Thread thread : assembly.getPool().getThreads()) {
             thread.start();
         }
-        for (Thread thread : assembly.getPool().getThreads()) {
+        carWarehouseControllerThread.start();
+        for (Thread thread : dealerThreads) {
             thread.start();
         }
     }
@@ -77,10 +77,10 @@ public class Factory {
         for (Thread thread : accessorySupplierThreads) {
             thread.interrupt();
         }
-        for (Thread thread : dealerThreads) {
+        for (Thread thread : assembly.getPool().getThreads()) {
             thread.interrupt();
         }
-        for (Thread thread : assembly.getPool().getThreads()) {
+        for (Thread thread : dealerThreads) {
             thread.interrupt();
         }
     }

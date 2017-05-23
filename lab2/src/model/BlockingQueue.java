@@ -7,9 +7,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 
-/**
- * Created by Alexander on 06/04/2017.
- */
 public class BlockingQueue<Type> {
 
     private final int capacity;
