@@ -10,13 +10,12 @@ import model.contractor.EngineSupplier;
 import model.warehouse.CarWarehouse;
 import model.warehouse.CarWarehouseController;
 import model.warehouse.Warehouse;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
+
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import view.FactoryForm;
 
-/**
- * Created by Alexander on 13/04/2017.
- */
 public class Main {
     private static Warehouse<Engine> engineWarehouse;
     private static Warehouse<Body> bodyWarehouse;
@@ -32,6 +31,7 @@ public class Main {
 
     private static int threadPoolSize;
     private static int taskQueueSize;
+    private static final Logger log = LogManager.getLogger(Main.class);
 
     private static void prepare() {
         Parser parser = new Parser("src/config.properties");
@@ -49,7 +49,7 @@ public class Main {
         dealerCount = parser.dealerCount;
         Boolean logSales = parser.logSales;
         if (!logSales) {
-            Logger.getRootLogger().setLevel(Level.OFF);
+
         }
     }
 
@@ -66,11 +66,8 @@ public class Main {
         carWarehouse.setController(carWarehouseController);
 
         Factory factory = new Factory(bodySupplier, engineSupplier, accessorySupplier, accessorySupplierCount, assembly, dealer, dealerCount, carWarehouseController);
-//        factory.getBodySupplier().getThread().start();
-
         FactoryForm form = new FactoryForm(factory);
         form.setVisible(true);
-//        FactoryForm form = new FactoryForm(factory);
-//        form.setVisible(true);
+        log.info("set everything up, ready to start");
     }
 }

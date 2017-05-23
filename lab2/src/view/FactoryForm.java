@@ -1,6 +1,8 @@
 package view;
 
 import model.Factory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import view.panel.ButtonPanel;
 import view.panel.ControlPanel;
 import view.panel.InformationPanel;
@@ -20,10 +22,12 @@ public class FactoryForm extends JFrame {
     private JPanel tableTitles;
     private Factory factory;
 
+    private static final Logger log = LogManager.getLogger(ButtonPanel.class);
+
     public FactoryForm(Factory factory) throws HeadlessException {
         super("Car Factory");
         this.factory = factory;
-        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setContentPane(mainPanel);
         pack();
         this.setResizable(false);
@@ -33,5 +37,12 @@ public class FactoryForm extends JFrame {
         controlPanel = new ControlPanel(factory);
         informationPanel = new InformationPanel(factory);
         buttonPanel = new ButtonPanel(factory);
+    }
+
+    public void dispose() {
+        factory.finish();
+        super.dispose();
+        log.info("exiting: stopping all threads in factory");
+        System.exit(0);
     }
 }

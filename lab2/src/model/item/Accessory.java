@@ -5,7 +5,7 @@ import java.util.concurrent.atomic.AtomicLong;
 /**
  * Created by Alexander on 06/04/2017.
  */
-public class Accessory implements Item {
+public class Accessory {
     public static final AtomicLong idGenerator = new AtomicLong(0);
     private long id;
 

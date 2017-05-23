@@ -2,7 +2,9 @@ package model.contractor;
 
 import model.item.Body;
 import model.warehouse.Warehouse;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -13,7 +15,7 @@ public class BodySupplier extends Contractor implements Runnable {
     private static AtomicInteger transactionCounter = new AtomicInteger(0);
     private final Object lock = new Object();
 
-    private static final Logger log = Logger.getLogger(BodySupplier.class);
+    private static final Logger log = LogManager.getLogger(BodySupplier.class);
 
     public BodySupplier(Warehouse<Body> warehouse, int timeout) {
         this.warehouse = warehouse;
@@ -29,7 +31,7 @@ public class BodySupplier extends Contractor implements Runnable {
             this.timeout = timeout;
             lock.notify();
         }
-        log.trace("Body contractor timeout changed to " + timeout);
+        log.info("timeout changed");
     }
 
     private void incrementItemsSuppliedCounter() {
@@ -39,19 +41,19 @@ public class BodySupplier extends Contractor implements Runnable {
 
     public Thread getThread() {
         Thread thread = new Thread(this);
-        thread.setName(this.toString() + "0");
+        thread.setName(this.toString());
         return thread;
     }
 
     @Override
     public void run() {
         try {
+            log.info("started");
             while(true) {
                 Body body = new Body();
                 warehouse.put(body);
                 incrementItemsSuppliedCounter();
-                log.info(Thread.currentThread().getName() +
-                        " : Accessory <" + body.getId() + ">");
+                log.info("put item B<" + body.getId() + "> in warehouse");
                 synchronized (lock) {
                     if (timeout > 0) {
                         lock.wait(timeout);
@@ -59,13 +61,12 @@ public class BodySupplier extends Contractor implements Runnable {
                 }
             }
         } catch (InterruptedException e) {
-            log.trace(Thread.currentThread().getName() + " stopped");
-            return;
+            log.info("stopped");
         }
     }
 
     public String toString() {
-        return "Supplier<Body>-";
+        return "BodySupplier";
     }
 
 }

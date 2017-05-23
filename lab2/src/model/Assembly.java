@@ -6,11 +6,9 @@ import model.item.Car;
 import model.item.Engine;
 import model.warehouse.CarWarehouse;
 import model.warehouse.Warehouse;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
-/**
- * Created by Alexander on 07/04/2017.
- */
 public class Assembly {
     private Warehouse<Body> bodyWarehouse;
     private Warehouse<Engine> engineWarehouse;
@@ -18,7 +16,7 @@ public class Assembly {
     private CarWarehouse carWarehouse;
     private ThreadPool pool;
 
-    public static final Logger log = Logger.getLogger(Assembly.class);
+    public static final Logger log = LogManager.getLogger(Assembly.class);
 
     public Assembly(int workerCount, int queueSize) {
         this.pool = new ThreadPool(workerCount, queueSize);
@@ -68,8 +66,7 @@ public class Assembly {
         try {
             pool.addTask(new MakeCar());
         } catch (InterruptedException e) {
-            log.error("Adding task to the pool exception : ", e);
-            System.exit(-1);
+            log.error("could not add task to the pool");
         }
     }
 
@@ -82,13 +79,12 @@ public class Assembly {
                 Accessory accessory = accessoryWarehouse.get();
                 Car car = new Car(body, engine, accessory);
                 carWarehouse.put(car);
-                log.info("put  car #" + car.getId() +
-                         " with body #" + car.getBody().getId() +
-                         ", motor #" + car.getEngine().getId() +
-                         ", accessory #" + car.getAccessory().getId());
+                log.info("put item C<" + car.getId() + ">" +
+                        "(B<" + car.getBody().getId() + ">," +
+                        "E<" + car.getEngine().getId() + ">," +
+                        "A<" + car.getAccessory().getId() + ">) in warehouse");
             } catch (InterruptedException e) {
-                log.trace(Thread.currentThread().getName() + " stopped");
-                return;
+                log.info("stopped");
             }
         }
     }

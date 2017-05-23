@@ -6,6 +6,7 @@ import view.LabeledSliderWithTextField;
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import java.awt.*;
+import java.util.Comparator;
 
 public class ControlPanel extends JPanel {
     private LabeledSliderWithTextField body;
@@ -13,18 +14,24 @@ public class ControlPanel extends JPanel {
     private LabeledSliderWithTextField engine;
     private LabeledSliderWithTextField car;
 
-    private static final int MIN_TIMEOUT = 0;
-    private static final int MAX_TIMEOUT = 10000;
-    private static final int SPACING = 500;
-    private static final String TITLE = "Suppliers timeouts, sec.";
-    private static final String BODY_LABEL = "Body supplier";
-    private static final String ACCESSORY_LABEL = "Accessory supplier";
-    private static final String ENGINE_LABEL = "Engine suplier";
-    private static final String CAR_LABEL = "Car dealer";
+    private final int MIN_TIMEOUT = 0;
+    private final int MAX_TIMEOUT = 10000;
+    private final int SPACING = 500;
+    private final String TITLE = "Suppliers timeouts, sec.";
+    private final String BODY_LABEL = "Body supplier";
+    private final String ENGINE_LABEL = "Engine suplier";
+    private final String ACCESSORY_LABEL;
+    private final String CAR_LABEL;
 
     public ControlPanel(Factory factory) {
         setBorder(new TitledBorder(TITLE));
         setLayout(new GridLayout(4, 1));
+
+        int supplierCount = factory.getAccessorySupplierCount();
+        int dealerCount = factory.getDealerCount();
+        this.ACCESSORY_LABEL = "Accessory supplier" + (supplierCount > 1 ? "s, " + supplierCount : "");
+        this.CAR_LABEL = "Car dealer" + (dealerCount > 1 ? "s, " + dealerCount : "");
+
 
         body = new LabeledSliderWithTextField(BODY_LABEL, MIN_TIMEOUT, MAX_TIMEOUT, SPACING);
         accessory = new LabeledSliderWithTextField(ACCESSORY_LABEL, MIN_TIMEOUT, MAX_TIMEOUT, SPACING);
@@ -41,9 +48,9 @@ public class ControlPanel extends JPanel {
         engine.addValueChangedObserver(timeout -> factory.getEngineSupplier().setTimeout(timeout));
         car.addValueChangedObserver(timeout -> factory.getDealer().setTimeout(timeout));
 
-        add(body);
         add(accessory);
         add(engine);
+        add(body);
         add(car);
 
 

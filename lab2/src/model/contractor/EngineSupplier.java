@@ -2,7 +2,9 @@ package model.contractor;
 
 import model.item.Engine;
 import model.warehouse.Warehouse;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -13,7 +15,7 @@ public class EngineSupplier extends Contractor implements Runnable {
     private static AtomicInteger transactionCounter = new AtomicInteger(0);
     private final Object lock = new Object();
 
-    private static final Logger log = Logger.getLogger(EngineSupplier.class);
+    private static final Logger log = LogManager.getLogger(EngineSupplier.class);
 
     public EngineSupplier(Warehouse<Engine> warehouse, int timeout) {
         this.warehouse = warehouse;
@@ -29,7 +31,7 @@ public class EngineSupplier extends Contractor implements Runnable {
             this.timeout = timeout;
             lock.notify();
         }
-        log.trace("Engine contractor timeout changed to " + timeout);
+        log.info("timeout changed");
     }
 
     private void incrementItemsSuppliedCounter() {
@@ -39,19 +41,19 @@ public class EngineSupplier extends Contractor implements Runnable {
 
     public Thread getThread() {
         Thread thread = new Thread(this);
-        thread.setName(this.toString() + "0");
+        thread.setName(this.toString());
         return thread;
     }
 
     @Override
     public void run() {
         try {
+            log.info("started");
             while(true) {
                 Engine engine = new Engine();
                 warehouse.put(engine);
                 incrementItemsSuppliedCounter();
-                log.info(Thread.currentThread().getName() +
-                        " : Accessory <" + engine.getId() + ">");
+                log.info("put item E<" + engine.getId() + "> in warehouse");
                 synchronized (lock) {
                     if (timeout > 0) {
                         lock.wait(timeout);
@@ -59,13 +61,12 @@ public class EngineSupplier extends Contractor implements Runnable {
                 }
             }
         } catch (InterruptedException e) {
-            log.trace(Thread.currentThread().getName() + " stopped");
-            return;
+            log.info("stopped");
         }
     }
 
     public String toString() {
-        return "Supplier<Engine>-";
+        return "EngineSupplier";
     }
 
 }

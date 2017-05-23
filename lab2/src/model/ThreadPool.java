@@ -1,18 +1,19 @@
 package model;
 
-import org.apache.log4j.Logger;
+
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-/**
- * Created by Alexander on 06/04/2017.
- */
+
 public class ThreadPool {
 
     private BlockingQueue<Runnable> queue;
     private Thread [] pool;
     private static AtomicInteger threadId = new AtomicInteger(0);
-    private static final Logger log = Logger.getLogger(ThreadPool.class);
+    private static final Logger log = LogManager.getLogger(ThreadPool.class);
 
     public ThreadPool(int threadCount, int queueSize) {
         pool = new Thread[threadCount];
@@ -20,8 +21,7 @@ public class ThreadPool {
         for (int i = 0; i < threadCount; ++i) {
             ThreadPoolRunnable runnable = new ThreadPoolRunnable();
             pool[i] = new Thread(runnable);
-            pool[i].setName("PoolThread-" + threadId.getAndIncrement());
-            pool[i].start();
+            pool[i].setName("PoolWorker[" + threadId.getAndIncrement() + "]");
         }
     }
 
@@ -40,14 +40,14 @@ public class ThreadPool {
     class ThreadPoolRunnable implements Runnable {
         @Override
         public void run() {
+            log.info("started");
             try{
                 while(!Thread.interrupted()) {
                     Runnable runnable = queue.dequeue();
                     runnable.run();
                 }
             } catch (InterruptedException e) {
-                log.trace(Thread.currentThread().getName() + " stopped");
-                return;
+                log.trace("stopped");
             }
         }
     }

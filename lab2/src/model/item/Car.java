@@ -5,7 +5,7 @@ import java.util.concurrent.atomic.AtomicLong;
 /**
  * Created by Alexander on 07/04/2017.
  */
-public class Car implements Item {
+public class Car {
     private static final AtomicLong idGenerator = new AtomicLong(0);
     private Body body;
     private Engine engine;

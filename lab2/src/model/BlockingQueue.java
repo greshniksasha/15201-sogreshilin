@@ -14,13 +14,8 @@ public class BlockingQueue<Type> {
 
     private final int capacity;
     private Queue<Type> queue;
-    private Object lock = new Object();
+    private final Object lock = new Object();
     private List<SizeObserver> observers = new ArrayList<>();
-
-//    public int getSize() {
-//        return queue.size();
-//    }
-
 
     public BlockingQueue(int size) {
         this.capacity = size;

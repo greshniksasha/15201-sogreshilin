@@ -1,17 +1,16 @@
 package model.warehouse;
 
 import model.Assembly;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
-/**
- * Created by Alexander on 07/04/2017.
- */
+
 public class CarWarehouseController implements Runnable {
     private Assembly assembly;
     private CarWarehouse warehouse;
     private final Object lock = new Object();
 
-    public static final Logger log = Logger.getLogger(CarWarehouseController.class);
+    public static final Logger log = LogManager.getLogger(CarWarehouseController.class);
 
     public CarWarehouseController(CarWarehouse warehouse) {
         this.warehouse = warehouse;
@@ -29,7 +28,7 @@ public class CarWarehouseController implements Runnable {
 
     public Thread getThread() {
         Thread thread = new Thread(this);
-        thread.setName("CarWarehouseController");
+        thread.setName("WarehouseController");
         return thread;
     }
 
@@ -37,18 +36,19 @@ public class CarWarehouseController implements Runnable {
     @Override
     public void run() {
         try {
+            log.info("started");
             while (true) {
                 synchronized (lock) {
                     int carsNeeded = warehouse.getCapacity() - warehouse.getSize() - assembly.getPoolSize();
                     for (int i = 0; i < carsNeeded; ++i) {
                         assembly.makeCar();
                     }
+                    log.info("requested " + carsNeeded + " car" + (carsNeeded == 1 ? "" : "s"));
                     lock.wait();
                 }
             }
         } catch (InterruptedException e) {
-            log.trace(Thread.currentThread().getName() + " stopped");
-            return;
+            log.info("stopped");
         }
     }
 

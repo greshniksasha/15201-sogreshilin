@@ -2,7 +2,9 @@ package model.contractor;
 
 import model.item.Accessory;
 import model.warehouse.Warehouse;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -13,7 +15,7 @@ public class AccessorySupplier extends Contractor implements Runnable {
     private static AtomicInteger transactionCounter = new AtomicInteger(0);
     private final Object lock = new Object();
 
-    private static final Logger log = Logger.getLogger(AccessorySupplier.class);
+    private static final Logger log = LogManager.getLogger(AccessorySupplier.class);
     private static AtomicInteger threadId = new AtomicInteger(0);
 
     public AccessorySupplier(Warehouse<Accessory> warehouse, int timeout) {
@@ -30,7 +32,7 @@ public class AccessorySupplier extends Contractor implements Runnable {
             this.timeout = timeout;
             lock.notify();
         }
-        log.trace("Accessory contractor timeout changed to " + timeout);
+        log.info("timeout changed");
     }
 
     private void incrementItemsSuppliedCounter() {
@@ -40,19 +42,19 @@ public class AccessorySupplier extends Contractor implements Runnable {
 
     public Thread getThread() {
         Thread thread = new Thread(this);
-        thread.setName(this.toString() + threadId.getAndIncrement());
+        thread.setName(this.toString() + threadId.getAndIncrement() + "]");
         return thread;
     }
 
     @Override
     public void run() {
         try {
+            log.info("started");
             while(true) {
                 Accessory accessory = new Accessory();
                 warehouse.put(accessory);
                 incrementItemsSuppliedCounter();
-                log.info(Thread.currentThread().getName() +
-                        " : Accessory <" + accessory.getId() + ">");
+                log.info("put item A<" + accessory.getId() + "> in warehouse");
                 synchronized (lock) {
                     if (timeout > 0) {
                         lock.wait(timeout);
@@ -60,12 +62,11 @@ public class AccessorySupplier extends Contractor implements Runnable {
                 }
             }
         } catch (InterruptedException e) {
-            log.trace(Thread.currentThread().getName() + " stopped");
-            return;
+            log.info("stopped");
         }
     }
 
     public String toString() {
-        return "Supplier<Accessory>-";
+        return "AccessorySupplier[";
     }
 }

@@ -11,40 +11,40 @@ import java.awt.*;
 
 public class InformationPanel extends JPanel {
 
-    private InformationLabels body;
-    private InformationLabels accessory;
-    private InformationLabels engine;
     private InformationLabels car;
+    private InformationLabels body;
+    private InformationLabels engine;
+    private InformationLabels accessory;
 
     public InformationPanel(Factory factory) {
         setBorder(new TitledBorder("Warehouses"));
         setLayout(new GridLayout(5,1));
 
-        body = new InformationLabels("Body");
-        accessory = new InformationLabels("Accessory");
-        engine = new InformationLabels("Engine");
         car = new InformationLabels("Car");
+        body = new InformationLabels("Body");
+        engine = new InformationLabels("Engine");
+        accessory = new InformationLabels("Accessory");
 
         Assembly assembly = factory.getAssembly();
-        body.setSizeObserver(assembly.getBodyWarehouse());
-        accessory.setSizeObserver(assembly.getAccessoryWarehouse());
-        engine.setSizeObserver(assembly.getEngineWarehouse());
         car.setSizeObserver(assembly.getCarWarehouse());
+        body.setSizeObserver(assembly.getBodyWarehouse());
+        engine.setSizeObserver(assembly.getEngineWarehouse());
+        accessory.setSizeObserver(assembly.getAccessoryWarehouse());
 
-        body.setTransactionCounterObserver(factory.getBodySupplier());
-        accessory.setTransactionCounterObserver(factory.getAccessorySupplier());
-        engine.setTransactionCounterObserver(factory.getEngineSupplier());
         car.setTransactionCounterObserver(factory.getDealer());
+        body.setTransactionCounterObserver(factory.getBodySupplier());
+        engine.setTransactionCounterObserver(factory.getEngineSupplier());
+        accessory.setTransactionCounterObserver(factory.getAccessorySupplier());
 
-        body.setWarehouseCapacity(assembly.getBodyWarehouse());
-        accessory.setWarehouseCapacity(assembly.getAccessoryWarehouse());
-        engine.setWarehouseCapacity(assembly.getEngineWarehouse());
         car.setWarehouseCapacity(assembly.getCarWarehouse());
+        body.setWarehouseCapacity(assembly.getBodyWarehouse());
+        engine.setWarehouseCapacity(assembly.getEngineWarehouse());
+        accessory.setWarehouseCapacity(assembly.getAccessoryWarehouse());
 
         add(new TitlesPanel());
-        add(body);
         add(accessory);
         add(engine);
+        add(body);
         add(car);
     }
 }

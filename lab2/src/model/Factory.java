@@ -15,13 +15,15 @@ public class Factory {
     private AccessorySupplier accessorySupplier;
     private Assembly assembly;
     private Dealer dealer;
-    private CarWarehouseController carWarehouseController;
 
     private Thread bodySupplierThread;
-    private Thread engineSupplerThread;
+    private Thread engineSupplierThread;
     private Thread carWarehouseControllerThread;
     private Thread[] accessorySupplierThreads;
     private Thread[] dealerThreads;
+
+    private int accessorySupplierCount;
+    private int dealerCount;
 
     public Factory(BodySupplier bodySupplier,
                    EngineSupplier engineSupplier,
@@ -36,10 +38,9 @@ public class Factory {
         this.accessorySupplier = accessorySupplier;
         this.assembly = assembly;
         this.dealer = dealer;
-        this.carWarehouseController = carWarehouseController;
 
         this.bodySupplierThread = bodySupplier.getThread();
-        this.engineSupplerThread = engineSupplier.getThread();
+        this.engineSupplierThread = engineSupplier.getThread();
         this.carWarehouseControllerThread = carWarehouseController.getThread();
         this.accessorySupplierThreads = new Thread[accessorySupplierCount];
         for (int i = 0; i < accessorySupplierCount; ++i) {
@@ -49,11 +50,14 @@ public class Factory {
         for (int i = 0; i < dealerCount; ++i) {
             dealerThreads[i] = dealer.getThread();
         }
+
+        this.dealerCount = dealerCount;
+        this.accessorySupplierCount = accessorySupplierCount;
     }
 
     public void start() {
         bodySupplierThread.start();
-        engineSupplerThread.start();
+        engineSupplierThread.start();
         carWarehouseControllerThread.start();
         for (Thread thread : accessorySupplierThreads) {
             thread.start();
@@ -61,11 +65,14 @@ public class Factory {
         for (Thread thread : dealerThreads) {
             thread.start();
         }
+        for (Thread thread : assembly.getPool().getThreads()) {
+            thread.start();
+        }
     }
 
     public void finish() {
         bodySupplierThread.interrupt();
-        engineSupplerThread.interrupt();
+        engineSupplierThread.interrupt();
         carWarehouseControllerThread.interrupt();
         for (Thread thread : accessorySupplierThreads) {
             thread.interrupt();
@@ -76,6 +83,14 @@ public class Factory {
         for (Thread thread : assembly.getPool().getThreads()) {
             thread.interrupt();
         }
+    }
+
+    public int getAccessorySupplierCount() {
+        return accessorySupplierCount;
+    }
+
+    public int getDealerCount() {
+        return dealerCount;
     }
 
     public Assembly getAssembly() {
@@ -96,9 +111,5 @@ public class Factory {
 
     public Dealer getDealer() {
         return dealer;
-    }
-
-    public CarWarehouseController getCarWarehouseController() {
-        return carWarehouseController;
     }
 }
