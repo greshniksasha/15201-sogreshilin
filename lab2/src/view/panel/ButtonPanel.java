@@ -2,9 +2,10 @@ package view.panel;
 
 
 import model.Factory;
+//import org.apache.log4j.LogManager;
+//import org.apache.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
 
 import javax.swing.*;
 import java.awt.*;
@@ -31,8 +32,8 @@ public class ButtonPanel extends JPanel {
         });
 
         stopButton.addMouseListener(new MouseAdapter() {
-            public void mouseClicked(MouseEvent e) {
-                log.info("stop button clicked, stopping");
+            public void mousePressed(MouseEvent e) {
+                log.info("stop button pressed, stopping");
                 stopButton.setEnabled(false);
                 factory.finish();
                 System.exit(0);

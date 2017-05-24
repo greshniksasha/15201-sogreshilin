@@ -14,6 +14,8 @@ import model.warehouse.Warehouse;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+//import org.apache.log4j.LogManager;
+//import org.apache.log4j.Logger;
 import view.FactoryForm;
 
 public class Main {
