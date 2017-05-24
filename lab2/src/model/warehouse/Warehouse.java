@@ -15,8 +15,7 @@ public class Warehouse<Type> {
     }
 
     public Type get() throws InterruptedException {
-        Type element = queue.dequeue();
-        return element;
+        return queue.dequeue();
     }
 
     public int getCapacity() {

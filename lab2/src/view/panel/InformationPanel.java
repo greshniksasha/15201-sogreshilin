@@ -5,7 +5,6 @@ import model.Factory;
 import view.InformationLabels;
 
 import javax.swing.*;
-import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
 import java.awt.*;
 

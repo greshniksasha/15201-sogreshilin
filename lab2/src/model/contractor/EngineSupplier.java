@@ -61,7 +61,7 @@ public class EngineSupplier extends Contractor implements Runnable {
                 Engine engine = new Engine();
                 warehouse.put(engine);
                 incrementItemsSuppliedCounter();
-                log.info("put item E<" + engine.getId() + "> in warehouse");
+                log.info("put item E<{}> in warehouse", engine.getId());
                 waitSettingTimeout(timeout);
             }
         } catch (InterruptedException e) {

@@ -19,7 +19,7 @@ public class Main {
 
     public static void main(String[] args) {
         Configs configs = new Configs(CONFIG_FILE_PATH);
-        setLogging(configs.getLogSales());
+        setLogging(configs.getLogOn());
         Factory factory = new Factory(configs);
         new FactoryForm(factory).setVisible(true);
         log.info("set everything up, ready to start");

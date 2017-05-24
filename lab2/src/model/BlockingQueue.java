@@ -1,7 +1,5 @@
 package model;
 
-import model.warehouse.Warehouse;
-
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;

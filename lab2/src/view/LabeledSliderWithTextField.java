@@ -1,9 +1,5 @@
 package view;
 
-
-
-//import org.apache.log4j.LogManager;
-//import org.apache.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -21,16 +17,12 @@ public class LabeledSliderWithTextField extends JPanel {
     private JLabel label;
     private JSlider slider;
     private JTextField textField;
-    int min;
-    int max;
 
-    List<ValueChangedObserver> observers = new ArrayList<>();
+    private List<ValueChangedObserver> observers = new ArrayList<>();
     private static final Logger log = LogManager.getLogger(LabeledSliderWithTextField.class);
 
 
     public LabeledSliderWithTextField(String name, int min, int max, int spacing) {
-        this.min = min;
-        this.max = max;
         setLayout(new GridLayout(1,3));
         label = new JLabel(name);
         slider = new JSlider(min, max);
@@ -72,9 +64,6 @@ public class LabeledSliderWithTextField extends JPanel {
 
         textField.addKeyListener(new KeyAdapter() {
             public void keyTyped(KeyEvent e) {
-                if (e.getKeyCode() == KeyEvent.VK_BACK_SPACE) {
-
-                }
                 if (textField.getText().isEmpty()) {
                     textField.setForeground(Color.black);
                 }

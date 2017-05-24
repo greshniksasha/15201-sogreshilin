@@ -3,12 +3,9 @@ package view;
 import model.Factory;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-//import org.apache.log4j.LogManager;
-//import org.apache.log4j.Logger;
 import view.panel.ButtonPanel;
 import view.panel.ControlPanel;
 import view.panel.InformationPanel;
-import view.panel.TitlesPanel;
 
 import javax.swing.*;
 import java.awt.*;
@@ -21,7 +18,6 @@ public class FactoryForm extends JFrame {
     private JPanel controlPanel;
     private JPanel informationPanel;
     private JPanel buttonPanel;
-    private JPanel tableTitles;
     private Factory factory;
 
     private static final Logger log = LogManager.getLogger(ButtonPanel.class);

@@ -43,7 +43,7 @@ public class CarWarehouseController implements Runnable {
                     for (int i = 0; i < carsNeeded; ++i) {
                         assembly.makeCar();
                     }
-                    log.info("requested {} car{}",  carsNeeded, (carsNeeded == 1 ? "" : "s"));
+                    log.info("requested {} car{}",  carsNeeded, (carsNeeded > 1 ? "s" : ""));
                     lock.wait();
                 }
             }

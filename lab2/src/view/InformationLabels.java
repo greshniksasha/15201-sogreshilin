@@ -6,7 +6,6 @@ import model.contractor.TransactionCounterObserver;
 import model.warehouse.Warehouse;
 
 import javax.swing.*;
-import javax.swing.border.BevelBorder;
 import javax.swing.border.EtchedBorder;
 import java.awt.*;
 

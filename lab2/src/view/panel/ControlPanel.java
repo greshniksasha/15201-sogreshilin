@@ -6,7 +6,6 @@ import view.LabeledSliderWithTextField;
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import java.awt.*;
-import java.util.Comparator;
 
 public class ControlPanel extends JPanel {
     private LabeledSliderWithTextField body;
@@ -52,11 +51,5 @@ public class ControlPanel extends JPanel {
         add(engine);
         add(body);
         add(car);
-
-
     }
-
-
-
-
 }

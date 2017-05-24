@@ -41,7 +41,7 @@ public class Configs {
     private int accessorySupplierTimeout;
     private int dealerTimeout;
 
-    private Boolean logSales;
+    private Boolean logOn;
 
     public static final Logger log = LogManager.getLogger(Assembly.class);
 
@@ -71,7 +71,7 @@ public class Configs {
         bodySupplierTimeout =       Integer.parseInt(properties.getProperty(BODY_SUPPLIER_TIMEOUT));
         accessorySupplierTimeout =  Integer.parseInt(properties.getProperty(ACCESSORY_SUPPLIER_TIMEOUT));
         dealerTimeout =             Integer.parseInt(properties.getProperty(DEALER_TIMEOUT));
-        logSales =                  Boolean.parseBoolean(properties.getProperty(LOG_ON));
+        logOn =                     Boolean.parseBoolean(properties.getProperty(LOG_ON));
     }
 
     public int getEngineWarehouseSize() {
@@ -122,7 +122,7 @@ public class Configs {
         return dealerTimeout;
     }
 
-    public Boolean getLogSales() {
-        return logSales;
+    public Boolean getLogOn() {
+        return logOn;
     }
 }
