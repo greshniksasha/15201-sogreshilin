@@ -1,8 +1,6 @@
 package model.warehouse;
 
 import model.Assembly;
-//import org.apache.log4j.LogManager;
-//import org.apache.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -39,13 +37,13 @@ public class CarWarehouseController implements Runnable {
     public void run() {
         try {
             log.info("started");
-            while (true) {
+            while (!Thread.interrupted()) {
                 synchronized (lock) {
                     int carsNeeded = warehouse.getCapacity() - warehouse.getSize() - assembly.getPoolSize();
                     for (int i = 0; i < carsNeeded; ++i) {
                         assembly.makeCar();
                     }
-                    log.info("requested " + carsNeeded + " car" + (carsNeeded == 1 ? "" : "s"));
+                    log.info("requested {} car{}",  carsNeeded, (carsNeeded == 1 ? "" : "s"));
                     lock.wait();
                 }
             }

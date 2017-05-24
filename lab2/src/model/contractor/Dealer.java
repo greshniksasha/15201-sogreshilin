@@ -4,6 +4,8 @@ import model.item.Car;
 import model.warehouse.CarWarehouse;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.Marker;
+import org.apache.logging.log4j.MarkerManager;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -17,6 +19,7 @@ public class Dealer extends Contractor implements Runnable {
 
     private final Object lock;
     private static final Logger log = LogManager.getLogger(Dealer.class);
+    private static final Marker CAR_SALES_MARKER = MarkerManager.getMarker("CAR_SALES_MARKER");
 
     public void setTimeout(int timeout) {
         synchronized (lock) {
@@ -24,6 +27,14 @@ public class Dealer extends Contractor implements Runnable {
             lock.notify();
         }
         log.info("timeout changed");
+    }
+
+    private void waitSettingTimeout(int millisec) throws InterruptedException {
+        synchronized (lock) {
+            if (millisec > 0) {
+                lock.wait(millisec);
+            }
+        }
     }
 
     public Dealer(CarWarehouse warehouse, int timeout) {
@@ -52,18 +63,15 @@ public class Dealer extends Contractor implements Runnable {
     public void run() {
         try {
             log.info("started");
-            while(true) {
+            while(!Thread.interrupted()) {
                 Car car = warehouse.get();
                 incrementSoldCarsCounter();
-                log.info("got item C<" + car.getId() + ">" +
-                        "(B<" + car.getBody().getId() + ">," +
-                        "E<" + car.getEngine().getId() + ">," +
-                        "A<" + car.getAccessory().getId() + ">) from warehouse");
-                synchronized (lock) {
-                    if (timeout > 0) {
-                        lock.wait(timeout);
-                    }
-                }
+                log.info("got item C<{}>(B<{}>,E<{}>,A<{}>) from warehouse",
+                        car.getId(),
+                        car.getBody().getId(),
+                        car.getEngine().getId(),
+                        car.getAccessory().getId());
+                waitSettingTimeout(timeout);
             }
         } catch (InterruptedException e) {
             log.info("stopped");

@@ -35,6 +35,14 @@ public class AccessorySupplier extends Contractor implements Runnable {
         log.info("timeout changed");
     }
 
+    private void waitSettingTimeout(int milliseconds) throws InterruptedException {
+        synchronized (lock) {
+            if (milliseconds > 0) {
+                lock.wait(milliseconds);
+            }
+        }
+    }
+
     private void incrementItemsSuppliedCounter() {
         int soldCars = transactionCounter.incrementAndGet();
         notifyTransactionCounterObserver(soldCars);
@@ -42,7 +50,7 @@ public class AccessorySupplier extends Contractor implements Runnable {
 
     public Thread getThread() {
         Thread thread = new Thread(this);
-        thread.setName(this.toString() + threadId.getAndIncrement() + "]");
+        thread.setName("AccessorySupplier[" + threadId.getAndIncrement() + "]");
         return thread;
     }
 
@@ -50,23 +58,15 @@ public class AccessorySupplier extends Contractor implements Runnable {
     public void run() {
         try {
             log.info("started");
-            while(true) {
+            while(!Thread.interrupted()) {
                 Accessory accessory = new Accessory();
                 warehouse.put(accessory);
                 incrementItemsSuppliedCounter();
-                log.info("put item A<" + accessory.getId() + "> in warehouse");
-                synchronized (lock) {
-                    if (timeout > 0) {
-                        lock.wait(timeout);
-                    }
-                }
+                log.info("put item A<{}> in warehouse", accessory.getId());
+                waitSettingTimeout(timeout);
             }
         } catch (InterruptedException e) {
             log.info("stopped");
         }
-    }
-
-    public String toString() {
-        return "AccessorySupplier[";
     }
 }

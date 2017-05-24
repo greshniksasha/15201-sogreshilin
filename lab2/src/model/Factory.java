@@ -4,7 +4,9 @@ import model.contractor.AccessorySupplier;
 import model.contractor.BodySupplier;
 import model.contractor.Dealer;
 import model.contractor.EngineSupplier;
+import model.warehouse.CarWarehouse;
 import model.warehouse.CarWarehouseController;
+import model.warehouse.Warehouse;
 
 /**
  * Created by Alexander on 22/05/2017.
@@ -25,34 +27,38 @@ public class Factory {
     private int accessorySupplierCount;
     private int dealerCount;
 
-    public Factory(BodySupplier bodySupplier,
-                   EngineSupplier engineSupplier,
-                   AccessorySupplier accessorySupplier,
-                   int accessorySupplierCount,
-                   Assembly assembly,
-                   Dealer dealer,
-                   int dealerCount,
-                   CarWarehouseController carWarehouseController) {
-        this.bodySupplier = bodySupplier;
-        this.engineSupplier = engineSupplier;
-        this.accessorySupplier = accessorySupplier;
-        this.assembly = assembly;
-        this.dealer = dealer;
+    public Factory(Configs configs) {
+        assembly = new Assembly(configs.getThreadPoolSize(), configs.getTaskQueueSize());
+        assembly.setAccessoryWarehouse(new Warehouse<>(configs.getAccessoryWarehouseSize()));
+        assembly.setBodyWarehouse(new Warehouse<>(configs.getBodyWarehouseSize()));
+        assembly.setEngineWarehouse(new Warehouse<>(configs.getEngineWarehouseSize()));
+        assembly.setCarWarehouse(new CarWarehouse(configs.getCarWarehouseSize()));
 
-        this.bodySupplierThread = bodySupplier.getThread();
-        this.engineSupplierThread = engineSupplier.getThread();
-        this.carWarehouseControllerThread = carWarehouseController.getThread();
-        this.accessorySupplierThreads = new Thread[accessorySupplierCount];
+        CarWarehouseController carWarehouseController = new CarWarehouseController(assembly.getCarWarehouse());
+        carWarehouseController.setAssembly(assembly);
+        assembly.getCarWarehouse().setController(carWarehouseController);
+
+        dealer = new Dealer(assembly.getCarWarehouse(), configs.getDealerTimeout());
+        bodySupplier = new BodySupplier(assembly.getBodyWarehouse(), configs.getBodySupplierTimeout());
+        engineSupplier = new EngineSupplier(assembly.getEngineWarehouse(), configs.getEngineSupplierTimeout());
+        accessorySupplier = new AccessorySupplier(assembly.getAccessoryWarehouse(), configs.getAccessorySupplierTimeout());
+
+        bodySupplierThread = bodySupplier.getThread();
+        engineSupplierThread = engineSupplier.getThread();
+        carWarehouseControllerThread = carWarehouseController.getThread();
+
+        accessorySupplierCount = configs.getAccessorySupplierCount();
+        accessorySupplierThreads = new Thread[accessorySupplierCount];
         for (int i = 0; i < accessorySupplierCount; ++i) {
             accessorySupplierThreads[i] = accessorySupplier.getThread();
         }
-        this.dealerThreads = new Thread[dealerCount];
+
+        dealerCount = configs.getDealerCount();
+        dealerThreads = new Thread[dealerCount];
         for (int i = 0; i < dealerCount; ++i) {
             dealerThreads[i] = dealer.getThread();
         }
 
-        this.dealerCount = dealerCount;
-        this.accessorySupplierCount = accessorySupplierCount;
     }
 
     public void start() {

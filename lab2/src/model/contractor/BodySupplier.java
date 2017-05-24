@@ -34,6 +34,14 @@ public class BodySupplier extends Contractor implements Runnable {
         log.info("timeout changed");
     }
 
+    private void waitSettingTimeout(int milliseconds) throws InterruptedException {
+        synchronized (lock) {
+            if (milliseconds > 0) {
+                lock.wait(milliseconds);
+            }
+        }
+    }
+
     private void incrementItemsSuppliedCounter() {
         int soldCars = transactionCounter.incrementAndGet();
         notifyTransactionCounterObserver(soldCars);
@@ -49,16 +57,12 @@ public class BodySupplier extends Contractor implements Runnable {
     public void run() {
         try {
             log.info("started");
-            while(true) {
+            while(!Thread.interrupted()) {
                 Body body = new Body();
                 warehouse.put(body);
                 incrementItemsSuppliedCounter();
-                log.info("put item B<" + body.getId() + "> in warehouse");
-                synchronized (lock) {
-                    if (timeout > 0) {
-                        lock.wait(timeout);
-                    }
-                }
+                log.info("put item B<{}> in warehouse", body.getId());
+                waitSettingTimeout(timeout);
             }
         } catch (InterruptedException e) {
             log.info("stopped");

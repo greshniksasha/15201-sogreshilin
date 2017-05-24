@@ -79,10 +79,11 @@ public class Assembly {
                 Accessory accessory = accessoryWarehouse.get();
                 Car car = new Car(body, engine, accessory);
                 carWarehouse.put(car);
-                log.info("put item C<" + car.getId() + ">" +
-                        "(B<" + car.getBody().getId() + ">," +
-                        "E<" + car.getEngine().getId() + ">," +
-                        "A<" + car.getAccessory().getId() + ">) in warehouse");
+                log.info("put item C<{}>(B<{}>,E<{}>,A<{}>) in warehouse",
+                        car.getId(),
+                        car.getBody().getId(),
+                        car.getEngine().getId(),
+                        car.getAccessory().getId());
             } catch (InterruptedException e) {
                 log.info("stopped");
             }

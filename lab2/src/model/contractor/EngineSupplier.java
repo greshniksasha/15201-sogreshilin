@@ -34,6 +34,14 @@ public class EngineSupplier extends Contractor implements Runnable {
         log.info("timeout changed");
     }
 
+    private void waitSettingTimeout(int millisec) throws InterruptedException {
+        synchronized (lock) {
+            if (millisec > 0) {
+                lock.wait(millisec);
+            }
+        }
+    }
+
     private void incrementItemsSuppliedCounter() {
         int soldCars = transactionCounter.incrementAndGet();
         notifyTransactionCounterObserver(soldCars);
@@ -49,16 +57,12 @@ public class EngineSupplier extends Contractor implements Runnable {
     public void run() {
         try {
             log.info("started");
-            while(true) {
+            while(!Thread.interrupted()) {
                 Engine engine = new Engine();
                 warehouse.put(engine);
                 incrementItemsSuppliedCounter();
                 log.info("put item E<" + engine.getId() + "> in warehouse");
-                synchronized (lock) {
-                    if (timeout > 0) {
-                        lock.wait(timeout);
-                    }
-                }
+                waitSettingTimeout(timeout);
             }
         } catch (InterruptedException e) {
             log.info("stopped");
