@@ -33,6 +33,7 @@ public class BlockingQueueTest {
 
         consumer.start();
         producer.start();
+        System.out.println("test passed");
     }
 
     @Test
@@ -46,5 +47,6 @@ public class BlockingQueueTest {
             queue.dequeue();
         }
         Assert.assertEquals(0, queue.getSize());
+        System.out.println("test passed");
     }
 }
