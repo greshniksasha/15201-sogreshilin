@@ -56,8 +56,8 @@ public class Dealer extends Contractor implements Runnable {
                 Car car = warehouse.get();
                 incrementSoldCarsCounter();
                 log.info("got item C<" + car.getId() + ">" +
-                        "(B<" + car.getBody().getId() + ">" +
-                        ",E<" + car.getEngine().getId() + ">" +
+                        "(B<" + car.getBody().getId() + ">," +
+                        "E<" + car.getEngine().getId() + ">," +
                         "A<" + car.getAccessory().getId() + ">) from warehouse");
                 synchronized (lock) {
                     if (timeout > 0) {

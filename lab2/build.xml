@@ -8,11 +8,17 @@
   <property name="dist" location="dist"/>
   <property name="lib" location="lib"/>
   <property name="test" location="test"/>
+  <property name="test-build" location="test-build"/>
 
   <path id="libraries">
     <fileset dir="${lib}" includes="javac2-7.0.3.jar"/>
     <fileset dir="${lib}" includes="log4j-api-2.8.1.jar"/>
     <fileset dir="${lib}" includes="log4j-core-2.8.1.jar"/>
+  </path>
+
+  <path id="test-libraries">
+    <fileset dir="${lib}" includes="junit-4.11.jar"/>
+    <fileset dir="${lib}" includes="hamcrest-core-1.3.jar"/>
   </path>
 
   <target name="init" depends="clean">
@@ -33,7 +39,33 @@
     </jar>
   </target>
 
-  <target name="run">
+  <target name="test-compile" depends="compile, dist">
+    <mkdir dir="${test-build}" />
+    <javac srcdir="${test}" destdir="${test-build}" includeantruntime="false">
+      <classpath>
+        <pathelement location="${lib}/junit-4.11.jar"/>
+        <pathelement location="${lib}/hamcrest-core-1.3.jar"/>
+        <pathelement location="${dist}/${project.name}.jar"/>
+      </classpath>
+    </javac>
+  </target>
+
+  <target name="test-run" depends="test-compile">
+    <junit>
+      <classpath>
+        <pathelement location="${lib}/junit-4.11.jar"/>
+        <pathelement location="${lib}/hamcrest-core-1.3.jar"/>
+        <pathelement location="${dist}/${project.name}.jar" />
+        <pathelement location="${test-build}" />
+      </classpath>
+      <formatter type="brief" usefile="false" />
+      <batchtest>
+        <fileset dir="${test-build}" includes="**/*Test.class" />
+      </batchtest>
+    </junit>
+  </target>
+
+  <target name="run" depends="dist">
     <java jar="${dist}/${project.name}.jar" fork="true" >
       <sysproperty key="log4j.configurationFile" value="file:${src}/log4j2.xml"/>
       <classpath refid="libraries"/>
@@ -43,6 +75,7 @@
   <target name="clean">
     <delete dir="${build}"/>
     <delete dir="${dist}"/>
+    <delete dir="${test-build}"/>
   </target>
 
 </project>
