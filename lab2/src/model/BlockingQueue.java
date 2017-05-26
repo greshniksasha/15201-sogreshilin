@@ -21,7 +21,7 @@ public class BlockingQueue<Type> {
         return capacity;
     }
 
-    public int getSize() {
+    public synchronized int getSize() {
         return queue.size();
     }
 

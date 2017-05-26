@@ -58,9 +58,9 @@ public class Assembly {
         return pool;
     }
 
-    public int getPoolSize() {
-        return pool.getSize();
-    }
+//    public int getPoolSize() {
+//        return pool.getSize();
+//    }
 
     public void makeCar() {
         try {

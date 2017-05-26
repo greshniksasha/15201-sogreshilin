@@ -31,8 +31,16 @@ public class ThreadPool {
         queue.enqueue(task);
     }
 
-    public int getSize() {
-        return queue.getSize();
+    public int getCapacity() {
+        return pool.length;
+    }
+
+    public BlockingQueue<Runnable> getQueue() {
+        return queue;
+    }
+
+    public void addSizeObserver(BlockingQueue.SizeObserver observer) {
+        queue.addSizeObserver(observer);
     }
 
     class ThreadPoolRunnable implements Runnable {

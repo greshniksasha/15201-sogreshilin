@@ -42,5 +42,6 @@ public class ButtonPanel extends JPanel {
 
         add(startButton);
         add(stopButton);
+
     }
 }

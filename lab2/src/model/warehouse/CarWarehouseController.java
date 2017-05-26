@@ -39,7 +39,7 @@ public class CarWarehouseController implements Runnable {
             log.info("started");
             while (!Thread.interrupted()) {
                 synchronized (lock) {
-                    int carsNeeded = warehouse.getCapacity() - warehouse.getSize() - assembly.getPoolSize();
+                    int carsNeeded = warehouse.getCapacity() - warehouse.getSize() - assembly.getPool().getQueue().getSize();
                     for (int i = 0; i < carsNeeded; ++i) {
                         assembly.makeCar();
                     }

@@ -16,7 +16,7 @@ public class ControlPanel extends JPanel {
     private final int MIN_TIMEOUT = 0;
     private final int MAX_TIMEOUT = 10000;
     private final int SPACING = 500;
-    private final String TITLE = "Suppliers timeouts, sec.";
+    private final String TITLE = "Suppliers";
     private final String BODY_LABEL = "Body supplier";
     private final String ENGINE_LABEL = "Engine suplier";
     private final String ACCESSORY_LABEL;
@@ -41,6 +41,11 @@ public class ControlPanel extends JPanel {
         accessory.setValue(factory.getAccessorySupplier().getTimeout());
         engine.setValue(factory.getEngineSupplier().getTimeout());
         car.setValue(factory.getDealer().getTimeout());
+
+        body.setTransactionCounterObserver(factory.getBodySupplier());
+        accessory.setTransactionCounterObserver(factory.getAccessorySupplier());
+        engine.setTransactionCounterObserver(factory.getEngineSupplier());
+        car.setTransactionCounterObserver(factory.getDealer());
 
         body.addValueChangedObserver(timeout -> factory.getBodySupplier().setTimeout(timeout));
         accessory.addValueChangedObserver(timeout -> factory.getAccessorySupplier().setTimeout(timeout));
