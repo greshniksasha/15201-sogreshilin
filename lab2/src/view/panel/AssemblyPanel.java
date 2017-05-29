@@ -16,7 +16,6 @@ import java.awt.*;
 public class AssemblyPanel extends JPanel {
 
     public static final String WORKERS_LABEL = "Workers";
-    public static final String BUSY_WORKERS_LABEL = "Busy workers";
     public static final String TASKS_TODO_LABEL = "Tasks in queue";
 
 
