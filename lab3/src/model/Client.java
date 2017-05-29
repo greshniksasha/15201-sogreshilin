@@ -44,26 +44,17 @@ public class Client {
 
     public void setupIncomingReader() {
         Thread thread = new Thread(() -> {
-            label21:
             while(true) {
                 try {
                     String message;
                     if((message = this.reader.readLine()) != null) {
-                        Iterator e = this.listeners.iterator();
-
-                        while(true) {
-                            if(!e.hasNext()) {
-                                continue label21;
-                            }
-
-                            Client.IncomingMessageListener listener = (Client.IncomingMessageListener)e.next();
+                        for (IncomingMessageListener listener : listeners) {
                             listener.newIncomingMessage(message);
                         }
                     }
-                } catch (IOException var4) {
-                    var4.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
-
                 return;
             }
         });
@@ -75,16 +66,14 @@ public class Client {
             while(true) {
                 try {
                     if(!Thread.interrupted()) {
-                        Object var2 = this.lock;
-                        String e;
-                        synchronized(this.lock) {
-                            this.lock.wait();
-                            e = this.outcoming;
+                        String message;
+                        synchronized(lock) {
+                            lock.wait();
+                            message = outcoming;
                         }
 
-                        this.writer.println(e);
+                        this.writer.println(message);
                         this.writer.flush();
-                        continue;
                     }
                 } catch (InterruptedException var5) {
                     log.info("stopped");
@@ -97,10 +86,9 @@ public class Client {
     }
 
     public void setOutcoming(String outcoming) {
-        Object var2 = this.lock;
-        synchronized(this.lock) {
+        synchronized(lock) {
             this.outcoming = outcoming;
-            this.lock.notify();
+            lock.notify();
         }
     }
 
@@ -118,6 +106,6 @@ public class Client {
     }
 
     public interface IncomingMessageListener {
-        void newIncomingMessage(String var1);
+        void newIncomingMessage(String message);
     }
 }
