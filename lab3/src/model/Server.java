@@ -25,10 +25,10 @@ public class Server {
     public Server() {
         try {
             this.serverSocket = new ServerSocket(5000);
-        } catch (IOException var2) {
+        } catch (IOException e) {
             log.error("server socket creating error");
+            System.exit(-1);
         }
-
         log.info("server socket created");
     }
 
@@ -38,9 +38,9 @@ public class Server {
                 Socket e = this.serverSocket.accept();
                 PrintWriter writer = new PrintWriter(e.getOutputStream());
                 this.clientOutputStreams.add(writer);
-                (new Thread(new Server.ClientHandler(e))).start();
+                new Thread(new Server.ClientHandler(e)).start();
             }
-        } catch (IOException var3) {
+        } catch (IOException e) {
             log.error("getting client\'s output stream error");
         }
     }
@@ -55,24 +55,19 @@ public class Server {
 
         public ClientHandler(Socket clientSocket) {
             this.socket = clientSocket;
-
             try {
                 this.reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-            } catch (IOException var4) {
+            } catch (IOException e) {
                 Server.log.error("getting client\'s input stream error");
             }
 
         }
 
         private void tellEveryone(String message) {
-            Iterator var2 = Server.this.clientOutputStreams.iterator();
-
-            while(var2.hasNext()) {
-                PrintWriter writer = (PrintWriter)var2.next();
+            for (PrintWriter writer : clientOutputStreams) {
                 writer.println(message);
                 writer.flush();
             }
-
         }
 
         public void run() {
@@ -84,10 +79,9 @@ public class Server {
                         this.tellEveryone(message);
                         continue;
                     }
-                } catch (IOException var3) {
+                } catch (IOException e) {
                     Server.log.error("receiving message from client error");
                 }
-
                 return;
             }
         }
