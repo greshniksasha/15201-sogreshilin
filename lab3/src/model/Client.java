@@ -36,7 +36,7 @@ public class Client {
             this.writer = new PrintWriter(this.socket.getOutputStream());
             this.reader = new BufferedReader(new InputStreamReader(this.socket.getInputStream()));
             log.info("networking established");
-        } catch (IOException var2) {
+        } catch (IOException e) {
             log.error("connection could not be established");
         }
 
@@ -75,7 +75,7 @@ public class Client {
                         this.writer.println(message);
                         this.writer.flush();
                     }
-                } catch (InterruptedException var5) {
+                } catch (InterruptedException e) {
                     log.info("stopped");
                 }
 
