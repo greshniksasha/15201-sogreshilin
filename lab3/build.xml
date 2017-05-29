@@ -1,0 +1,94 @@
+<project name="Chat" default="dist" basedir=".">
+
+  <property name="client.name" value="Client"/>
+  <property name="server.name" value="Server"/>
+  <property name="client.main.class" value="model.Client"/>
+  <property name="server.main.class" value="model.Server"/>
+  <property name="src.dir" location="src"/>
+  <property name="build.dir" location="build"/>
+  <property name="lib.dir" location="lib"/>
+  <property name="test.dir" location="test"/>
+  <property name="test-build.dir" location="test-build"/>
+
+  <path id="libraries">
+    <fileset dir="${lib.dir}" includes="javac2-7.0.3.jar"/>
+    <fileset dir="${lib.dir}" includes="log4j-api-2.8.1.jar"/>
+    <fileset dir="${lib.dir}" includes="log4j-core-2.8.1.jar"/>
+  </path>
+
+  <path id="test-libraries">
+    <fileset dir="${lib.dir}" includes="junit-4.11.jar"/>
+    <fileset dir="${lib.dir}" includes="hamcrest-core-1.3.jar"/>
+  </path>
+
+  <target name="init" depends="clean">
+    <mkdir dir="${build.dir}"/>
+  </target>
+
+  <target name="compile" depends="init">
+    <javac classpathref="libraries" srcdir="${src.dir}" destdir="${build.dir}" includeantruntime="false" fork="true" />
+  </target>
+
+  <target name="dist" depends="compile">
+    <jar destfile="${client.name}.jar" basedir="${build.dir}">
+      <zipgroupfileset dir="${lib.dir}" includes="*.jar" />
+      <manifest>
+        <attribute name="Main-Class" value="${client.main.class}"/>
+      </manifest>
+    </jar>
+    <jar destfile="${server.name}.jar" basedir="${build.dir}">
+      <zipgroupfileset dir="${lib.dir}" includes="*.jar" />
+      <manifest>
+        <attribute name="Main-Class" value="${server.main.class}"/>
+      </manifest>
+    </jar>
+  </target>
+
+  <!--<target name="test-compile" depends="compile, dist">-->
+    <!--<mkdir dir="${test-build.dir}" />-->
+    <!--<javac srcdir="${test.dir}" destdir="${test-build.dir}" includeantruntime="false">-->
+      <!--<classpath>-->
+        <!--<pathelement location="${lib.dir}/junit-4.11.jar"/>-->
+        <!--<pathelement location="${lib.dir}/hamcrest-core-1.3.jar"/>-->
+        <!--<pathelement location="${project.name}.jar"/>-->
+      <!--</classpath>-->
+    <!--</javac>-->
+  <!--</target>-->
+
+  <!--<target name="test" depends="test-compile">-->
+    <!--<junit>-->
+      <!--<classpath>-->
+        <!--<pathelement location="${lib.dir}/junit-4.11.jar"/>-->
+        <!--<pathelement location="${lib.dir}/hamcrest-core-1.3.jar"/>-->
+        <!--<pathelement location="${project.name}.jar" />-->
+        <!--<pathelement location="${test-build.dir}" />-->
+      <!--</classpath>-->
+      <!--<formatter type="brief" usefile="false" />-->
+      <!--<batchtest>-->
+        <!--<fileset dir="${test-build.dir}" includes="**/*Test.class" />-->
+      <!--</batchtest>-->
+    <!--</junit>-->
+  <!--</target>-->
+
+  <target name="run-server">
+    <java jar="${server.name}.jar" fork="true" >
+      <sysproperty key="log4j.configurationFile" value="file:${src.dir}/log4j2.xml"/>
+      <classpath refid="libraries"/>
+    </java>
+  </target>
+
+  <target name="run-client">
+    <java jar="${client.name}.jar" fork="true" >
+      <sysproperty key="log4j.configurationFile" value="file:${src.dir}/log4j2.xml"/>
+      <classpath refid="libraries"/>
+    </java>
+  </target>
+
+  <target name="clean">
+    <delete dir="${build.dir}"/>
+    <!--<delete dir="${test-build.dir}"/>-->
+    <delete file="${client.name}.jar"/>
+    <delete file="${server.name}.jar"/>
+  </target>
+
+</project>
