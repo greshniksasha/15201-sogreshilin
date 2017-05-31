@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<project name="lab1" default="main" basedir=".">
+
+    <property name="projectName" value="LoC" />
+
+    <property name="main.src.dir" location="src" />
+    <property name="main.build.dir" location="build/main" />
+    <property name="test.src.dir" location="test" />
+    <property name="test.build.dir" location="build/test" />
+    <property name="dist.dir" location="." />
+
+    <target name="main" depends="clean, compile, dist, test-compile" />
+
+    <target name="compile">
+        <mkdir dir="${main.build.dir}" />
+        <javac srcdir="${main.src.dir}" destdir="${main.build.dir}" includeantruntime="false" />
+    </target>
+
+    <target name="test-compile" depends="compile, dist">
+        <mkdir dir="${test.build.dir}" />
+        <javac srcdir="${test.src.dir}" classpath="${projectName}.jar:../lib/junit/junit-4.11.jar" destdir="${test.build.dir}" includeantruntime="false" />
+    </target>
+
+    <target name="test" depends="test-compile">
+        <junit>
+            <classpath>
+                <pathelement location="../lib/junit/junit-4.11.jar" />
+                <pathelement location="../lib/hamcrest/hamcrest-core-1.3.jar" />
+                <pathelement location="${projectName}.jar" />
+                <pathelement location="${test.build.dir}" />
+            </classpath>
+            <formatter type="brief" usefile="false" />
+            <batchtest>
+                <fileset dir="${test.build.dir}" includes="**/*Test.class" />
+            </batchtest>
+        </junit>
+    </target>
+
+    <target name="dist" depends="compile">
+        <mkdir dir="${dist.dir}" />
+        <jar jarfile="${dist.dir}/${projectName}.jar" basedir="${main.build.dir}">
+            <manifest>
+                <attribute name="Main-Class" value="com.lab1.Main" />
+            </manifest>
+        </jar>
+    </target>
+
+    <target name="clean" description="Flush staging directory">
+        <delete dir="build" />
+        <delete file="${projectName}.jar" />
+    </target>
+
+</project>
