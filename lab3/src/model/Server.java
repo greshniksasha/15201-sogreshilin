@@ -3,87 +3,73 @@ package model;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
 
 /**
  * Created by Alexander on 29/05/2017.
  */
 public class Server {
     private static final short PORT = 5000;
-    private ServerSocket serverSocket;
-    private List<PrintWriter> clientOutputStreams = new ArrayList();
+    private static final int CAPACITY = 100;
+//    private ServerSocket serverSocket;
+    private List<String> participants = new ArrayList<>();
+    private List<ClientHandler> clientHandlers = new ArrayList<>();
+    private BlockingQueue<Message> buffer = new ArrayBlockingQueue<Message>(10);
+
     private static final Logger log = LogManager.getLogger(Server.class);
 
     public Server() {
-        try {
-            this.serverSocket = new ServerSocket(5000);
+        try (ServerSocket serverSocket = new ServerSocket(PORT)) {
+            while(!Thread.interrupted()) {
+                Socket socket = serverSocket.accept();
+                log.info("new client accepted");
+                clientHandlers.add(new ClientHandler(this, socket));
+            }
         } catch (IOException e) {
             log.error("server socket creating error");
             System.exit(-1);
         }
-        log.info("server socket created");
+        log.info("thread interrupted");
     }
 
-    public void go() {
-        try {
-            while(true) {
-                Socket e = this.serverSocket.accept();
-                PrintWriter writer = new PrintWriter(e.getOutputStream());
-                this.clientOutputStreams.add(writer);
-                new Thread(new Server.ClientHandler(e)).start();
-            }
-        } catch (IOException e) {
-            log.error("getting client\'s output stream error");
-        }
+    public BlockingQueue<Message> getBuffer() {
+        return buffer;
+    }
+
+    public List<ClientHandler> getClientHandlers() {
+        return clientHandlers;
+    }
+
+    public List<String> getParticipants() {
+        return participants;
+    }
+
+    private void go() {
+
     }
 
     public static void main(String[] args) {
-        (new Server()).go();
-    }
-
-    public class ClientHandler implements Runnable {
-        private Socket socket;
-        BufferedReader reader;
-
-        public ClientHandler(Socket clientSocket) {
-            this.socket = clientSocket;
-            try {
-                this.reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-            } catch (IOException e) {
-                Server.log.error("getting client\'s input stream error");
+        Thread serverThread = new Thread(() -> {
+            new Server();
+        }, "Server");
+        serverThread.start();
+        try {
+            BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+            System.out.print("to exit enter exit");
+            while (br.readLine().compareToIgnoreCase("exit") != 0) {
+                System.out.println("here");
             }
-
+        } catch (IOException e) {
+            e.printStackTrace();
         }
+        serverThread.interrupt();
 
-        private void tellEveryone(String message) {
-            for (PrintWriter writer : clientOutputStreams) {
-                writer.println(message);
-                writer.flush();
-            }
-        }
 
-        public void run() {
-            while(true) {
-                try {
-                    String message;
-                    if((message = this.reader.readLine()) != null) {
-                        Server.log.info("received message from {}: {}", this.socket.getInetAddress().toString(), message);
-                        this.tellEveryone(message);
-                        continue;
-                    }
-                } catch (IOException e) {
-                    Server.log.error("receiving message from client error");
-                }
-                return;
-            }
-        }
     }
 }
