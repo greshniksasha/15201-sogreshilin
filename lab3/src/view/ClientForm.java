@@ -1,61 +1,212 @@
 package view;
 
 import model.Client;
-import model.ClientReader;
-import model.MessageType;
+import model.message.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.util.List;
 
 /**
  * Created by Alexander on 29/05/2017.
  */
 public class ClientForm extends JFrame {
-    private ClientReader clientReader;
+    private Client client;
     private static final Logger log = LogManager.getLogger(Client.class);
 
-    public ClientForm(ClientReader clientReader) throws HeadlessException {
+
+    private JLabel loginL;
+    private JTextField loginTF;
+    private JButton connectB;
+    private JButton disconnectB;
+    private JTextField outgoingTF;
+    private JButton sendB;
+    private IncomingMessagesPanel incomingP;
+    private OnlineUsersPanel usersP;
+
+
+    public ClientForm(Client client) throws HeadlessException {
         super("Client");
-        this.clientReader = clientReader;
+        this.client = client;
         this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
-        JTextField outgoing = new JTextField(20);
-        JButton sendButton = new JButton("send");
-        JPanel inputPanel = new JPanel();
-        inputPanel.add(outgoing);
-        inputPanel.add(sendButton);
+        client.addObserver((message -> {
+            message.process(this);
+        }));
 
-        sendButton.addActionListener((e) -> {
-            clientReader.getClient().addOutgoingMessage(MessageType.REGULAR, outgoing.getText());
-            outgoing.setText("");
+        //***** NORTH PANEL *****/
+
+        JPanel northP = new JPanel(new GridLayout(1,4));
+        loginL = new JLabel("Enter username");
+        loginTF = new JTextField();
+        connectB = new JButton("CONNECT");
+        disconnectB = new JButton("DISCONNECT");
+        northP.add(loginL);
+        northP.add(loginTF);
+        northP.add(connectB);
+        northP.add(disconnectB);
+
+        loginL.setHorizontalAlignment(SwingConstants.CENTER);
+
+        connectB.addActionListener((e) -> {
+            String name = loginTF.getText();
+            client.setName(name);
+            client.addOutgoingMessage(new LoginRequest(name, client.getChatClientName()));
+            log.info("trying to log in as {}", name);
         });
-        getRootPane().setDefaultButton(sendButton);
 
-        JButton participantsButton = new JButton("participants");
-        participantsButton.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                clientReader.getClient().addOutgoingMessage(MessageType.PARTICIPANTS, "");
+        connectB.setEnabled(false);
+        getRootPane().setDefaultButton(connectB);
+
+        disconnectB.addActionListener((e) -> {
+            client.addOutgoingMessage(new LogoutRequest(client.getSessionID()));
+            sendB.setEnabled(false);
+            outgoingTF.setEditable(false);
+            log.info("trying to disconnect");
+        });
+
+        disconnectB.setEnabled(false);
+
+        loginTF.addKeyListener(new KeyAdapter() {
+            public void keyReleased(KeyEvent e) {
+                if (loginTF.isEditable()) {
+                    if (loginTF.getText().trim().isEmpty()) {
+                        connectB.setEnabled(false);
+                    } else {
+                        connectB.setEnabled(true);
+                    }
+                }
             }
         });
 
+        //***** SOUTH PANEL *****/
+
+        JPanel southP = new JPanel();
+        sendB = new JButton("SEND");
+        outgoingTF = new JTextField(20);
+        southP.add(outgoingTF);
+        southP.add(sendB);
+
+        sendB.setEnabled(false);
+
+        sendB.addActionListener((e) -> {
+            String text = outgoingTF.getText();
+            outgoingTF.setText("");
+            client.addOutgoingMessage(new TextMessage(text, client.getSessionID()));
+        });
+
+        outgoingTF.addKeyListener(new KeyAdapter() {
+            public void keyReleased(KeyEvent e) {
+                if (disconnectB.isEnabled()) {
+                    if (outgoingTF.getText().trim().isEmpty()) {
+                        sendB.setEnabled(false);
+                    } else {
+                        sendB.setEnabled(true);
+                    }
+                }
+            }
+        });
+
+        outgoingTF.setEditable(false);
+
+        //***** CENTER PANEL *****/
+
+        incomingP = new IncomingMessagesPanel();
+        usersP = new OnlineUsersPanel();
+
+        //***** ALL FORM *****/
+
         JPanel mainPanel = new JPanel();
         mainPanel.setLayout(new BorderLayout());
-        mainPanel.add(new IncomingMessagesPanel(clientReader), BorderLayout.CENTER);
-        mainPanel.add(new ParticipantsPanel(clientReader), BorderLayout.WEST);
-        mainPanel.add(inputPanel, BorderLayout.SOUTH);
-
+        mainPanel.add(northP, BorderLayout.NORTH);
+        mainPanel.add(incomingP, BorderLayout.WEST);
+        mainPanel.add(usersP, BorderLayout.EAST);
+        mainPanel.add(southP, BorderLayout.SOUTH);
         this.setContentPane(mainPanel);
         this.pack();
         this.setResizable(false);
     }
 
+    public void process(LoginResponse message) {
+        if (message.succeeded()) {
+            client.setSessionID(message.getSessionID());
+//            sendB.setEnabled(true);
+            outgoingTF.setEditable(true);
+            loginTF.setText(client.getName());
+            loginTF.setEditable(false);
+            outgoingTF.requestFocus();
+            loginL.setText("Logged in as");
+            getRootPane().setDefaultButton(sendB);
+            disconnectB.setEnabled(true);
+            connectB.setEnabled(false);
+            log.info("view is ready to exchange messages");
+        } else {
+            JOptionPane.showMessageDialog(this, "Name is already in use");
+            log.info("view informed user that name in use");
+        }
+    }
+
+    public void process(LastMessages message) {
+        for (DisplayMessage m : message.getMessages()) {
+            incomingP.appendText(m.messageToShow());
+        }
+        log.info("view displayed all last messages");
+    }
+
+    public void process(ListUsersResponse message) {
+        if (message.succeeded()) {
+            usersP.refreshUsersList(client.getUsers());
+            log.info("view displayed online users");
+        } else {
+            log.info("view could not display online users");
+        }
+    }
+
+    public void process(LogoutResponse message) {
+        if (message.succeeded()) {
+            log.info("disconnected from the chat");
+            disconnectB.setEnabled(false);
+        } else {
+            JOptionPane.showMessageDialog(this, "Could not disconnect, try again");
+            sendB.setEnabled(true);
+            outgoingTF.setEnabled(true);
+            log.info("logout failed");
+        }
+    }
+
+    public void process(TextResponse message) {
+        if (message.succeeded()) {
+            log.info("message displayed");
+        } else {
+            //TODO : message should be marked as undelivered
+            log.info("message marked as undelivered");
+        }
+    }
+
+    public void process(UserLoginMessage message) {
+        usersP.refreshUsersList(client.getUsers());
+        log.info("user {} added to userList", message.getName());
+    }
+
+    public void process(UserLogoutMessage message) {
+        usersP.refreshUsersList(client.getUsers());
+        log.info("user {} removed from userList", message.getName());
+    }
+
+    public void process(UserMessage message) {
+        incomingP.appendText(message.messageToShow());
+        log.info("displayed message \"{}\" from {}", message.getMessage(), message.getName());
+    }
+
+
     public void dispose() {
-        clientReader.getClient().addOutgoingMessage(MessageType.LOGOUT, null);
+        if (disconnectB.isEnabled()) {
+            disconnectB.doClick();
+        }
         super.dispose();
         log.info("exiting");
         System.exit(0);
