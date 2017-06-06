@@ -34,7 +34,7 @@ public class Client {
     private Thread readerThread;
     private Thread writerThread;
 
-    private static final int CAPACITY = 100;
+    private static final int CAPACITY = 100000;
     private static final Logger log = LogManager.getLogger(Client.class);
 
     public Client() {
@@ -45,13 +45,25 @@ public class Client {
         loggedIn = false;
     }
 
-    private void connectToServer() {
+    public void connectToServer() {
         try {
             socket = new Socket(IP, PORT);
         } catch (IOException e) {
             log.error("connecting to server error");
         }
         log.info("connected to server");
+    }
+
+    public void disconnectFromServer() {
+        try {
+            socket.close();
+        } catch (IOException e) {
+            log.error("closing socket error");
+        }
+    }
+
+    public Boolean isConnectedToServer() {
+        return !socket.isClosed();
     }
 
     public Boolean loggedIn() {
@@ -62,19 +74,11 @@ public class Client {
         this.loggedIn = loggedIn;
     }
 
-    private void go () {
-        try {
+    public void go () {
             readerThread = new Thread(new Reader(), "Reader");
             writerThread = new Thread(new Writer(), "Writer");
-
             readerThread.start();
             writerThread.start();
-            readerThread.join();
-            writerThread.join();
-
-        } catch (InterruptedException e) {
-            log.info("interrupted");
-        }
     }
 
 
@@ -117,10 +121,6 @@ public class Client {
         observers.add(o);
     }
 
-//    public void removeObserver(IncomingMsgObserver o) {
-//        observers.remove(o);
-//    }
-
     public void notifyObservers(ServerMessage message) {
         for (IncomingMsgObserver o : observers) {
             o.process(message);
@@ -135,14 +135,14 @@ public class Client {
         users.remove(name);
     }
 
+    public void removeAllUsers() {
+        users.clear();
+    }
+
     public void finish() {
         readerThread.interrupt();
         writerThread.interrupt();
-        try {
-            socket.close();
-        } catch (IOException e) {
-            log.error("closing socket error");
-        }
+        disconnectFromServer();
     }
 
     public static void main(String[] args) {

@@ -3,15 +3,25 @@ package model.message;
 import model.MessageHandler;
 import model.Server;
 
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 import java.io.Serializable;
 
 /**
  * Created by Alexander on 02/06/2017.
  */
+@XmlRootElement(name = "command")
 public class LogoutRequest implements ClientMessage, Serializable {
     private int sessionID;
+    @XmlAttribute(name = "name")
+    private final Command type = Command.LOGOUT;
 
-    public LogoutRequest(int sessionID) {
+    public LogoutRequest() {
+    }
+
+    @XmlElement(name = "session")
+    public void setSessionID(int sessionID) {
         this.sessionID = sessionID;
     }
 

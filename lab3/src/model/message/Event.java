@@ -5,13 +5,11 @@ import javax.xml.bind.annotation.XmlEnumValue;
 /**
  * Created by Alexander on 03/06/2017.
  */
-public enum Command {
-    @XmlEnumValue(value = "login")
-    LOGIN,
-    @XmlEnumValue(value = "list")
-    LIST,
+public enum Event {
     @XmlEnumValue(value = "message")
     MESSAGE,
-    @XmlEnumValue(value = "logout")
-    LOGOUT
+    @XmlEnumValue(value = "userlogin")
+    USER_LOGIN,
+    @XmlEnumValue(value = "userlogout")
+    USER_LOGOUT
 }

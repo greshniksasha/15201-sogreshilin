@@ -7,7 +7,7 @@ import view.ClientForm;
 /**
  * Created by Alexander on 02/06/2017.
  */
-public interface ServerMessage {
+public interface ServerMessage extends Message {
     void process(MessageHandler handler);
     void process(ClientForm form);
 }

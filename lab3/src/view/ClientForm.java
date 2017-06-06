@@ -55,7 +55,10 @@ public class ClientForm extends JFrame {
         connectB.addActionListener((e) -> {
             String name = loginTF.getText();
             client.setName(name);
-            client.addOutgoingMessage(new LoginRequest(name, client.getChatClientName()));
+            LoginRequest msg = new LoginRequest();
+            msg.setName(name);
+            msg.setChatClientName(client.getChatClientName());
+            client.addOutgoingMessage(msg);
             log.info("trying to log in as {}", name);
         });
 
@@ -63,8 +66,11 @@ public class ClientForm extends JFrame {
         getRootPane().setDefaultButton(connectB);
 
         disconnectB.addActionListener((e) -> {
-            client.addOutgoingMessage(new LogoutRequest(client.getSessionID()));
+            LogoutRequest msg = new LogoutRequest();
+            msg.setSessionID(client.getSessionID());
+            client.addOutgoingMessage(msg);
             sendB.setEnabled(false);
+            disconnectB.setEnabled(false);
             outgoingTF.setEditable(false);
             log.info("trying to disconnect");
         });
@@ -96,7 +102,10 @@ public class ClientForm extends JFrame {
         sendB.addActionListener((e) -> {
             String text = outgoingTF.getText();
             outgoingTF.setText("");
-            client.addOutgoingMessage(new TextMessage(text, client.getSessionID()));
+            TextMessage msg = new TextMessage();
+            msg.setText(text);
+            msg.setSessionID(client.getSessionID());
+            client.addOutgoingMessage(msg);
         });
 
         outgoingTF.addKeyListener(new KeyAdapter() {
@@ -132,22 +141,16 @@ public class ClientForm extends JFrame {
     }
 
     public void process(LoginResponse message) {
-        if (message.succeeded()) {
-            client.setSessionID(message.getSessionID());
-//            sendB.setEnabled(true);
-            outgoingTF.setEditable(true);
-            loginTF.setText(client.getName());
-            loginTF.setEditable(false);
-            outgoingTF.requestFocus();
-            loginL.setText("Logged in as");
-            getRootPane().setDefaultButton(sendB);
-            disconnectB.setEnabled(true);
-            connectB.setEnabled(false);
-            log.info("view is ready to exchange messages");
-        } else {
-            JOptionPane.showMessageDialog(this, "Name is already in use");
-            log.info("view informed user that name in use");
-        }
+        client.setSessionID(message.getSessionID());
+        outgoingTF.setEditable(true);
+        loginTF.setText(client.getName());
+        loginTF.setEditable(false);
+        outgoingTF.requestFocus();
+        loginL.setText("Logged in as");
+        getRootPane().setDefaultButton(sendB);
+        disconnectB.setEnabled(true);
+        connectB.setEnabled(false);
+        log.info("view is ready to exchange messages");
     }
 
     public void process(LastMessages message) {
@@ -157,20 +160,25 @@ public class ClientForm extends JFrame {
         log.info("view displayed all last messages");
     }
 
+    public void process(ErrorMessage message) {
+        JOptionPane.showMessageDialog(this, message.getError());
+        log.info("view informed user about error");
+    }
+
     public void process(ListUsersResponse message) {
-        if (message.succeeded()) {
+//        if (message.succeeded()) {
             usersP.refreshUsersList(client.getUsers());
             log.info("view displayed online users");
-        } else {
-            log.info("view could not display online users");
-        }
+//        } else {
+//            log.info("view could not display online users");
+//        }
     }
 
     public void process(LogoutResponse message) {
         if (message.succeeded()) {
             log.info("disconnected from the chat");
-            disconnectB.setEnabled(false);
         } else {
+            disconnectB.setEnabled(true);
             JOptionPane.showMessageDialog(this, "Could not disconnect, try again");
             sendB.setEnabled(true);
             outgoingTF.setEnabled(true);
@@ -189,11 +197,13 @@ public class ClientForm extends JFrame {
 
     public void process(UserLoginMessage message) {
         usersP.refreshUsersList(client.getUsers());
+        incomingP.appendText(message.messageToShow());
         log.info("user {} added to userList", message.getName());
     }
 
     public void process(UserLogoutMessage message) {
         usersP.refreshUsersList(client.getUsers());
+        incomingP.appendText(message.messageToShow());
         log.info("user {} removed from userList", message.getName());
     }
 

@@ -3,27 +3,20 @@ package model.message;
 import model.MessageHandler;
 import view.ClientForm;
 
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 import java.io.Serializable;
 
 /**
- * Created by Alexander on 02/06/2017.
+ * Created by Alexander on 06/06/2017.
  */
-public class LogoutResponse implements ServerMessage, Serializable {
-    private Boolean success;
+@XmlRootElement(name="error")
+public class ListUsersError implements ServerMessage, Serializable {
     private String error;
 
-    public LogoutResponse() {
-        success = true;
-        error = null;
-    }
-
-    public LogoutResponse(String errorMessage) {
-        success = false;
-        error = errorMessage;
-    }
-
-    public Boolean succeeded() {
-        return success;
+    @XmlElement(name = "message")
+    public void setError(String error) {
+        this.error = error;
     }
 
     public String getError() {

@@ -19,7 +19,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class Server {
     private static AtomicInteger sessionIDGenerator = new AtomicInteger(0);
     private static final int BUFFER_CAPACITY = 10;
-    private static final int QUEUE_CAPACITY = 100;
+    private static final int QUEUE_CAPACITY = 100000;
     private static final short PORT = 5000;
 
     private ServerSocket serverSocket;
@@ -53,64 +53,81 @@ public class Server {
 
     public void process(LoginRequest message, ClientHandler handler) {
         String name = message.getName();
-        LoginResponse response;
         if (users.contains(name)) {
-            response = new LoginResponse("user name is already in use");
+            LoginError response = new LoginError();
+            response.setError("User name is already in use");
+            handler.addOutgoingMessage(response);
             log.info("user name is already in use");
-        } else {
-            handler.setName(name);
-            users.add(name);
-            response = new LoginResponse(handler.getSessionID());
-            log.info("add new user={} sessionID={}", name, handler.getSessionID());
-            serverMessages.add(new UserLoginMessage(name));
+            return;
         }
+        handler.setName(name);
+        users.add(name);
+        LoginSuccess response = new LoginSuccess();
+        response.setSessionID(handler.getSessionID());
         handler.addOutgoingMessage(response);
+        log.info("add new user={} sessionID={}", name, handler.getSessionID());
+        UserLoginMessage msg = new UserLoginMessage();
+        msg.setName(name);
+        serverMessages.add(msg);
     }
 
     public void process(TextMessage message, ClientHandler handler) {
         if (message.getSessionID() != handler.getSessionID()) {
-            handler.addOutgoingMessage(new TextResponse("session IDs are not equal"));
+            TextError msg = new TextError();
+            msg.setError("session IDs are not equal");
+            handler.addOutgoingMessage(msg);
             log.info("in text message session IDs are not equal");
             return;
         }
-        handler.addOutgoingMessage(new TextResponse());
+        handler.addOutgoingMessage(new TextSuccess());
         log.info("successful text response sent to {}", handler.getName());
         String name = handler.getName();
         String text = message.getText();
-        serverMessages.add(new UserMessage(name, text));
+        UserMessage messageToSend = new UserMessage();
+        messageToSend.setName(name);
+        messageToSend.setMessage(text);
+        serverMessages.add(messageToSend);
         log.info("text message \"{}\" sent to everyone", text);
     }
 
     public void process(ListUsersRequest message, ClientHandler handler) {
         if (message.getSessionID() != handler.getSessionID()) {
-            handler.addOutgoingMessage(new ListUsersResponse("session IDs are not equal"));
+            ListUsersError msg = new ListUsersError();
+            msg.setError("session IDs are not equal");
+            handler.addOutgoingMessage(msg);
             log.info("in list users request session IDs are not equal");
             return;
         }
-        handler.addOutgoingMessage(new ListUsersResponse(getUsers()));
+        ListUsersSuccess msg = new ListUsersSuccess();
+        msg.setUsers(getUsers());
+        handler.addOutgoingMessage(msg);
         log.info("sent list users {} to {}", getUsers(), handler.getName());
     }
 
     public void process(LogoutRequest message, ClientHandler handler) {
         if (message.getSessionID() != handler.getSessionID()) {
-            handler.addOutgoingMessage(new LogoutResponse("session IDs are not equal"));
+            LogoutError msg = new LogoutError();
+            msg.setError("session IDs are not equal");
+            handler.addOutgoingMessage(msg);
             log.info("in logout request session IDs are not equal");
             return;
         }
-        handler.addOutgoingMessage(new LogoutResponse());
+        handler.addOutgoingMessage(new LogoutSuccess());
         log.info("successful logout response sent to user {}", handler.getName());
         users.remove(handler.getName());
-        serverMessages.add(new UserLogoutMessage(handler.getName()));
+        UserLogoutMessage msg = new UserLogoutMessage();
+        msg.setName(handler.getName());
+        serverMessages.add(msg);
         handler.stop();
         clientHandlers.remove(handler);
         log.info("sent user logout message to everyone");
     }
 
     private void start() {
-        acceptor = new Thread(new Acceptor());
+        acceptor = new Thread(new Acceptor(), "Acceptor");
         acceptor.start();
 
-        sender = new Thread(new Sender());
+        sender = new Thread(new Sender(), "Sender");
         sender.start();
     }
 
@@ -121,14 +138,14 @@ public class Server {
             for (ClientHandler h : clientHandlers) {
                 h.stop();
             }
-//            acceptor.join();
-//            sender.join();
+            acceptor.join();
+            sender.join();
         } catch (IOException e) {
             log.error("error closing socket");
+
+        } catch (InterruptedException e) {
+            log.info("interrupted");
         }
-//        } catch (InterruptedException e) {
-//            log.info("interrupted");
-//        }
     }
 
     public static void main(String[] args) {
@@ -211,11 +228,11 @@ public class Server {
         }
 
         void stop() {
-            try {
-                socket.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+//            try {
+//                socket.close();
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
 //            reader.interrupt();
             writer.interrupt();
         }

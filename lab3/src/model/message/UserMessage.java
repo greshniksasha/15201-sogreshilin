@@ -3,17 +3,33 @@ package model.message;
 import model.MessageHandler;
 import view.ClientForm;
 
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlType;
 import java.io.Serializable;
 
 /**
  * Created by Alexander on 03/06/2017.
  */
+@XmlRootElement(name = "event")
+@XmlType(propOrder = {"message", "name"})
 public class UserMessage implements ServerMessage, DisplayMessage, Serializable {
     private String name;
     private String message;
+    @XmlAttribute(name = "name")
+    private final Event type = Event.MESSAGE;
 
-    public UserMessage(String name, String message) {
+    public UserMessage() {
+    }
+
+    @XmlElement(name = "name")
+    public void setName(String name) {
         this.name = name;
+    }
+
+    @XmlElement(name = "message")
+    public void setMessage(String message) {
         this.message = message;
     }
 
