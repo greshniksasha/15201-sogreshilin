@@ -1,6 +1,7 @@
 package model.message;
 
 import model.MessageHandler;
+import model.User;
 import view.ClientForm;
 
 import javax.xml.bind.annotation.XmlAttribute;
@@ -16,28 +17,34 @@ import java.io.Serializable;
 public class UserLoginMessage implements ServerMessage, DisplayMessage, Serializable {
     @XmlAttribute(name = "name")
     private final String messageType = "userlogin";
-    private String name;
-    private String type;
+//    private String name;
+//    private String type;
+    private User user;
 
     public UserLoginMessage() {
+        user = new User();
     }
 
     @XmlElement(name = "name")
     public void setName(String name) {
-        this.name = name;
+        user.setName(name);
     }
 
     @XmlElement(name = "type")
     public void setType(String type) {
-        this.type = type;
+        user.setType(type);
     }
 
     public String getType() {
-        return type;
+        return user.getType();
     }
 
     public String getName() {
-        return name;
+        return user.getName();
+    }
+
+    public User getUser() {
+        return user;
     }
 
     @Override
@@ -52,6 +59,6 @@ public class UserLoginMessage implements ServerMessage, DisplayMessage, Serializ
 
     @Override
     public String messageToShow() {
-        return name + " joined the chat";
+        return user.getName() + " joined the chat";
     }
 }

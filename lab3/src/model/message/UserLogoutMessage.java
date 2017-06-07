@@ -1,6 +1,7 @@
 package model.message;
 
 import model.MessageHandler;
+import model.User;
 import view.ClientForm;
 
 import javax.xml.bind.annotation.XmlAttribute;
@@ -15,18 +16,24 @@ import java.io.Serializable;
 public class UserLogoutMessage implements ServerMessage, DisplayMessage, Serializable {
     @XmlAttribute(name = "name")
     private final String messageType = "userlogout";
-    private String name;
+//    private String name;
+    private User user;
 
     public UserLogoutMessage() {
+        user = new User();
     }
 
     @XmlElement(name = "name")
     public void setName(String name) {
-        this.name = name;
+        user.setName(name);
     }
 
     public String getName() {
-        return name;
+        return user.getName();
+    }
+
+    public User getUser() {
+        return user;
     }
 
     @Override
@@ -41,6 +48,6 @@ public class UserLogoutMessage implements ServerMessage, DisplayMessage, Seriali
 
     @Override
     public String messageToShow() {
-        return name + " left the chat";
+        return user.getName() + " left the chat";
     }
 }

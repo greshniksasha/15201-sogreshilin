@@ -25,6 +25,7 @@ public class XMLClientHandler implements ClientHandler {
     private String name;
     private Socket socket;
     private BlockingQueue<ServerMessage> messagesToSend;
+    private User user = new User();
 
     private static final Logger log = LogManager.getLogger(ObjectStreamClientHandler.class);
     private static AtomicInteger sessionIDGenerator = new AtomicInteger(0);
@@ -34,6 +35,9 @@ public class XMLClientHandler implements ClientHandler {
         this.socket = socket;
         sessionID = sessionIDGenerator.getAndIncrement();
         messagesToSend = new ArrayBlockingQueue<ServerMessage>(QUEUE_CAPACITY);
+//        user = new User();
+//        user.setName("null");
+//        user.setType("null");
 
         reader = new Thread(() -> {
             try {
@@ -81,11 +85,17 @@ public class XMLClientHandler implements ClientHandler {
     }
 
     public String getName() {
-        return name;
+        return user.getName();
     }
 
-    public void setName(String name) {
-        this.name = name;
+//    public void setName(String name) {
+//        this.name = name;
+//    }
+
+
+    @Override
+    public User getUser() {
+        return user;
     }
 
     public int getSessionID() {
@@ -95,6 +105,11 @@ public class XMLClientHandler implements ClientHandler {
     public void start() {
         reader.start();
         writer.start();
+    }
+
+    @Override
+    public void setUser(User user) {
+        this.user = user;
     }
 
     public void stop() {

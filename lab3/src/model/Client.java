@@ -20,18 +20,19 @@ import java.util.concurrent.BlockingQueue;
  */
 public class Client {
     private static final String CONFIG_FILE_PATH = "src/client_config.properties";
-    private static final String OBJECTS = "objects";
+    private static final String OBJ = "obj";
     private static final String XML = "xml";
     private Socket socket;
-    private String name;
+    private User user;
+//    private String name;
+//    private final String type;
     private int sessionID;
     private Boolean loggedIn;
     private BlockingQueue<ClientMessage> messagesToSend;
     private BlockingQueue<TextMessage> textMessages;
     private BlockingQueue<Class> sentMessageTypes;
-    private List<String> users;
+    private List<User> users;
     private List<IncomingMsgObserver> observers;
-    private final String type;
     private short port;
     private String ip;
 
@@ -47,7 +48,9 @@ public class Client {
     }
 
     public Client(ClientConfigs clientConfigs) {
-        type = clientConfigs.getType();
+        user = new User();
+        user.setType(clientConfigs.getType());
+//        type = clientConfigs.getType();
         sentMessageTypes = new ArrayBlockingQueue<>(CAPACITY);
         messageHandler = new ClientMessageHandler(this);
         messagesToSend = new ArrayBlockingQueue<>(CAPACITY);
@@ -112,7 +115,7 @@ public class Client {
     }
 
 
-    public List<String> getUsers() {
+    public List<User> getUsers() {
         return users;
     }
 
@@ -122,7 +125,7 @@ public class Client {
     }
 
     public String getType() {
-        return type;
+        return user.getType();
     }
 
     public void setSessionID(int sessionID) {
@@ -130,20 +133,20 @@ public class Client {
     }
 
     public void setName(String name) {
-        this.name = name;
+        user.setName(name);
     }
 
     public String getName() {
-        return name;
+        return user.getName();
     }
 
     public int getSessionID() {
         return sessionID;
     }
 
-    public void addUser(String name) {
-        if (!users.contains(name)) {
-            users.add(name);
+    public void addUser(User user) {
+        if (!users.contains(user)) {
+            users.add(user);
         }
     }
 
@@ -161,8 +164,8 @@ public class Client {
         void process(ServerMessage message);
     }
 
-    public void removeUser(String name) {
-        users.remove(name);
+    public void removeUser(User user) {
+        users.remove(user);
     }
 
     public void removeAllUsers() {
@@ -176,8 +179,8 @@ public class Client {
     }
 
     public void connectToServer() {
-        switch (type) {
-            case OBJECTS:
+        switch (user.getType()) {
+            case OBJ:
                 this.connectToServerObjectStream();
                 this.objectStreamsGo();
                 log.info("Connected to ObjectStream Server");

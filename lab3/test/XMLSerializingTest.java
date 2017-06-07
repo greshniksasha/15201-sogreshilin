@@ -1,3 +1,4 @@
+import model.User;
 import model.message.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -30,7 +31,7 @@ public class XMLSerializingTest {
     private static final String TYPE = "xml";
     private static final String TEXT = "this is TEXT message";
     private static final String ERROR_MSG = "this is error message";
-    private static final List<String> USERS = new ArrayList<>();
+    private static final List<User> USERS = new ArrayList<>();
     private static final int USER_COUNT = 10;
 
     static {
@@ -44,7 +45,10 @@ public class XMLSerializingTest {
             deserializer = new DOMDeserializer();
             deserializer.setQueue(queue);
             for (int i = 0; i < USER_COUNT; ++i) {
-                USERS.add("name-" + i);
+                User user = new User();
+                user.setName("name-" + i);
+                user.setType(TYPE);
+                USERS.add(user);
             }
 
         } catch (IOException e) {
@@ -67,7 +71,7 @@ public class XMLSerializingTest {
             throw new Exception("less bytes read than supposed to");
         }
         String string = new String(inputData, StandardCharsets.UTF_8);
-//        System.out.println(string);
+        System.out.println(string);
 
         // deserializing message
         return deserializer.deserialize(string);

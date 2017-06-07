@@ -11,11 +11,15 @@ public interface ClientHandler {
 
     String getName();
 
-    void setName(String name);
+//    void setName(String name);
 
     int getSessionID();
 
     void start();
 
     void stop();
+
+    void setUser(User user);
+
+    User getUser();
 }

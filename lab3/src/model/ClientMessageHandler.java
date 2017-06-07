@@ -36,7 +36,7 @@ public class ClientMessageHandler implements MessageHandler {
 
     @Override
     public void process(ListUsersSuccess message) {
-        for (String user : message.getUsers()) {
+        for (User user : message.getUsers()) {
             client.addUser(user);
             log.info("add user to userlist {}", user);
         }
@@ -80,7 +80,7 @@ public class ClientMessageHandler implements MessageHandler {
     @Override
     public void process(UserLoginMessage message) {
         if (client.loggedIn()) {
-            client.addUser(message.getName());
+            client.addUser(message.getUser());
             client.notifyObservers(message);
         }
     }
@@ -88,7 +88,7 @@ public class ClientMessageHandler implements MessageHandler {
     @Override
     public void process(UserLogoutMessage message) {
         if (client.loggedIn()) {
-            client.removeUser(message.getName());
+            client.removeUser(message.getUser());
             client.notifyObservers(message);
         }
     }

@@ -1,6 +1,7 @@
 package model.message;
 
 import model.MessageHandler;
+import model.User;
 import view.ClientForm;
 
 import javax.xml.bind.annotation.XmlElement;
@@ -14,15 +15,15 @@ import java.util.List;
  */
 @XmlRootElement(name="success")
 public class ListUsersSuccess implements ServerMessage, Serializable {
-    private List<String> users;
+    private List<User> users;
 
     @XmlElementWrapper(name = "listusers")
     @XmlElement(name = "user")
-    public void setUsers(List<String> users) {
+    public void setUsers(List<User> users) {
         this.users = users;
     }
 
-    public List<String> getUsers() {
+    public List<User> getUsers() {
         return users;
     }
 

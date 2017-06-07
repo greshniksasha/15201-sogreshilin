@@ -25,7 +25,7 @@ public class Server {
 
     private ServerSocket ooServerSocket;
     private ServerSocket xmlServerSocket;
-    private List<String> users;
+    private List<User> users;
     private BlockingQueue<ServerMessage> messageBuffer;
     private BlockingQueue<ServerMessage> serverMessages;
     private List<ClientHandler> clientHandlers;
@@ -59,25 +59,26 @@ public class Server {
     }
 
     public void process(LoginRequest message, ClientHandler handler) {
-        String name = message.getName();
-        if (this.getUsers().contains(name)) {
+        User user = message.getUser();
+        if (this.getUsers().contains(user)) {
             LoginError response = new LoginError();
             response.setError("User name is already in use");
             handler.addOutgoingMessage(response);
             log.info("user name is already in use");
             return;
         }
-        handler.setName(name);
-        this.getUsers().add(name);
+        handler.setUser(user);
+        this.getUsers().add(user);
         LoginSuccess response = new LoginSuccess();
         response.setSessionID(handler.getSessionID());
         handler.addOutgoingMessage(response);
         for (Object m : messageBuffer.toArray()) {
             handler.addOutgoingMessage((ServerMessage) m);
         }
-        log.info("add new user={} sessionID={}", name, handler.getSessionID());
+        log.info("add new user={} sessionID={}", user.getName(), handler.getSessionID());
         UserLoginMessage msg = new UserLoginMessage();
-        msg.setName(name);
+        msg.setName(user.getName());
+        msg.setType(user.getType());
         this.getServerMessages().add(msg);
     }
 
@@ -124,7 +125,7 @@ public class Server {
         }
         handler.addOutgoingMessage(new LogoutSuccess());
         log.info("successful logout response sent to user {}", handler.getName());
-        this.getUsers().remove(handler.getName());
+        this.getUsers().remove(handler.getUser());
         UserLogoutMessage msg = new UserLogoutMessage();
         msg.setName(handler.getName());
         this.getServerMessages().add(msg);
@@ -133,7 +134,7 @@ public class Server {
         log.info("sent user logout message to everyone");
     }
 
-    public List<String> getUsers() {
+    public List<User> getUsers() {
         return users;
     }
 

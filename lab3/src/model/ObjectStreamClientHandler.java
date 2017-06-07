@@ -20,9 +20,10 @@ public class ObjectStreamClientHandler implements ClientHandler {
     private Thread reader;
     private Thread writer;
     private int sessionID;
-    private String name;
+//    private String name;
     private Socket socket;
     private BlockingQueue<ServerMessage> messagesToSend;
+    private User user;
 
     private static final Logger log = LogManager.getLogger(ObjectStreamClientHandler.class);
     private static AtomicInteger sessionIDGenerator = new AtomicInteger(0);
@@ -39,10 +40,13 @@ public class ObjectStreamClientHandler implements ClientHandler {
                 log.info("got input stream file descriptor");
                 while (!Thread.interrupted()) {
                     ClientMessage m = (ClientMessage)inputStream.readObject();
+                    log.info("объект прочитан");
                     m.process(server, this);
                 }
-            } catch (IOException | ClassNotFoundException e) {
-                log.info("stopped");
+            } catch (IOException e) {
+                log.info("socket has been closed");
+            } catch (ClassNotFoundException e) {
+                log.info("class not found");
             }
         }, "ObjectReader-" + sessionID);
 
@@ -70,11 +74,16 @@ public class ObjectStreamClientHandler implements ClientHandler {
     }
 
     public String getName() {
-        return name;
+        return user.getName();
     }
 
-    public void setName(String name) {
-        this.name = name;
+//    public void setName(String name) {
+//        this.name = name;
+//    }
+
+    @Override
+    public User getUser() {
+        return user;
     }
 
     public int getSessionID() {
@@ -88,6 +97,11 @@ public class ObjectStreamClientHandler implements ClientHandler {
 
     public void stop() {
         writer.interrupt();
+    }
+
+    @Override
+    public void setUser(User user) {
+        this.user = user;
     }
 }
 

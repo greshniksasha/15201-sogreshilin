@@ -2,6 +2,7 @@ package model.message;
 
 import model.ClientHandler;
 import model.Server;
+import model.User;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
@@ -17,28 +18,34 @@ import java.io.Serializable;
 public class LoginRequest implements ClientMessage, Serializable {
     @XmlAttribute(name = "name")
     private final String messageType = "login";
-    private String name;
-    private String type;
+    private User user;
+//    private String name;
+//    private String type;
 
     public LoginRequest() {
+        user = new User();
     }
 
     @XmlElement(name = "name")
     public void setName(String name) {
-        this.name = name;
+        user.setName(name);
     }
 
     @XmlElement(name = "type")
     public void setType(String type) {
-        this.type = type;
+        user.setType(type);
     }
 
     public String getName() {
-        return name;
+        return user.getName();
     }
 
     public String getType() {
-        return type;
+        return user.getType();
+    }
+
+    public User getUser() {
+        return user;
     }
 
     @Override
