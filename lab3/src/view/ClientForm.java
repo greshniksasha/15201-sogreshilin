@@ -9,7 +9,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.util.List;
 
 /**
  * Created by Alexander on 29/05/2017.
@@ -53,6 +52,9 @@ public class ClientForm extends JFrame {
         loginL.setHorizontalAlignment(SwingConstants.CENTER);
 
         connectB.addActionListener((e) -> {
+            if (!this.client.isConnectedToServer()) {
+                this.client.connectToServer();
+            }
             String name = loginTF.getText();
             client.setName(name);
             LoginRequest msg = new LoginRequest();
@@ -140,7 +142,15 @@ public class ClientForm extends JFrame {
         this.setResizable(false);
     }
 
-    public void process(LoginResponse message) {
+
+
+
+
+
+
+
+
+    public void process(LoginSuccess message) {
         client.setSessionID(message.getSessionID());
         outgoingTF.setEditable(true);
         loginTF.setText(client.getName());
@@ -153,46 +163,48 @@ public class ClientForm extends JFrame {
         log.info("view is ready to exchange messages");
     }
 
-    public void process(LastMessages message) {
-        for (DisplayMessage m : message.getMessages()) {
-            incomingP.appendText(m.messageToShow());
-        }
-        log.info("view displayed all last messages");
-    }
-
-    public void process(ErrorMessage message) {
+    public void process(LoginError message) {
         JOptionPane.showMessageDialog(this, message.getError());
         log.info("view informed user about error");
     }
 
-    public void process(ListUsersResponse message) {
-//        if (message.succeeded()) {
-            usersP.refreshUsersList(client.getUsers());
-            log.info("view displayed online users");
-//        } else {
-//            log.info("view could not display online users");
-//        }
+    public void process(ListUsersSuccess message) {
+        usersP.refreshUsersList(client.getUsers());
+        log.info("view displayed online users");
     }
 
-    public void process(LogoutResponse message) {
-        if (message.succeeded()) {
-            log.info("disconnected from the chat");
-        } else {
-            disconnectB.setEnabled(true);
-            JOptionPane.showMessageDialog(this, "Could not disconnect, try again");
-            sendB.setEnabled(true);
-            outgoingTF.setEnabled(true);
-            log.info("logout failed");
-        }
+    public void process(ListUsersError message) {
+        log.info("view could not display online users");
     }
 
-    public void process(TextResponse message) {
-        if (message.succeeded()) {
-            log.info("message displayed");
-        } else {
-            //TODO : message should be marked as undelivered
-            log.info("message marked as undelivered");
-        }
+    public void process(TextSuccess message) {
+        log.info("message displayed");
+    }
+
+    public void process(TextError message) {
+        incomingP.appendText("your message was not delivered : \"" + message.getText() + "\"");
+        log.info("message marked as undelivered");
+    }
+
+    public void process(LogoutSuccess message) {
+        //TODO
+        loginL.setText("Last logged in as");
+        usersP.refreshUsersList(client.getUsers());
+        incomingP.appendText("you are disconnected from chat");
+        loginTF.setEditable(true);
+        loginTF.requestFocus();
+        getRootPane().setDefaultButton(connectB);
+        connectB.setEnabled(true);
+        client.disconnectFromServer();
+        log.info("disconnected from the chat");
+    }
+
+    public void process(LogoutError message) {
+        disconnectB.setEnabled(true);
+        JOptionPane.showMessageDialog(this, message.getError());
+        sendB.setEnabled(true);
+        outgoingTF.setEnabled(true);
+        log.info("logout failed");
     }
 
     public void process(UserLoginMessage message) {
@@ -221,4 +233,11 @@ public class ClientForm extends JFrame {
         log.info("exiting");
         System.exit(0);
     }
+
+
+
+
+
+
+
 }
