@@ -37,6 +37,10 @@ public class Server {
 
     private static final Logger log = LogManager.getLogger(Server.class);
 
+    static {
+        System.getProperties().setProperty("log4j.configurationFile", "src/log4j2.xml");
+    }
+
     public Server(ServerConfigs configs) {
         try {
             OS_PORT = configs.getPortObjects();

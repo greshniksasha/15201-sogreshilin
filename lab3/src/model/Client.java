@@ -40,6 +40,10 @@ public class Client {
     private static final int CAPACITY = 100000;
     private static final Logger log = LogManager.getLogger(Client.class);
 
+    static {
+        System.getProperties().setProperty("log4j.configurationFile", "src/log4j2.xml");
+    }
+
     public Client(ClientConfigs clientConfigs) {
         type = clientConfigs.getType();
         sentMessageTypes = new ArrayBlockingQueue<>(CAPACITY);

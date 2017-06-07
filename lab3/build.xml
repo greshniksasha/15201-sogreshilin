@@ -44,31 +44,33 @@
     </jar>
   </target>
 
-  <!--<target name="test-compile" depends="compile, dist">-->
-    <!--<mkdir dir="${test-build.dir}" />-->
-    <!--<javac srcdir="${test.dir}" destdir="${test-build.dir}" includeantruntime="false">-->
-      <!--<classpath>-->
-        <!--<pathelement location="${lib.dir}/junit-4.11.jar"/>-->
-        <!--<pathelement location="${lib.dir}/hamcrest-core-1.3.jar"/>-->
-        <!--<pathelement location="${project.name}.jar"/>-->
-      <!--</classpath>-->
-    <!--</javac>-->
-  <!--</target>-->
+  <target name="test-compile" depends="compile, dist">
+    <mkdir dir="${test-build.dir}" />
+    <javac srcdir="${test.dir}" destdir="${test-build.dir}" includeantruntime="false">
+      <classpath>
+        <pathelement location="${lib.dir}/junit-4.11.jar"/>
+        <pathelement location="${lib.dir}/hamcrest-core-1.3.jar"/>
+        <pathelement location="${server.name}.jar"/>
+        <pathelement location="${client.name}.jar"/>
+      </classpath>
+    </javac>
+  </target>
 
-  <!--<target name="test" depends="test-compile">-->
-    <!--<junit>-->
-      <!--<classpath>-->
-        <!--<pathelement location="${lib.dir}/junit-4.11.jar"/>-->
-        <!--<pathelement location="${lib.dir}/hamcrest-core-1.3.jar"/>-->
-        <!--<pathelement location="${project.name}.jar" />-->
-        <!--<pathelement location="${test-build.dir}" />-->
-      <!--</classpath>-->
-      <!--<formatter type="brief" usefile="false" />-->
-      <!--<batchtest>-->
-        <!--<fileset dir="${test-build.dir}" includes="**/*Test.class" />-->
-      <!--</batchtest>-->
-    <!--</junit>-->
-  <!--</target>-->
+  <target name="test" depends="test-compile">
+    <junit>
+      <sysproperty key="log4j.configurationFile" value="file:${src.dir}/log4j2.xml"/>
+      <classpath>
+        <pathelement location="${lib.dir}/junit-4.11.jar"/>
+        <pathelement location="${lib.dir}/hamcrest-core-1.3.jar"/>
+        <pathelement location="${client.name}.jar"/>
+        <pathelement location="${test-build.dir}" />
+      </classpath>
+      <formatter type="brief" usefile="false" />
+      <batchtest>
+        <fileset dir="${test-build.dir}" includes="**/*Test.class" />
+      </batchtest>
+    </junit>
+  </target>
 
   <target name="run-server">
     <java jar="${server.name}.jar" fork="true" >
@@ -86,7 +88,7 @@
 
   <target name="clean">
     <delete dir="${build.dir}"/>
-    <!--<delete dir="${test-build.dir}"/>-->
+    <delete dir="${test-build.dir}"/>
     <delete file="${client.name}.jar"/>
     <delete file="${server.name}.jar"/>
   </target>

@@ -33,8 +33,6 @@ public class XMLSerializingTest {
     private static final List<String> USERS = new ArrayList<>();
     private static final int USER_COUNT = 10;
 
-    private static final Logger log = LogManager.getLogger(XMLSerializingTest.class);
-
     static {
         try {
             serializer = new JAXBSerializer();
@@ -56,7 +54,6 @@ public class XMLSerializingTest {
 
     public Message sendAndReceiveMessage(Message sentMessage) throws Exception {
         // serializing message
-        System.out.println(serializer.messageToXMLString(sentMessage));
         byte[] data = serializer.messageToXMLString(sentMessage).getBytes(StandardCharsets.UTF_8);
 
         // writing message
@@ -67,11 +64,10 @@ public class XMLSerializingTest {
         int len = in.readInt();
         byte[] inputData = new byte[len];
         if (in.read(inputData, 0, len) != len) {
-            log.error("less bytes read than supposed to");
-            return null;
+            throw new Exception("less bytes read than supposed to");
         }
         String string = new String(inputData, StandardCharsets.UTF_8);
-        System.out.println(string);
+//        System.out.println(string);
 
         // deserializing message
         return deserializer.deserialize(string);
@@ -81,7 +77,7 @@ public class XMLSerializingTest {
     public void serializeLoginRequest() throws Exception {
         // creating message
         LoginRequest sentMessage = new LoginRequest();
-        sentMessage.setName(NAME);
+        sentMessage .setName(NAME);
         sentMessage.setType(TYPE);
 
         LoginRequest receivedMessage = (LoginRequest) sendAndReceiveMessage(sentMessage);
