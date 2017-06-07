@@ -20,15 +20,18 @@ public class Server {
     private static AtomicInteger sessionIDGenerator = new AtomicInteger(0);
     private static final int BUFFER_CAPACITY = 10;
     private static final int QUEUE_CAPACITY = 100000;
-    private static final short PORT = 5000;
+    private static final short OS_PORT = 5000;
+    private static final short XML_PORT = 5001;
 
-    private ServerSocket serverSocket;
+    private ServerSocket ooServerSocket;
+    private ServerSocket xmlServerSocket;
     private List<String> users;
     private BlockingQueue<DisplayMessage> messageBuffer;
     private BlockingQueue<ServerMessage> serverMessages;
     private List<ClientHandler> clientHandlers;
 
-    private Thread acceptor;
+    private Thread objectStreamAcceptor;
+    private Thread xmlAcceptor;
     private Thread sender;
     private final Object lock = new Object();
 
@@ -36,24 +39,23 @@ public class Server {
 
     public Server() {
         try {
-            serverSocket = new ServerSocket(PORT);
+            ooServerSocket = new ServerSocket(OS_PORT);
+            xmlServerSocket = new ServerSocket(XML_PORT);
         } catch (IOException e) {
             log.error("server socket creating error");
+            System.exit(1);
         }
         messageBuffer = new ArrayBlockingQueue<>(BUFFER_CAPACITY);
         serverMessages = new ArrayBlockingQueue<>(QUEUE_CAPACITY);
         clientHandlers = new ArrayList<>();
         users = new ArrayList<>();
-        log.info("server socket created");
-    }
-
-    public List<String> getUsers() {
-        return users;
+//        messageHandler = new ServerMessageHandler(this);
+        log.info("server sockets created on ports : {}, {}", OS_PORT, XML_PORT);
     }
 
     public void process(LoginRequest message, ClientHandler handler) {
         String name = message.getName();
-        if (users.contains(name)) {
+        if (this.getUsers().contains(name)) {
             LoginError response = new LoginError();
             response.setError("User name is already in use");
             handler.addOutgoingMessage(response);
@@ -61,14 +63,14 @@ public class Server {
             return;
         }
         handler.setName(name);
-        users.add(name);
+        this.getUsers().add(name);
         LoginSuccess response = new LoginSuccess();
         response.setSessionID(handler.getSessionID());
         handler.addOutgoingMessage(response);
         log.info("add new user={} sessionID={}", name, handler.getSessionID());
         UserLoginMessage msg = new UserLoginMessage();
         msg.setName(name);
-        serverMessages.add(msg);
+        this.getServerMessages().add(msg);
     }
 
     public void process(TextMessage message, ClientHandler handler) {
@@ -86,7 +88,7 @@ public class Server {
         UserMessage messageToSend = new UserMessage();
         messageToSend.setName(name);
         messageToSend.setMessage(text);
-        serverMessages.add(messageToSend);
+        this.getServerMessages().add(messageToSend);
         log.info("text message \"{}\" sent to everyone", text);
     }
 
@@ -99,9 +101,9 @@ public class Server {
             return;
         }
         ListUsersSuccess msg = new ListUsersSuccess();
-        msg.setUsers(getUsers());
+        msg.setUsers(this.getUsers());
         handler.addOutgoingMessage(msg);
-        log.info("sent list users {} to {}", getUsers(), handler.getName());
+        log.info("sent list users {} to {}", this.getUsers(), handler.getName());
     }
 
     public void process(LogoutRequest message, ClientHandler handler) {
@@ -114,18 +116,33 @@ public class Server {
         }
         handler.addOutgoingMessage(new LogoutSuccess());
         log.info("successful logout response sent to user {}", handler.getName());
-        users.remove(handler.getName());
+        this.getUsers().remove(handler.getName());
         UserLogoutMessage msg = new UserLogoutMessage();
         msg.setName(handler.getName());
-        serverMessages.add(msg);
+        this.getServerMessages().add(msg);
         handler.stop();
-        clientHandlers.remove(handler);
+        this.removeClientHandler(handler);
         log.info("sent user logout message to everyone");
     }
 
+    public List<String> getUsers() {
+        return users;
+    }
+
+    public void removeClientHandler(ClientHandler handler) {
+        clientHandlers.remove(handler);
+    }
+
+    public BlockingQueue<ServerMessage> getServerMessages() {
+        return serverMessages;
+    }
+
     private void start() {
-        acceptor = new Thread(new Acceptor(), "Acceptor");
-        acceptor.start();
+        objectStreamAcceptor = new Thread(new ObjectStreamAcceptor(), "ObjectStreamAcceptor");
+        objectStreamAcceptor.start();
+
+        xmlAcceptor = new Thread(new XMLAcceptor(), "XMLAcceptor");
+        xmlAcceptor.start();
 
         sender = new Thread(new Sender(), "Sender");
         sender.start();
@@ -133,12 +150,14 @@ public class Server {
 
     private void stop() {
         try {
-            serverSocket.close();
+            ooServerSocket.close();
+            xmlServerSocket.close();
             sender.interrupt();
             for (ClientHandler h : clientHandlers) {
                 h.stop();
             }
-            acceptor.join();
+            objectStreamAcceptor.join();
+            xmlAcceptor.join();
             sender.join();
         } catch (IOException e) {
             log.error("error closing socket");
@@ -161,95 +180,39 @@ public class Server {
         server.stop();
     }
 
-    public class ClientHandler {
-        private Thread reader;
-        private Thread writer;
-        private int sessionID;
-        private String name;
-        private Socket socket;
-        private BlockingQueue<ServerMessage> messagesToSend;
 
-        ClientHandler(Socket socket) {
-            this.socket = socket;
-            sessionID = Server.sessionIDGenerator.getAndIncrement();
-            messagesToSend = new ArrayBlockingQueue<ServerMessage>(QUEUE_CAPACITY);
-
-            reader = new Thread(() -> {
-                try {
-                    ObjectInputStream inputStream = new ObjectInputStream(socket.getInputStream());
-                    log.info("got input stream file descriptor");
-                    while (!Thread.interrupted()) {
-                        ClientMessage m = (ClientMessage)inputStream.readObject();
-                        m.process(Server.this, this);
-                    }
-                } catch (IOException | ClassNotFoundException e) {
-                    log.info("stopped");
-                }
-            }, "Reader-" + sessionID);
-
-            writer = new Thread(() -> {
-                try {
-                    ObjectOutputStream outputStream = new ObjectOutputStream(socket.getOutputStream());
-                    log.info("got output stream file descriptor");
-                    while (!Thread.interrupted()) {
-                        ServerMessage m = messagesToSend.take();
-                        outputStream.writeObject(m);
-                        outputStream.flush();
-                        log.info("message writen to {}", getName());
-                    }
-                } catch (IOException e) {
-                    log.error("could not get output stream");
-                } catch (InterruptedException e) {
-                    log.info("interrupted");
-                }
-            }, "Writer-" + sessionID);
-
-        }
-
-        void addOutgoingMessage(ServerMessage message) {
-            messagesToSend.add(message);
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public void setName(String name) {
-            this.name = name;
-        }
-
-        public int getSessionID() {
-            return sessionID;
-        }
-
-        void start() {
-            reader.start();
-            writer.start();
-        }
-
-        void stop() {
-//            try {
-//                socket.close();
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-//            reader.interrupt();
-            writer.interrupt();
-        }
-    }
-
-    private class Acceptor implements Runnable {
+    private class XMLAcceptor implements Runnable {
         @Override
         public void run() {
             try {
                 while (true) {
-                    Socket socket = serverSocket.accept();
-                    ClientHandler handler = new ClientHandler(socket);
+                    Socket socket = xmlServerSocket.accept();
+                    XMLClientHandler handler = new XMLClientHandler(Server.this, socket);
                     handler.start();
                     synchronized (lock) {
                         clientHandlers.add(handler);
                     }
-                    log.info("new client accepted");
+                    log.info("new client accepted on port {}", XML_PORT);
+                }
+            } catch (IOException e) {
+                log.info("stopped");
+            }
+        }
+    }
+
+
+    private class ObjectStreamAcceptor implements Runnable {
+        @Override
+        public void run() {
+            try {
+                while (true) {
+                    Socket socket = ooServerSocket.accept();
+                    ObjectStreamClientHandler handler = new ObjectStreamClientHandler(Server.this, socket);
+                    handler.start();
+                    synchronized (lock) {
+                        clientHandlers.add(handler);
+                    }
+                    log.info("new client accepted on port {}", OS_PORT);
                 }
             } catch (IOException e) {
                 log.info("stopped");

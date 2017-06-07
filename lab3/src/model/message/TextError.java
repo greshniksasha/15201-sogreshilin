@@ -16,6 +16,7 @@ import java.io.Serializable;
 @XmlRootElement(name="error")
 public class TextError implements ServerMessage, Serializable {
     private String error;
+    private String text;
 
     @XmlElement(name = "message")
     public void setError(String error) {
@@ -24,6 +25,14 @@ public class TextError implements ServerMessage, Serializable {
 
     public String getError() {
         return error;
+    }
+
+    public void setText(String text) {
+        this.text = text;
+    }
+
+    public String getText() {
+        return text;
     }
 
     @Override

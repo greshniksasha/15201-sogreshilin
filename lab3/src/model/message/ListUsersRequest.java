@@ -1,5 +1,6 @@
 package model.message;
 
+import model.ClientHandler;
 import model.Server;
 
 import javax.xml.bind.annotation.XmlAttribute;
@@ -29,7 +30,7 @@ public class ListUsersRequest implements ClientMessage, Serializable {
     }
 
     @Override
-    public void process(Server server, Server.ClientHandler handler) {
+    public void process(Server server, ClientHandler handler) {
         server.process(this, handler);
     }
 }

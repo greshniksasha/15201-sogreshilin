@@ -10,7 +10,7 @@ import org.apache.logging.log4j.Logger;
 public class ClientMessageHandler implements MessageHandler {
 
     private Client client;
-    private static final Logger log = LogManager.getLogger(Client.class);
+    private static final Logger log = LogManager.getLogger(ClientMessageHandler.class);
 
     public ClientMessageHandler(Client client) {
         this.client = client;
@@ -50,13 +50,15 @@ public class ClientMessageHandler implements MessageHandler {
 
     @Override
     public void process(TextSuccess message) {
-        //TODO
+        client.takeTextMessage();
         log.info("message delivered successfully");
     }
 
     @Override
     public void process(TextError message) {
-        //TODO
+        TextMessage undeliveredMessage = client.takeTextMessage();
+        message.setText(undeliveredMessage.getText());
+        client.notifyObservers(message);
         log.info("message was not delivered");
     }
 
@@ -94,6 +96,8 @@ public class ClientMessageHandler implements MessageHandler {
     @Override
     public void process(UserMessage message) {
         log.info("got message \"{}\" from {}", message.getMessage(), message.getName());
-        client.notifyObservers(message);
+        if (client.loggedIn()) {
+            client.notifyObservers(message);
+        }
     }
 }
