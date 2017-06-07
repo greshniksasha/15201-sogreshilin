@@ -55,7 +55,6 @@ public class Server {
         serverMessages = new ArrayBlockingQueue<>(QUEUE_CAPACITY);
         clientHandlers = new ArrayList<>();
         users = new ArrayList<>();
-//        messageHandler = new ServerMessageHandler(this);
         log.info("server sockets created on ports : {}, {}", OS_PORT, XML_PORT);
     }
 

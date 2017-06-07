@@ -20,6 +20,8 @@ import java.util.concurrent.BlockingQueue;
  */
 public class Client {
     private static final String CONFIG_FILE_PATH = "src/client_config.properties";
+    private static final String OBJECTS = "objects";
+    private static final String XML = "xml";
     private Socket socket;
     private String name;
     private int sessionID;
@@ -175,12 +177,12 @@ public class Client {
 
     public void connectToServer() {
         switch (type) {
-            case "objects":
+            case OBJECTS:
                 this.connectToServerObjectStream();
                 this.objectStreamsGo();
                 log.info("Connected to ObjectStream Server");
                 return;
-            case "xml":
+            case XML:
                 this.connectToServerXML();
                 this.xmlGo();
                 log.info("Connected to XML Server");
