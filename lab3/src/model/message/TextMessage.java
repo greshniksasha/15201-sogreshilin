@@ -16,10 +16,10 @@ import java.io.Serializable;
 @XmlRootElement(name = "command")
 @XmlType(propOrder = {"text", "sessionID"})
 public class TextMessage implements ClientMessage, Serializable {
+    @XmlAttribute(name = "name")
+    private final String messageType = "message";
     private String text;
     private int sessionID;
-    @XmlAttribute(name = "name")
-    private final Command type = Command.MESSAGE;
 
     public TextMessage() {
     }

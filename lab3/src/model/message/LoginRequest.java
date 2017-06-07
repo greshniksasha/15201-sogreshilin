@@ -15,10 +15,10 @@ import java.io.Serializable;
 @XmlRootElement(name = "command")
 @XmlType(propOrder = {"name", "type"})
 public class LoginRequest implements ClientMessage, Serializable {
+    @XmlAttribute(name = "name")
+    private final String messageType = "login";
     private String name;
     private String type;
-    @XmlAttribute(name = "name")
-    private final Command messageType = Command.LOGIN;
 
     public LoginRequest() {
     }

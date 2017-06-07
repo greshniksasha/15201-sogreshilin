@@ -15,10 +15,10 @@ import java.io.Serializable;
 @XmlRootElement(name = "event")
 @XmlType(propOrder = {"message", "name"})
 public class UserMessage implements ServerMessage, DisplayMessage, Serializable {
+    @XmlAttribute(name = "name")
+    private final String messageType = "message";
     private String name;
     private String message;
-    @XmlAttribute(name = "name")
-    private final Event type = Event.MESSAGE;
 
     public UserMessage() {
     }

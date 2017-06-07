@@ -13,9 +13,9 @@ import java.io.Serializable;
  */
 @XmlRootElement(name = "command")
 public class ListUsersRequest implements ClientMessage, Serializable {
-    private int sessionID;
     @XmlAttribute(name = "name")
-    private final Command type = Command.LIST;
+    private final String messageType = "list";
+    private int sessionID;
 
     public ListUsersRequest() {
     }

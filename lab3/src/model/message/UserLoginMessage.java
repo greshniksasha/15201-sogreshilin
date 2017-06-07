@@ -14,10 +14,10 @@ import java.io.Serializable;
  */
 @XmlRootElement(name = "event")
 public class UserLoginMessage implements ServerMessage, DisplayMessage, Serializable {
+    @XmlAttribute(name = "name")
+    private final String messageType = "userlogin";
     private String name;
     private String type;
-    @XmlAttribute(name = "name")
-    private final Event messageType = Event.USER_LOGIN;
 
     public UserLoginMessage() {
     }

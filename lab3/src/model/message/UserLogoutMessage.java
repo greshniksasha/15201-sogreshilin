@@ -13,9 +13,9 @@ import java.io.Serializable;
  */
 @XmlRootElement(name = "event")
 public class UserLogoutMessage implements ServerMessage, DisplayMessage, Serializable {
-    private String name;
     @XmlAttribute(name = "name")
-    private final Event type = Event.USER_LOGOUT;
+    private final String messageType = "userlogout";
+    private String name;
 
     public UserLogoutMessage() {
     }

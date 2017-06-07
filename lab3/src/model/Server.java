@@ -146,7 +146,7 @@ public class Server {
         return serverMessages;
     }
 
-    private void start() {
+    public void start() {
         objectStreamAcceptor = new Thread(new ObjectStreamAcceptor(), "ObjectStreamAcceptor");
         objectStreamAcceptor.start();
 
@@ -157,7 +157,7 @@ public class Server {
         sender.start();
     }
 
-    private void stop() {
+    public void stop() {
         try {
             ooServerSocket.close();
             xmlServerSocket.close();

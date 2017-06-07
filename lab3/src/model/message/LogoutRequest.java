@@ -14,9 +14,9 @@ import java.io.Serializable;
  */
 @XmlRootElement(name = "command")
 public class LogoutRequest implements ClientMessage, Serializable {
-    private int sessionID;
     @XmlAttribute(name = "name")
-    private final Command type = Command.LOGOUT;
+    private final String messageType = "logout";
+    private int sessionID;
 
     public LogoutRequest() {
     }
