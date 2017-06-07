@@ -17,16 +17,16 @@ import java.util.concurrent.atomic.AtomicInteger;
  * Created by Alexander on 29/05/2017.
  */
 public class Server {
-    private static AtomicInteger sessionIDGenerator = new AtomicInteger(0);
+    private static final String CONFIG_FILE_PATH = "src/server_config.properties";
     private static final int BUFFER_CAPACITY = 10;
     private static final int QUEUE_CAPACITY = 100000;
-    private static final short OS_PORT = 5000;
-    private static final short XML_PORT = 5001;
+    private short OS_PORT;
+    private short XML_PORT;
 
     private ServerSocket ooServerSocket;
     private ServerSocket xmlServerSocket;
     private List<String> users;
-    private BlockingQueue<DisplayMessage> messageBuffer;
+    private BlockingQueue<ServerMessage> messageBuffer;
     private BlockingQueue<ServerMessage> serverMessages;
     private List<ClientHandler> clientHandlers;
 
@@ -37,8 +37,10 @@ public class Server {
 
     private static final Logger log = LogManager.getLogger(Server.class);
 
-    public Server() {
+    public Server(ServerConfigs configs) {
         try {
+            OS_PORT = configs.getPortObjects();
+            XML_PORT = configs.getPortXML();
             ooServerSocket = new ServerSocket(OS_PORT);
             xmlServerSocket = new ServerSocket(XML_PORT);
         } catch (IOException e) {
@@ -67,6 +69,9 @@ public class Server {
         LoginSuccess response = new LoginSuccess();
         response.setSessionID(handler.getSessionID());
         handler.addOutgoingMessage(response);
+        for (Object m : messageBuffer.toArray()) {
+            handler.addOutgoingMessage((ServerMessage) m);
+        }
         log.info("add new user={} sessionID={}", name, handler.getSessionID());
         UserLoginMessage msg = new UserLoginMessage();
         msg.setName(name);
@@ -169,7 +174,8 @@ public class Server {
 
     public static void main(String[] args) {
         log.info("to stop server write \"exit\"");
-        Server server = new Server();
+        ServerConfigs configs = new ServerConfigs(CONFIG_FILE_PATH);
+        Server server = new Server(configs);
         server.start();
         try {
             BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
@@ -226,6 +232,9 @@ public class Server {
             try {
                 while (!Thread.interrupted()) {
                     ServerMessage m = serverMessages.take();
+                    while (!messageBuffer.offer(m)) {
+                        messageBuffer.take();
+                    }
                     synchronized (lock) {
                         for (ClientHandler h : clientHandlers) {
                             h.addOutgoingMessage(m);

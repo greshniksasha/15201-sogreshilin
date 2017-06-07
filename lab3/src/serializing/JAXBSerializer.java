@@ -19,7 +19,6 @@ public class JAXBSerializer {
     private static final Logger log = LogManager.getLogger(Client.class);
 
     public String messageToXMLString(Message message) {
-        String xmlMessage = null;
         try {
             JAXBContext context = JAXBContext.newInstance(message.getClass());
             Marshaller marshaller = context.createMarshaller();
@@ -28,10 +27,10 @@ public class JAXBSerializer {
 
             StringWriter stringWriter = new StringWriter();
             marshaller.marshal(message, stringWriter);
-            xmlMessage = stringWriter.toString();
+            return stringWriter.toString();
         } catch (JAXBException e) {
             log.error("JAXB serialising error", e);
         }
-        return xmlMessage;
+        return null;
     }
 }

@@ -59,7 +59,7 @@ public class ClientForm extends JFrame {
             client.setName(name);
             LoginRequest msg = new LoginRequest();
             msg.setName(name);
-            msg.setChatClientName(client.getChatClientName());
+            msg.setType(client.getType());
             client.addOutgoingMessage(msg);
             log.info("trying to log in as {}", name);
         });

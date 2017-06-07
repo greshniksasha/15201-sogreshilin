@@ -6,25 +6,29 @@ import org.apache.logging.log4j.Logger;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.Serializable;
 import java.util.Properties;
 
 /**
  * Created by Alexander on 07/06/2017.
  */
-public class Configs {
-    enum SerializationType { STANDARD, XML };
+public class ClientConfigs {
 
-    private static final String SERIALIZATION = "SERIALIZATION";
-    private SerializationType serializationType;
+    private static final String TYPE = "TYPE";
+    private static final String SERVER_IP = "SERVER_IP";
+    private static final String SERVER_PORT = "SERVER_PORT";
+    private String type;
+    private String ip;
+    private short port;
 
-    public static final Logger log = LogManager.getLogger(Configs.class);
+    public static final Logger log = LogManager.getLogger(ClientConfigs.class);
 
-    public Configs(String configFileName) {
+    public ClientConfigs(String configFileName) {
         Properties properties = new Properties();
         try (FileInputStream input = new FileInputStream(configFileName)) {
             properties.load(input);
-            serializationType = SerializationType.valueOf(properties.getProperty(SERIALIZATION));
+            type = properties.getProperty(TYPE).toLowerCase();
+            port = Short.parseShort(properties.getProperty(SERVER_PORT));
+            ip = properties.getProperty(SERVER_IP);
         } catch (FileNotFoundException e) {
             log.error("Config file not found");
             System.exit(-1);
@@ -40,7 +44,15 @@ public class Configs {
         }
     }
 
-    public SerializationType getSerializationType() {
-        return serializationType;
+    public String getType() {
+        return type;
+    }
+
+    public String getIp() {
+        return ip;
+    }
+
+    public short getPort() {
+        return port;
     }
 }

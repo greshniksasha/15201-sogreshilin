@@ -27,7 +27,7 @@ public class XMLSerializingTest {
 
     private static final Integer ID = 1001000111;
     private static final String NAME = "alexander";
-    private static final String CHAT = "CHAT_CLIENT_NAME";
+    private static final String TYPE = "xml";
     private static final String TEXT = "this is TEXT message";
     private static final String ERROR_MSG = "this is error message";
     private static final List<String> USERS = new ArrayList<>();
@@ -56,6 +56,7 @@ public class XMLSerializingTest {
 
     public Message sendAndReceiveMessage(Message sentMessage) throws Exception {
         // serializing message
+        System.out.println(serializer.messageToXMLString(sentMessage));
         byte[] data = serializer.messageToXMLString(sentMessage).getBytes(StandardCharsets.UTF_8);
 
         // writing message
@@ -70,7 +71,7 @@ public class XMLSerializingTest {
             return null;
         }
         String string = new String(inputData, StandardCharsets.UTF_8);
-//        System.out.println(string);
+        System.out.println(string);
 
         // deserializing message
         return deserializer.deserialize(string);
@@ -81,13 +82,13 @@ public class XMLSerializingTest {
         // creating message
         LoginRequest sentMessage = new LoginRequest();
         sentMessage.setName(NAME);
-        sentMessage.setChatClientName(CHAT);
+        sentMessage.setType(TYPE);
 
         LoginRequest receivedMessage = (LoginRequest) sendAndReceiveMessage(sentMessage);
 
         // comparing results
         Assert.assertEquals(sentMessage.getName(), receivedMessage.getName());
-        Assert.assertEquals(sentMessage.getChatClientName(), receivedMessage.getChatClientName());
+        Assert.assertEquals(sentMessage.getType(), receivedMessage.getType());
     }
 
     @Test
@@ -200,6 +201,7 @@ public class XMLSerializingTest {
     public void serializeUserLoginMessage() throws Exception {
         UserLoginMessage sentMessage = new UserLoginMessage();
         sentMessage.setName(NAME);
+        sentMessage.setType(TYPE);
         UserLoginMessage receivedMessage = (UserLoginMessage) sendAndReceiveMessage(sentMessage);
         Assert.assertEquals(sentMessage.getName(), receivedMessage.getName());
     }

@@ -15,8 +15,9 @@ import java.io.Serializable;
 @XmlRootElement(name = "event")
 public class UserLoginMessage implements ServerMessage, DisplayMessage, Serializable {
     private String name;
+    private String type;
     @XmlAttribute(name = "name")
-    private final Event type = Event.USER_LOGIN;
+    private final Event messageType = Event.USER_LOGIN;
 
     public UserLoginMessage() {
     }
@@ -24,6 +25,15 @@ public class UserLoginMessage implements ServerMessage, DisplayMessage, Serializ
     @XmlElement(name = "name")
     public void setName(String name) {
         this.name = name;
+    }
+
+    @XmlElement(name = "type")
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public String getType() {
+        return type;
     }
 
     public String getName() {

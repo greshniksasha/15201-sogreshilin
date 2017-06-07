@@ -18,7 +18,7 @@ public class LoginSuccess implements ServerMessage, Serializable {
     public LoginSuccess() {
     }
 
-    @XmlElement(name = "message")
+    @XmlElement(name = "session")
     public void setSessionID(Integer sessionID) {
         this.sessionID = sessionID;
     }

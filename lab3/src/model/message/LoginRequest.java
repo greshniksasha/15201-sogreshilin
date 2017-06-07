@@ -1,7 +1,6 @@
 package model.message;
 
 import model.ClientHandler;
-import model.ObjectStreamClientHandler;
 import model.Server;
 
 import javax.xml.bind.annotation.XmlAttribute;
@@ -14,12 +13,12 @@ import java.io.Serializable;
  * Created by Alexander on 02/06/2017.
  */
 @XmlRootElement(name = "command")
-@XmlType(propOrder = {"name", "chatClientName"})
+@XmlType(propOrder = {"name", "type"})
 public class LoginRequest implements ClientMessage, Serializable {
     private String name;
-    private String chatClientName;
+    private String type;
     @XmlAttribute(name = "name")
-    private final Command type = Command.LOGIN;
+    private final Command messageType = Command.LOGIN;
 
     public LoginRequest() {
     }
@@ -30,16 +29,16 @@ public class LoginRequest implements ClientMessage, Serializable {
     }
 
     @XmlElement(name = "type")
-    public void setChatClientName(String chatClientName) {
-        this.chatClientName = chatClientName;
+    public void setType(String type) {
+        this.type = type;
     }
 
     public String getName() {
         return name;
     }
 
-    public String getChatClientName() {
-        return chatClientName;
+    public String getType() {
+        return type;
     }
 
     @Override

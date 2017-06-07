@@ -19,13 +19,8 @@ import java.util.concurrent.BlockingQueue;
  * Created by Alexander on 29/05/2017.
  */
 public class Client {
-    private static final String IP = "localhost";
-    private static final short OS_PORT = 5000;
-    private static final short XML_PORT = 5001;
-    private static final String CHAT_CLIENT_NAME = "My_Client";
     private static final String CONFIG_FILE_PATH = "src/client_config.properties";
     private Socket socket;
-
     private String name;
     private int sessionID;
     private Boolean loggedIn;
@@ -34,7 +29,9 @@ public class Client {
     private BlockingQueue<Class> sentMessageTypes;
     private List<String> users;
     private List<IncomingMsgObserver> observers;
-    private final Configs.SerializationType serializationType;
+    private final String type;
+    private short port;
+    private String ip;
 
     private MessageHandler messageHandler;
     private Thread readerThread;
@@ -43,20 +40,22 @@ public class Client {
     private static final int CAPACITY = 100000;
     private static final Logger log = LogManager.getLogger(Client.class);
 
-    public Client(Configs.SerializationType type) {
-        serializationType = type;
+    public Client(ClientConfigs clientConfigs) {
+        type = clientConfigs.getType();
         sentMessageTypes = new ArrayBlockingQueue<>(CAPACITY);
         messageHandler = new ClientMessageHandler(this);
         messagesToSend = new ArrayBlockingQueue<>(CAPACITY);
         textMessages = new ArrayBlockingQueue<TextMessage>(CAPACITY);
         observers = new ArrayList<>();
-        users = new ArrayList<>();
         loggedIn = false;
+        users = new ArrayList<>();
+        port = clientConfigs.getPort();
+        ip = clientConfigs.getIp();
     }
 
     public void connectToServerObjectStream() {
         try {
-            socket = new Socket(IP, OS_PORT);
+            socket = new Socket(ip, port);
         } catch (IOException e) {
             log.error("connecting to server error");
         }
@@ -65,7 +64,7 @@ public class Client {
 
     public void connectToServerXML() {
         try {
-            socket = new Socket(IP, XML_PORT);
+            socket = new Socket(ip, port);
         } catch (IOException e) {
             log.error("connecting to server error");
         }
@@ -116,8 +115,8 @@ public class Client {
         log.info("message added to the messagesToSend");
     }
 
-    public static String getChatClientName() {
-        return CHAT_CLIENT_NAME;
+    public String getType() {
+        return type;
     }
 
     public void setSessionID(int sessionID) {
@@ -171,13 +170,13 @@ public class Client {
     }
 
     public void connectToServer() {
-        switch (serializationType) {
-            case STANDARD:
+        switch (type) {
+            case "objects":
                 this.connectToServerObjectStream();
                 this.objectStreamsGo();
                 log.info("Connected to ObjectStream Server");
                 return;
-            case XML:
+            case "xml":
                 this.connectToServerXML();
                 this.xmlGo();
                 log.info("Connected to XML Server");
@@ -185,8 +184,8 @@ public class Client {
     }
 
     public static void main(String[] args) {
-        Configs configs = new Configs(CONFIG_FILE_PATH);
-        Client client = new Client(configs.getSerializationType());
+        ClientConfigs clientConfigs = new ClientConfigs(CONFIG_FILE_PATH);
+        Client client = new Client(clientConfigs);
         client.connectToServer();
         new ClientForm(client).setVisible(true);
 
