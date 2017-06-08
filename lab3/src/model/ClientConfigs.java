@@ -16,9 +16,11 @@ public class ClientConfigs {
     private static final String TYPE = "TYPE";
     private static final String SERVER_IP = "SERVER_IP";
     private static final String SERVER_PORT = "SERVER_PORT";
+    private static final String LOG_ON = "LOG_ON";
     private String type;
     private String ip;
     private short port;
+    private Boolean logOn;
 
     public static final Logger log = LogManager.getLogger(ClientConfigs.class);
 
@@ -29,6 +31,7 @@ public class ClientConfigs {
             type = properties.getProperty(TYPE).toLowerCase();
             port = Short.parseShort(properties.getProperty(SERVER_PORT));
             ip = properties.getProperty(SERVER_IP);
+            logOn = Boolean.parseBoolean(properties.getProperty(LOG_ON));
         } catch (FileNotFoundException e) {
             log.error("Config file not found");
             System.exit(-1);
@@ -54,5 +57,9 @@ public class ClientConfigs {
 
     public short getPort() {
         return port;
+    }
+
+    public Boolean getLogOn() {
+        return logOn;
     }
 }

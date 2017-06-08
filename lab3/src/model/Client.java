@@ -1,8 +1,10 @@
 package model;
 
 import model.message.*;
+import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.core.config.Configurator;
 import serializing.DOMDeserializer;
 import serializing.JAXBSerializer;
 import view.ClientForm;
@@ -194,6 +196,9 @@ public class Client {
 
     public static void main(String[] args) {
         ClientConfigs clientConfigs = new ClientConfigs(CONFIG_FILE_PATH);
+        if (!clientConfigs.getLogOn()) {
+            Configurator.setRootLevel(Level.OFF);
+        }
         Client client = new Client(clientConfigs);
         client.connectToServer();
         new ClientForm(client).setVisible(true);
@@ -202,9 +207,11 @@ public class Client {
 //            try {
 //                Thread.sleep(7000);
 //                TextMessage message = new TextMessage();
-//                message.setSessionID(1000);
-//                message.setText("Hello");
-//                client.addOutgoingMessage(message);
+//                message.setSessionID(client.getSessionID());
+//                for (int i = 0; i < 1000; ++i) {
+//                    message.setText("message-" + i);
+//                    client.addOutgoingMessage(message);
+//                }
 //            } catch (InterruptedException e) {
 //                e.printStackTrace();
 //            }

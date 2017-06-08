@@ -65,6 +65,7 @@ public class XMLClientHandler implements ClientHandler {
                 while(!Thread.interrupted()) {
                     ServerMessage message = messagesToSend.take();
                     String xmlString = serializer.messageToXMLString(message);
+                    System.out.println(xmlString);
                     byte[] data = xmlString.getBytes(StandardCharsets.UTF_8);
                     writerStream.writeInt(data.length);
                     writerStream.write(data);
