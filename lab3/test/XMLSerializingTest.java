@@ -3,6 +3,7 @@ import model.message.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import serializing.DOMDeserializer;
 import serializing.JAXBSerializer;
@@ -19,22 +20,23 @@ import java.util.concurrent.BlockingQueue;
  */
 public class XMLSerializingTest {
 
-    private static JAXBSerializer serializer;
-    private static File tmpFile;
-    private static DataInputStream in;
-    private static DataOutputStream out;
-    private static DOMDeserializer deserializer;
-    private static BlockingQueue<Class> queue;
+    private JAXBSerializer serializer;
+    private File tmpFile;
+    private DataInputStream in;
+    private DataOutputStream out;
+    private DOMDeserializer deserializer;
+    private BlockingQueue<Class> queue;
 
-    private static final Integer ID = 1001000111;
-    private static final String NAME = "alexander";
-    private static final String TYPE = "xml";
-    private static final String TEXT = "this is TEXT message";
-    private static final String ERROR_MSG = "this is error message";
-    private static final List<User> USERS = new ArrayList<>();
-    private static final int USER_COUNT = 10;
+    private final Integer ID = 1001000111;
+    private final String NAME = "alexander";
+    private final String TYPE = "xml";
+    private final String TEXT = "this is TEXT message";
+    private final String ERROR_MSG = "this is error message";
+    private final List<User> USERS = new ArrayList<>();
+    private final int USER_COUNT = 10;
 
-    static {
+    @Before
+    public void setUp() throws Exception {
         try {
             serializer = new JAXBSerializer();
             tmpFile = File.createTempFile("test", "txt");
