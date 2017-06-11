@@ -1,19 +1,17 @@
 package model;
 
 import model.message.*;
-import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.core.config.Configurator;
 
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.ConcurrentModificationException;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Created by Alexander on 29/05/2017.
@@ -22,8 +20,8 @@ public class Server {
     private static final String CONFIG_FILE_PATH = "src/server_config.properties";
     private static final int BUFFER_CAPACITY = 10;
     private static final int QUEUE_CAPACITY = 100000;
-    private short OS_PORT;
-    private short XML_PORT;
+    private int OS_PORT;
+    private int XML_PORT;
 
     private ServerSocket ooServerSocket;
     private ServerSocket xmlServerSocket;
@@ -131,7 +129,7 @@ public class Server {
         UserLogoutMessage msg = new UserLogoutMessage();
         msg.setName(handler.getName());
         this.getServerMessages().add(msg);
-        handler.stop();
+        handler.interruptWriter();
         this.removeClientHandler(handler);
         log.info("sent user logout message to everyone");
     }
@@ -165,7 +163,8 @@ public class Server {
             xmlServerSocket.close();
             sender.interrupt();
             for (ClientHandler h : clientHandlers) {
-                h.stop();
+                h.interruptWriter();
+                h.closeSocket();
             }
             objectStreamAcceptor.join();
             xmlAcceptor.join();
@@ -181,7 +180,7 @@ public class Server {
     public static void main(String[] args) {
         ServerConfigs configs = new ServerConfigs(CONFIG_FILE_PATH);
         Server server = new Server(configs);
-        log.info("to stop server write \"exit\"");
+        log.info("to interruptWriter server write \"exit\"");
         server.start();
         try {
             BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
@@ -238,17 +237,30 @@ public class Server {
             try {
                 while (!Thread.interrupted()) {
                     ServerMessage m = serverMessages.take();
-                    while (!messageBuffer.offer(m)) {
-                        messageBuffer.take();
-                    }
-                    synchronized (lock) {
-                        for (ClientHandler h : clientHandlers) {
-                            h.addOutgoingMessage(m);
+                    if (m instanceof UserMessage) {
+                        while (!messageBuffer.offer(m)) {
+                            messageBuffer.take();
+                        }
+                        synchronized (lock) {
+                            for (ClientHandler h : clientHandlers) {
+                                if (!((UserMessage) m).getName().equals(h.getName())) {
+                                    h.addOutgoingMessage(m);
+                                }
+                            }
+                        }
+                    } else {
+                        synchronized (lock) {
+                            for (ClientHandler h : clientHandlers) {
+                                h.addOutgoingMessage(m);
+                            }
                         }
                     }
                 }
             } catch (InterruptedException e) {
                 log.info("interrupted");
+            } catch (ConcurrentModificationException e) {
+                //TODO
+                log.error("WHY THIS EXCEPTION HAPPENS?");
             }
         }
     }

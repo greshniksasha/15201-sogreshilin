@@ -1,16 +1,17 @@
 package model;
 
 import model.message.*;
-import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.core.config.Configurator;
+import org.xml.sax.SAXException;
 import serializing.DOMDeserializer;
 import serializing.JAXBSerializer;
-import view.ClientForm;
+import view.WelcomeForm;
 
 import java.io.*;
+import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.net.SocketTimeoutException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,21 +22,22 @@ import java.util.concurrent.BlockingQueue;
  * Created by Alexander on 29/05/2017.
  */
 public class Client {
+    private static int BYTE_BUFFER_SIZE = 10000;
+    private static int TIMEOUT = 5000;
     private static final String CONFIG_FILE_PATH = "src/client_config.properties";
     private static final String OBJ = "obj";
     private static final String XML = "xml";
     private Socket socket;
-    private User user;
-//    private String name;
-//    private final String type;
     private int sessionID;
+    private User user;
     private Boolean loggedIn;
     private BlockingQueue<ClientMessage> messagesToSend;
     private BlockingQueue<TextMessage> textMessages;
     private BlockingQueue<Class> sentMessageTypes;
     private List<User> users;
     private List<IncomingMsgObserver> observers;
-    private short port;
+    private ConnectionObserver connectionObserver;
+    private int port;
     private String ip;
 
     private MessageHandler messageHandler;
@@ -52,11 +54,10 @@ public class Client {
     public Client(ClientConfigs clientConfigs) {
         user = new User();
         user.setType(clientConfigs.getType());
-//        type = clientConfigs.getType();
         sentMessageTypes = new ArrayBlockingQueue<>(CAPACITY);
         messageHandler = new ClientMessageHandler(this);
         messagesToSend = new ArrayBlockingQueue<>(CAPACITY);
-        textMessages = new ArrayBlockingQueue<TextMessage>(CAPACITY);
+        textMessages = new ArrayBlockingQueue<>(CAPACITY);
         observers = new ArrayList<>();
         loggedIn = false;
         users = new ArrayList<>();
@@ -64,22 +65,33 @@ public class Client {
         ip = clientConfigs.getIp();
     }
 
-    public void connectToServerObjectStream() {
+    public void connectToServer() {
         try {
-            socket = new Socket(ip, port);
+            log.info("IP = {}; PORT = {}", ip, port);
+            socket = new Socket();
+            socket.connect(new InetSocketAddress(ip, port), TIMEOUT);
+        } catch (SocketTimeoutException e) {
+            log.error("timeout expired");
+            connectionObserver.handle(false);
+            return;
         } catch (IOException e) {
             log.error("connecting to server error");
+            connectionObserver.handle(false);
+            return;
+        }
+        if (connectionObserver != null) {
+            connectionObserver.handle(true);
         }
         log.info("connected to server");
-    }
-
-    public void connectToServerXML() {
-        try {
-            socket = new Socket(ip, port);
-        } catch (IOException e) {
-            log.error("connecting to server error");
+        switch (user.getType()) {
+            case OBJ:
+                this.objectStreamsGo();
+                log.info("Connected to ObjectStream Server");
+                return;
+            case XML:
+                this.xmlGo();
+                log.info("Connected to XML Server");
         }
-        log.info("connected to server");
     }
 
     public void disconnectFromServer() {
@@ -162,6 +174,14 @@ public class Client {
         }
     }
 
+    public interface ConnectionObserver {
+        void handle(Boolean connected);
+    }
+
+    public void setConnectionObserver(ConnectionObserver connectionObserver) {
+        this.connectionObserver = connectionObserver;
+    }
+
     public interface IncomingMsgObserver {
         void process(ServerMessage message);
     }
@@ -180,42 +200,18 @@ public class Client {
         disconnectFromServer();
     }
 
-    public void connectToServer() {
-        switch (user.getType()) {
-            case OBJ:
-                this.connectToServerObjectStream();
-                this.objectStreamsGo();
-                log.info("Connected to ObjectStream Server");
-                return;
-            case XML:
-                this.connectToServerXML();
-                this.xmlGo();
-                log.info("Connected to XML Server");
-        }
+    public void joinThreads() throws InterruptedException {
+        readerThread.join();
+        writerThread.join();
+        disconnectFromServer();
     }
 
     public static void main(String[] args) {
         ClientConfigs clientConfigs = new ClientConfigs(CONFIG_FILE_PATH);
-        if (!clientConfigs.getLogOn()) {
-            Configurator.setRootLevel(Level.OFF);
-        }
-        Client client = new Client(clientConfigs);
-        client.connectToServer();
-        new ClientForm(client).setVisible(true);
-
-//        new Thread(() -> {
-//            try {
-//                Thread.sleep(7000);
-//                TextMessage message = new TextMessage();
-//                message.setSessionID(client.getSessionID());
-//                for (int i = 0; i < 1000; ++i) {
-//                    message.setText("message-" + i);
-//                    client.addOutgoingMessage(message);
-//                }
-//            } catch (InterruptedException e) {
-//                e.printStackTrace();
-//            }
-//        }).start();
+        new WelcomeForm(clientConfigs).setVisible(true);
+//        Client client = new Client(clientConfigs);
+//        client.connectToServer();
+//        new ClientForm(client).setVisible(true);
     }
 
     private class ObjectWriter implements Runnable {
@@ -277,6 +273,7 @@ public class Client {
                     ClientMessage message = messagesToSend.take();
                     String xmlString = serializer.messageToXMLString(message);
                     byte[] data = xmlString.getBytes(StandardCharsets.UTF_8);
+                    log.info("data length : {}", data.length);
                     writerStream.writeInt(data.length);
                     writerStream.write(data);
                     writerStream.flush();
@@ -294,6 +291,18 @@ public class Client {
         }
     }
 
+    private String readData(DataInputStream inputStream) throws IOException {
+        int leftToRead = inputStream.readInt();
+        String data = "";
+        do {
+            byte[] inputData = new byte[Integer.min(BYTE_BUFFER_SIZE, leftToRead)];
+            leftToRead -= inputStream.read(inputData, 0, Integer.min(leftToRead, BYTE_BUFFER_SIZE));
+            String partOfData = new String(inputData, StandardCharsets.UTF_8);
+            data += partOfData;
+        } while (leftToRead != 0);
+        return data;
+    }
+
     private class XMLReader implements Runnable {
         @Override
         public void run() {
@@ -302,22 +311,19 @@ public class Client {
                 deserializer.setQueue(sentMessageTypes);
                 DataInputStream readerStream = new DataInputStream(socket.getInputStream());
                 while(!Thread.interrupted()) {
-                    int messageLength = readerStream.readInt();
-                    byte[] inputData = new byte[messageLength];
-                    if (readerStream.read(inputData, 0, messageLength) != messageLength) {
-                        log.error("read less bytes than supposed to");
-                    }
-                    String data = new String(inputData, StandardCharsets.UTF_8);
+                    String data = readData(readerStream);
                     ServerMessage message = (ServerMessage)deserializer.deserialize(data);
                     message.process(messageHandler);
                 }
             } catch (IOException e) {
                 log.info("socket closed");
+                connectionObserver.handle(false);
+                writerThread.interrupt();
+            } catch (SAXException e) {
+                log.info("could not deserialize data from server");
             } finally {
                 log.info("finished");
             }
         }
     }
-
-
 }

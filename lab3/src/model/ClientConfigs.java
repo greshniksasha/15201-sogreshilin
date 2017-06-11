@@ -19,22 +19,29 @@ public class ClientConfigs {
     private static final String LOG_ON = "LOG_ON";
     private String type;
     private String ip;
-    private short port;
-    private Boolean logOn;
+    private Integer port;
+//    private Boolean logOn;
 
     public static final Logger log = LogManager.getLogger(ClientConfigs.class);
+
+    public ClientConfigs() {}
 
     public ClientConfigs(String configFileName) {
         Properties properties = new Properties();
         try (FileInputStream input = new FileInputStream(configFileName)) {
             properties.load(input);
-            type = properties.getProperty(TYPE).toLowerCase();
-            port = Short.parseShort(properties.getProperty(SERVER_PORT));
+            if (properties.getProperty(TYPE) != null) {
+                type = properties.getProperty(TYPE).toLowerCase();
+            }
+            if (properties.getProperty(SERVER_PORT) != null) {
+                port = Integer.parseInt(properties.getProperty(SERVER_PORT));
+            }
             ip = properties.getProperty(SERVER_IP);
-            logOn = Boolean.parseBoolean(properties.getProperty(LOG_ON));
+//            if (properties.getProperty(LOG_ON) != null) {
+//                logOn = Boolean.parseBoolean(properties.getProperty(LOG_ON));
+//            }
         } catch (FileNotFoundException e) {
-            log.error("Config file not found");
-            System.exit(-1);
+            log.info("Config file not found");
         } catch (IOException e) {
             log.error("I/O Exception : ", e);
             System.exit(-1);
@@ -47,6 +54,22 @@ public class ClientConfigs {
         }
     }
 
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public void setIp(String ip) {
+        this.ip = ip;
+    }
+
+    public void setPort(int port) {
+        this.port = port;
+    }
+
+//    public void setLogOn(Boolean logOn) {
+//        this.logOn = logOn;
+//    }
+
     public String getType() {
         return type;
     }
@@ -55,11 +78,11 @@ public class ClientConfigs {
         return ip;
     }
 
-    public short getPort() {
+    public Integer getPort() {
         return port;
     }
 
-    public Boolean getLogOn() {
-        return logOn;
-    }
+//    public Boolean getLogOn() {
+//        return logOn;
+//    }
 }

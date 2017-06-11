@@ -2,6 +2,8 @@ package model;
 
 import model.message.ServerMessage;
 
+import java.io.IOException;
+
 /**
  * Created by Alexander on 07/06/2017.
  */
@@ -11,13 +13,13 @@ public interface ClientHandler {
 
     String getName();
 
-//    void setName(String name);
-
     int getSessionID();
 
     void start();
 
-    void stop();
+    void interruptWriter();
+
+    void closeSocket() throws IOException;
 
     void setUser(User user);
 

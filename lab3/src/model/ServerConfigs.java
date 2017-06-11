@@ -18,18 +18,20 @@ public class ServerConfigs {
     private static final String PORT_XML = "PORT_XML";
     private static final String PORT_OBJECTS = "PORT_OBJECTS";
     private static final String LOG_ON = "LOG_ON";
-    private short portObjects;
-    private short portXML;
+    private int portObjects;
+    private int portXML;
     private Boolean logOn;
 
     public static final Logger log = LogManager.getLogger(ClientConfigs.class);
+
+    public ServerConfigs() {}
 
     public ServerConfigs(String configFileName) {
         Properties properties = new Properties();
         try (FileInputStream input = new FileInputStream(configFileName)) {
             properties.load(input);
-            portObjects = Short.parseShort(properties.getProperty(PORT_OBJECTS));
-            portXML = Short.parseShort(properties.getProperty(PORT_XML));
+            portObjects = Integer.parseInt(properties.getProperty(PORT_OBJECTS));
+            portXML = Integer.parseInt(properties.getProperty(PORT_XML));
             logOn = Boolean.parseBoolean(properties.getProperty(LOG_ON));
             if (!logOn) {
                 Configurator.setRootLevel(Level.OFF);
@@ -49,11 +51,23 @@ public class ServerConfigs {
         }
     }
 
-    public short getPortObjects() {
+    public void setPortObjects(int portObjects) {
+        this.portObjects = portObjects;
+    }
+
+    public void setPortXML(int portXML) {
+        this.portXML = portXML;
+    }
+
+    public void setLogOn(Boolean logOn) {
+        this.logOn = logOn;
+    }
+
+    public int getPortObjects() {
         return portObjects;
     }
 
-    public short getPortXML() {
+    public int getPortXML() {
         return portXML;
     }
 

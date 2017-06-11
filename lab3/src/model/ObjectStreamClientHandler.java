@@ -95,8 +95,13 @@ public class ObjectStreamClientHandler implements ClientHandler {
         writer.start();
     }
 
-    public void stop() {
+    public void interruptWriter() {
         writer.interrupt();
+    }
+
+    @Override
+    public void closeSocket() throws IOException {
+        socket.close();
     }
 
     @Override

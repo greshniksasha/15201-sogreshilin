@@ -50,7 +50,7 @@ public class ClientMessageHandler implements MessageHandler {
 
     @Override
     public void process(TextSuccess message) {
-        client.takeTextMessage();
+        client.notifyObservers(message);
         log.info("message delivered successfully");
     }
 
