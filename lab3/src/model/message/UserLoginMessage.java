@@ -53,12 +53,7 @@ public class UserLoginMessage implements ServerMessage, DisplayMessage, Serializ
     }
 
     @Override
-    public void process(ClientForm form) {
-        form.process(this);
-    }
-
-    @Override
     public String messageToShow() {
-        return user.getName() + " joined the chat";
+        return "joined the chat";
     }
 }

@@ -4,7 +4,6 @@ package model.message;
  * Created by Alexander on 06/06/2017.
  */
 import model.MessageHandler;
-import view.ClientForm;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -29,10 +28,5 @@ public class LoginError implements ServerMessage, Serializable {
     @Override
     public void process(MessageHandler handler) {
         handler.process(this);
-    }
-
-    @Override
-    public void process(ClientForm form) {
-        form.process(this);
     }
 }

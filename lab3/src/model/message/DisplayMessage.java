@@ -5,4 +5,5 @@ package model.message;
  */
 public interface DisplayMessage {
     String messageToShow();
+    String getName();
 }

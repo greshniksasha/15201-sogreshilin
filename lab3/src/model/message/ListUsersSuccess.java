@@ -2,7 +2,6 @@ package model.message;
 
 import model.MessageHandler;
 import model.User;
-import view.ClientForm;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
@@ -30,10 +29,5 @@ public class ListUsersSuccess implements ServerMessage, Serializable {
     @Override
     public void process(MessageHandler handler) {
         handler.process(this);
-    }
-
-    @Override
-    public void process(ClientForm form) {
-        form.process(this);
     }
 }

@@ -1,7 +1,6 @@
 package model.message;
 
 import model.ClientHandler;
-import model.ObjectStreamClientHandler;
 import model.Server;
 
 import javax.xml.bind.annotation.XmlAttribute;

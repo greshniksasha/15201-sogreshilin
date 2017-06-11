@@ -42,12 +42,7 @@ public class UserLogoutMessage implements ServerMessage, DisplayMessage, Seriali
     }
 
     @Override
-    public void process(ClientForm form) {
-        form.process(this);
-    }
-
-    @Override
     public String messageToShow() {
-        return user.getName() + " left the chat";
+        return "left the chat";
     }
 }

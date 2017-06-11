@@ -47,12 +47,7 @@ public class UserMessage implements ServerMessage, DisplayMessage, Serializable 
     }
 
     @Override
-    public void process(ClientForm form) {
-        form.process(this);
-    }
-
-    @Override
     public String messageToShow() {
-        return name + ": " + message;
+        return message;
     }
 }
