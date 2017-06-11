@@ -1,19 +1,27 @@
 package view;
 
 import model.Client;
+import model.MessageHandler;
 import model.message.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import javax.swing.*;
+import javax.swing.border.CompoundBorder;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.EtchedBorder;
+import javax.swing.border.LineBorder;
+import javax.swing.text.DefaultCaret;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.InputEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 
 /**
  * Created by Alexander on 29/05/2017.
  */
-public class ClientForm extends JFrame {
+public class ClientForm extends JFrame implements MessageHandler {
     private Client client;
     private static final Logger log = LogManager.getLogger(Client.class);
 
@@ -22,23 +30,55 @@ public class ClientForm extends JFrame {
     private JTextField loginTF;
     private JButton connectB;
     private JButton disconnectB;
-    private JTextField outgoingTF;
+    private JTextArea outgoingTF;
     private JButton sendB;
-    private IncomingMessagesPanel incomingP;
+    private JTextArea incomingTA;
     private OnlineUsersPanel usersP;
 
 
     public ClientForm(Client client) throws HeadlessException {
-        super("Client");
-        this.client = client;
+        super("Chat");
         this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+        this.client = client;
 
         client.addObserver((message -> {
             message.process(this);
         }));
 
-        //***** NORTH PANEL *****/
+        JPanel northP = setNorthPanel();
+        JPanel southP = setSouthPanel();
 
+        //***** CENTER PANEL *****/
+        incomingTA = new JTextArea();
+        incomingTA.setLineWrap(true);
+        incomingTA.setWrapStyleWord(true);
+        incomingTA.setEditable(false);
+        JScrollPane scroller = new JScrollPane(incomingTA);
+        scroller.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+        scroller.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        EmptyBorder emptyBorder = new EmptyBorder(6,6,6,3);
+        EtchedBorder etchedBorder = new EtchedBorder();
+        scroller.setBorder(new CompoundBorder(emptyBorder,etchedBorder));
+        DefaultCaret caret = (DefaultCaret) incomingTA.getCaret();
+        caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
+
+        usersP = new OnlineUsersPanel();
+
+        //***** ALL FORM *****/
+
+        JPanel mainPanel = new JPanel();
+        mainPanel.setLayout(new BorderLayout());
+        mainPanel.add(northP, BorderLayout.NORTH);
+        mainPanel.add(scroller, BorderLayout.CENTER);
+        mainPanel.add(usersP, BorderLayout.EAST);
+        mainPanel.add(southP, BorderLayout.SOUTH);
+//        this.getRootPane().setDefaultButton(sendB);
+        this.setContentPane(mainPanel);
+        this.pack();
+        this.setMinimumSize(new Dimension(450, 300));
+    }
+
+    private JPanel setNorthPanel() {
         JPanel northP = new JPanel(new GridLayout(1,4));
         loginL = new JLabel("Enter username");
         loginTF = new JTextField();
@@ -50,6 +90,15 @@ public class ClientForm extends JFrame {
         northP.add(disconnectB);
 
         loginL.setHorizontalAlignment(SwingConstants.CENTER);
+
+        client.setConnectionObserver(connected -> {
+            if (!connected) {
+                JOptionPane.showMessageDialog(this,
+                        "Server is not available",
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE);
+            }
+        });
 
         connectB.addActionListener((e) -> {
             if (!this.client.isConnectedToServer()) {
@@ -90,19 +139,28 @@ public class ClientForm extends JFrame {
                 }
             }
         });
+        return northP;
+    }
 
-        //***** SOUTH PANEL *****/
-
-        JPanel southP = new JPanel();
+    private JPanel setSouthPanel() {
+        JPanel southP = new JPanel(new BorderLayout());
         sendB = new JButton("SEND");
-        outgoingTF = new JTextField(20);
-        southP.add(outgoingTF);
-        southP.add(sendB);
+        outgoingTF = new JTextArea(4,10);
+        outgoingTF.setLineWrap(true);
+        outgoingTF.setWrapStyleWord(true);
+        southP.add(sendB, BorderLayout.EAST);
+
+        JScrollPane scroller = new JScrollPane(outgoingTF);
+        scroller.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+        scroller.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        southP.add(scroller, BorderLayout.CENTER);
+
 
         sendB.setEnabled(false);
 
         sendB.addActionListener((e) -> {
             String text = outgoingTF.getText();
+            text = text.replaceAll("^\\s+|\\s+$", "");
             outgoingTF.setText("");
             TextMessage msg = new TextMessage();
             msg.setText(text);
@@ -122,24 +180,31 @@ public class ClientForm extends JFrame {
             }
         });
 
+        KeyStroke shiftEnter = KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, KeyEvent.SHIFT_DOWN_MASK, false);
+        KeyStroke enter = KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0, false);
+
+        outgoingTF.getInputMap().put(shiftEnter, "shift+enter");
+        outgoingTF.getInputMap().put(enter, "enter");
+
+        outgoingTF.getActionMap().put("shift+enter", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent ae) {
+                outgoingTF.append("\n");
+            }
+        });
+        outgoingTF.getActionMap().put("enter", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                sendB.doClick();
+            }
+        });
+
+//        add(outgoingTF);
+
+
         outgoingTF.setEditable(false);
-
-        //***** CENTER PANEL *****/
-
-        incomingP = new IncomingMessagesPanel();
-        usersP = new OnlineUsersPanel();
-
-        //***** ALL FORM *****/
-
-        JPanel mainPanel = new JPanel();
-        mainPanel.setLayout(new BorderLayout());
-        mainPanel.add(northP, BorderLayout.NORTH);
-        mainPanel.add(incomingP, BorderLayout.WEST);
-        mainPanel.add(usersP, BorderLayout.EAST);
-        mainPanel.add(southP, BorderLayout.SOUTH);
-        this.setContentPane(mainPanel);
-        this.pack();
-        this.setResizable(false);
+        southP.setBorder(new EmptyBorder(0,6,3,6));
+        return southP;
     }
 
 
@@ -147,11 +212,16 @@ public class ClientForm extends JFrame {
 
 
 
+    public void appendText(String text) {
+        incomingTA.append(text + "\n");
+    }
 
-
+    public void clear() {
+        incomingTA.setText("");
+    }
 
     public void process(LoginSuccess message) {
-        client.setSessionID(message.getSessionID());
+        clear();
         outgoingTF.setEditable(true);
         loginTF.setText(client.getName());
         loginTF.setEditable(false);
@@ -178,11 +248,12 @@ public class ClientForm extends JFrame {
     }
 
     public void process(TextSuccess message) {
+        appendText( client.getName() + ": " + client.takeTextMessage().getText());
         log.info("message displayed");
     }
 
     public void process(TextError message) {
-        incomingP.appendText("your message was not delivered : \"" + message.getText() + "\"");
+        appendText("your message was not delivered : \"" + message.getText() + "\"");
         log.info("message marked as undelivered");
     }
 
@@ -190,7 +261,6 @@ public class ClientForm extends JFrame {
         //TODO
         loginL.setText("Last logged in as");
         usersP.refreshUsersList(client.getUsers());
-        incomingP.appendText("you are disconnected from chat");
         loginTF.setEditable(true);
         loginTF.requestFocus();
         getRootPane().setDefaultButton(connectB);
@@ -209,19 +279,23 @@ public class ClientForm extends JFrame {
 
     public void process(UserLoginMessage message) {
         usersP.refreshUsersList(client.getUsers());
-        incomingP.appendText(message.messageToShow());
+        appendMessage(message);
         log.info("user {} added to userList", message.getName());
     }
 
     public void process(UserLogoutMessage message) {
         usersP.refreshUsersList(client.getUsers());
-        incomingP.appendText(message.messageToShow());
+        appendMessage(message);
         log.info("user {} removed from userList", message.getName());
     }
 
     public void process(UserMessage message) {
-        incomingP.appendText(message.messageToShow());
+        appendMessage(message);
         log.info("displayed message \"{}\" from {}", message.getMessage(), message.getName());
+    }
+
+    public void appendMessage(DisplayMessage message) {
+        appendText(message.getName() + ": " + message.messageToShow());
     }
 
 

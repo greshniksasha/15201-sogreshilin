@@ -4,6 +4,9 @@ package view;
 import model.User;
 
 import javax.swing.*;
+import javax.swing.border.CompoundBorder;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.EtchedBorder;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -17,7 +20,8 @@ public class OnlineUsersPanel extends JPanel {
     private JTextArea usersTA;
 
     public OnlineUsersPanel() {
-        usersTA = new JTextArea(15, 15);
+        setLayout(new BorderLayout());
+        usersTA = new JTextArea(10,13);
         usersTA.setLineWrap(true);
         usersTA.setWrapStyleWord(true);
         usersTA.setEditable(false);
@@ -25,8 +29,10 @@ public class OnlineUsersPanel extends JPanel {
         JScrollPane scroller = new JScrollPane(usersTA);
         scroller.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
         scroller.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-
-        add(scroller);
+        EmptyBorder emptyBorder = new EmptyBorder(6,3,6,6);
+        EtchedBorder etchedBorder = new EtchedBorder();
+        scroller.setBorder(new CompoundBorder(emptyBorder,etchedBorder));
+        add(scroller, BorderLayout.CENTER);
     }
 
     public void refreshUsersList(List<User> users) {
