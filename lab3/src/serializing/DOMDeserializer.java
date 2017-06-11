@@ -88,7 +88,9 @@ public class DOMDeserializer {
     private Message parse(Document doc) {
         Element root = doc.getDocumentElement();
         try {
+            log.info("root element : {}", root.getNodeName());
             switch (root.getNodeName()) {
+
                 case COMMAND:
                     switch (root.getAttribute(NAME)) {
                         case LIST: return unmarshallMessage(ListUsersRequest.class);
@@ -98,7 +100,9 @@ public class DOMDeserializer {
 //                        case MESSAGE: return deserializeTextMessage();
                     }
                 case EVENT:
+                  log.info("root attribute : {}", root.getAttribute(NAME));
                     switch (root.getAttribute(NAME)) {
+
                         case MESSAGE: return unmarshallMessage(UserMessage.class);
                         case USERLOGIN: return unmarshallMessage(UserLoginMessage.class);
                         case USERLOGOUT: return unmarshallMessage(UserLogoutMessage.class);

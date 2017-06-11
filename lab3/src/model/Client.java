@@ -277,6 +277,7 @@ public class Client {
                     writerStream.writeInt(data.length);
                     writerStream.write(data);
                     writerStream.flush();
+                    log.info("data : {}\n{}", data.length, xmlString);
                     sentMessageTypes.add(message.getClass());
                     if (message instanceof TextMessage) {
                         textMessages.add((TextMessage) message);
@@ -292,12 +293,15 @@ public class Client {
     }
 
     private String readData(DataInputStream inputStream) throws IOException {
+
         int leftToRead = inputStream.readInt();
+        log.info("message length : {}", leftToRead);
         String data = "";
         do {
             byte[] inputData = new byte[Integer.min(BYTE_BUFFER_SIZE, leftToRead)];
             leftToRead -= inputStream.read(inputData, 0, Integer.min(leftToRead, BYTE_BUFFER_SIZE));
             String partOfData = new String(inputData, StandardCharsets.UTF_8);
+            log.info("part of data : \n {}", partOfData);
             data += partOfData;
         } while (leftToRead != 0);
         return data;
@@ -312,6 +316,7 @@ public class Client {
                 DataInputStream readerStream = new DataInputStream(socket.getInputStream());
                 while(!Thread.interrupted()) {
                     String data = readData(readerStream);
+                    log.info("data : \n{}", data);
                     ServerMessage message = (ServerMessage)deserializer.deserialize(data);
                     message.process(messageHandler);
                 }

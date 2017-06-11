@@ -9,6 +9,8 @@ import javax.swing.border.EtchedBorder;
 import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * Created by Alexander on 11/06/2017.
@@ -25,6 +27,7 @@ public class WelcomeForm  extends JFrame {
     private Boolean radioBChecked = false;
     private ClientConfigs configs;
     private JLabel stateL;
+    private static final Logger log = LogManager.getLogger(WelcomeForm.class);
 
     public WelcomeForm(ClientConfigs configs) throws HeadlessException {
         super("Chat");
@@ -61,24 +64,26 @@ public class WelcomeForm  extends JFrame {
 
         ipL.setHorizontalAlignment(SwingConstants.CENTER);
         portL.setHorizontalAlignment(SwingConstants.CENTER);
-        xmlRB.setHorizontalAlignment(SwingConstants.CENTER);
-        objectsRB.setHorizontalAlignment(SwingConstants.CENTER);
+        // xmlRB.setHorizontalAlignment(SwingConstants.CENTER);
+        // objectsRB.setHorizontalAlignment(SwingConstants.CENTER);
 
-        objectsRB.addChangeListener((e) -> {
+        objectsRB.addActionListener((e) -> {
             radioBChecked = true;
             configs.setType("obj");
+            log.info("checked OBJ marked");
         });
 
-        xmlRB.addChangeListener((e) -> {
+        xmlRB.addActionListener((e) -> {
             radioBChecked = true;
             configs.setType("xml");
+            log.info("checked XML marked");
         });
 
         if (configs.getType() != null) {
             radioBChecked = true;
             if (configs.getType().equals("obj")) {
                 objectsRB.setSelected(true);
-            } else {
+            } else if (configs.getType().equals("xml")) {
                 xmlRB.setSelected(true);
             }
         }
@@ -123,7 +128,9 @@ public class WelcomeForm  extends JFrame {
         okB.addActionListener((e) -> {
             ipTF.setForeground(setIp(ipTF.getText()) ? Color.black : Color.red);
             portTF.setForeground((setPort(portTF.getText())) ? Color.black : Color.red);
+
             if (validIp && validPort && radioBChecked) {
+                log.info("configs : {}, {}, {}", configs.getType(), configs.getIp(), configs.getPort());
                 Client client = new Client(configs);
                 client.setConnectionObserver(connected -> {
                     if (connected) {
