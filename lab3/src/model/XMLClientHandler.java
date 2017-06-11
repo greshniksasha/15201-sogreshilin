@@ -1,15 +1,15 @@
 package model;
 
-import model.message.ClientMessage;
-import model.message.ServerMessage;
-import model.message.TextMessage;
+import model.message.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.xml.sax.SAXException;
 import serializing.DOMDeserializer;
 import serializing.JAXBSerializer;
 
 import java.io.*;
 import java.net.Socket;
+import java.net.SocketTimeoutException;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
@@ -22,7 +22,7 @@ public class XMLClientHandler implements ClientHandler {
     private Thread reader;
     private Thread writer;
     private int sessionID;
-    private String name;
+    private Server server;
     private Socket socket;
     private BlockingQueue<ServerMessage> messagesToSend;
     private User user = new User();
@@ -30,31 +30,36 @@ public class XMLClientHandler implements ClientHandler {
     private static final Logger log = LogManager.getLogger(ObjectStreamClientHandler.class);
     private static AtomicInteger sessionIDGenerator = new AtomicInteger(0);
     private static final int QUEUE_CAPACITY = 1000;
+    private static int BYTE_BUFFER_SIZE = 10000;
 
     XMLClientHandler(Server server, Socket socket) {
+        this.server = server;
         this.socket = socket;
         sessionID = sessionIDGenerator.getAndIncrement();
         messagesToSend = new ArrayBlockingQueue<ServerMessage>(QUEUE_CAPACITY);
-//        user = new User();
-//        user.setName("null");
-//        user.setType("null");
 
         reader = new Thread(() -> {
             try {
                 DOMDeserializer deserializer = new DOMDeserializer();
                 DataInputStream inputStream = new DataInputStream(socket.getInputStream());
                 while (!Thread.interrupted()) {
-                    int messageLength = inputStream.readInt();
-                    byte[] inputData = new byte[messageLength];
-                    if (inputStream.read(inputData, 0, messageLength) != messageLength) {
-                        log.error("read less bytes than supposed to");
+                    String data = readData(inputStream);
+                    if (data == null) {
+                        break;
                     }
-                    String data = new String(inputData, StandardCharsets.UTF_8);
-                    ClientMessage message = (ClientMessage) deserializer.deserialize(data);
+                    ClientMessage message = null;
+                    try {
+                        message = (ClientMessage) deserializer.deserialize(data);
+                    } catch (SAXException e) {
+                        log.error("could not deserialize : user send bad data");
+                        blockUser();
+                        return;
+                    }
                     message.process(server, this);
                 }
             } catch (IOException e) {
                 log.info("stopped");
+
             }
         }, "XMLReader-" + sessionID);
 
@@ -81,6 +86,45 @@ public class XMLClientHandler implements ClientHandler {
 
     }
 
+    private void blockUser() throws IOException {
+        if (!server.getUsers().isEmpty()) {
+            server.getUsers().remove(user);
+        }
+        UserLogoutMessage msg = new UserLogoutMessage();
+        msg.setName(getName());
+        server.getServerMessages().add(msg);
+        log.info("sent user logout message to everyone");
+        new Thread(() -> {server.removeClientHandler(this);}).start();
+        writer.interrupt();
+        log.info("blocked user");
+        closeSocket();
+    }
+
+    private String readData(DataInputStream inputStream) throws IOException {
+        int messageLength = inputStream.readInt();
+        if (messageLength <= 0) {
+            blockUser();
+            return null;
+        }
+        int leftToRead = messageLength;
+        String data = "";
+        socket.setSoTimeout(1000);
+        try {
+            do {
+                byte[] inputData = new byte[Integer.min(BYTE_BUFFER_SIZE, leftToRead)];
+                leftToRead -= inputStream.read(inputData, 0, Integer.min(leftToRead, BYTE_BUFFER_SIZE));
+                String partOfData = new String(inputData, StandardCharsets.UTF_8);
+                data += partOfData;
+            } while (leftToRead != 0);
+        } catch (SocketTimeoutException e) {
+            log.error("actual message length is shorter than one in the xml");
+        }
+        socket.setSoTimeout(0);
+
+
+        return data;
+    }
+
     public void addOutgoingMessage(ServerMessage message) {
         messagesToSend.add(message);
     }
@@ -88,11 +132,6 @@ public class XMLClientHandler implements ClientHandler {
     public String getName() {
         return user.getName();
     }
-
-//    public void setName(String name) {
-//        this.name = name;
-//    }
-
 
     @Override
     public User getUser() {
@@ -109,11 +148,16 @@ public class XMLClientHandler implements ClientHandler {
     }
 
     @Override
+    public void closeSocket() throws IOException {
+        socket.close();
+    }
+
+    @Override
     public void setUser(User user) {
         this.user = user;
     }
 
-    public void stop() {
+    public void interruptWriter() {
         writer.interrupt();
     }
 }
