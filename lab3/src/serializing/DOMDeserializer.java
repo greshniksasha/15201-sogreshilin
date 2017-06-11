@@ -32,7 +32,6 @@ public class DOMDeserializer {
 
     private static final String USERLOGIN = "userlogin";
     private static final String USERLOGOUT = "userlogout";
-    private static final String LISTUSERS = "listusers";
     private static final String SESSION = "session";
     private static final String NAME = "name";
 
@@ -54,7 +53,7 @@ public class DOMDeserializer {
         this.sentMessageTypes = sentMessageTypes;
     }
 
-    public Message serializeMessage(Class c) {
+    public Message unmarshallMessage(Class c) {
         Message message = null;
         try {
             JAXBContext context = JAXBContext.newInstance(c);
@@ -65,6 +64,10 @@ public class DOMDeserializer {
         }
         return message;
     }
+
+//    public TextMessage deserializeTextMessage() {
+//        return null;
+//    }
 
     private Class getAppropriateClass(String type, Class sentMessage) {
         if (sentMessage.equals(TextMessage.class)) {
@@ -88,19 +91,20 @@ public class DOMDeserializer {
             switch (root.getNodeName()) {
                 case COMMAND:
                     switch (root.getAttribute(NAME)) {
-                        case LIST: return serializeMessage(ListUsersRequest.class);
-                        case LOGIN: return serializeMessage(LoginRequest.class);
-                        case LOGOUT: return serializeMessage(LogoutRequest.class);
-                        case MESSAGE: return serializeMessage(TextMessage.class);
+                        case LIST: return unmarshallMessage(ListUsersRequest.class);
+                        case LOGIN: return unmarshallMessage(LoginRequest.class);
+                        case LOGOUT: return unmarshallMessage(LogoutRequest.class);
+                        case MESSAGE: return unmarshallMessage(TextMessage.class);
+//                        case MESSAGE: return deserializeTextMessage();
                     }
                 case EVENT:
                     switch (root.getAttribute(NAME)) {
-                        case MESSAGE: return serializeMessage(UserMessage.class);
-                        case USERLOGIN: return serializeMessage(UserLoginMessage.class);
-                        case USERLOGOUT: return serializeMessage(UserLogoutMessage.class);
+                        case MESSAGE: return unmarshallMessage(UserMessage.class);
+                        case USERLOGIN: return unmarshallMessage(UserLoginMessage.class);
+                        case USERLOGOUT: return unmarshallMessage(UserLogoutMessage.class);
                     }
-                case ERROR: return serializeMessage(getAppropriateClass(ERROR, sentMessageTypes.take()));
-                case SUCCESS: return serializeMessage(getAppropriateClass(SUCCESS, sentMessageTypes.take()));
+                case ERROR: return unmarshallMessage(getAppropriateClass(ERROR, sentMessageTypes.take()));
+                case SUCCESS: return unmarshallMessage(getAppropriateClass(SUCCESS, sentMessageTypes.take()));
             }
         } catch (InterruptedException e) {
             log.error("interrupted while taking message from sentMessageTypes queue");
@@ -108,15 +112,10 @@ public class DOMDeserializer {
         return null;
     }
 
-    public Message deserialize(String data) {
-        try {
-            this.data = data;
-            Document doc = documentBuilder.parse(new ByteArrayInputStream(data.getBytes()));
-            return parse(doc);
-        } catch (SAXException | IOException e) {
-            log.error("parsing message error", e);
-        }
-        return null;
+    public Message deserialize(String data) throws SAXException, IOException {
+        this.data = data;
+        Document doc = documentBuilder.parse(new ByteArrayInputStream(data.getBytes()));
+        return parse(doc);
     }
 
 
