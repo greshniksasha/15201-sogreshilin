@@ -6,6 +6,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import javax.xml.bind.JAXBContext;
@@ -16,7 +17,9 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.StringReader;
+import java.nio.charset.StandardCharsets;
 import java.util.concurrent.BlockingQueue;
 
 public class DOMDeserializer {
@@ -35,7 +38,7 @@ public class DOMDeserializer {
     private static final String USERLOGOUT = "userlogout";
     private static final String NAME = "name";
 
-    private String data;
+    private byte[] data;
     private DocumentBuilder documentBuilder;
     private BlockingQueue<Class> sentMessageTypes;
     private static final Logger log = LogManager.getLogger(DOMDeserializer.class);
@@ -57,7 +60,8 @@ public class DOMDeserializer {
         try {
             JAXBContext context = JAXBContext.newInstance(c);
             Unmarshaller unmarshaller = context.createUnmarshaller();
-            return (Message) unmarshaller.unmarshal(new StringReader(data));
+            String sdata = new String(data, StandardCharsets.UTF_8);
+            return (Message) unmarshaller.unmarshal(new StringReader(sdata));
         } catch (JAXBException e) {
             log.error("parsing : JAXB deserializing error");
         }
@@ -109,9 +113,9 @@ public class DOMDeserializer {
         return null;
     }
 
-    public Message deserialize(String data) throws SAXException, IOException {
+    public Message deserialize(byte[] data) throws SAXException, IOException {
         this.data = data;
-        Document doc = documentBuilder.parse(new ByteArrayInputStream(data.getBytes()));
+        Document doc = documentBuilder.parse(new InputSource(new InputStreamReader(new ByteArrayInputStream(data,0,data.length),"UTF-8")));
         return parse(doc);
     }
 }

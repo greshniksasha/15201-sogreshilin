@@ -33,7 +33,7 @@ public class XMLClientHandler extends ClientHandler {
                 DOMDeserializer deserializer = new DOMDeserializer();
                 DataInputStream inputStream = new DataInputStream(socket.getInputStream());
                 while (!Thread.interrupted()) {
-                    String data = readData(inputStream);
+                    byte[] data = readData(inputStream);
                     if (data == null) {
                         break;
                     }
@@ -77,29 +77,49 @@ public class XMLClientHandler extends ClientHandler {
         }, "XMLWriter-" + sessionID);
     }
 
-    private String readData(DataInputStream inputStream) throws IOException {
-        int messageLength = inputStream.readInt();
-        log.info("message length : {}", messageLength);
-        if (messageLength <= 0) {
-            log.error("blocked user because messageLength is negative : {}", messageLength);
+    private byte[] readData(DataInputStream inputStream) throws IOException {
+        int length = inputStream.readInt();
+        if(length < 0){
+            log.error("blocked user because messageLength is negative : {}", length);
             blockUser();
             return null;
         }
-        int leftToRead = messageLength;
-        String data = "";
+        int read = 0;
+        int fails = 0;
+        byte[] buffer = new byte[length];
         socket.setSoTimeout(1000);
         try {
-            do {
-                byte[] inputData = new byte[Integer.min(BYTE_BUFFER_SIZE, leftToRead)];
-                leftToRead -= inputStream.read(inputData, 0, Integer.min(leftToRead, BYTE_BUFFER_SIZE));
-                String partOfData = new String(inputData, StandardCharsets.UTF_8);
-//                log.info("read data : {}", partOfData);
-                data += partOfData;
-            } while (leftToRead != 0);
+            while(read != length) {
+                int temp = inputStream.read(buffer, read, length - read);
+                read += temp;
+            }
         } catch (SocketTimeoutException e) {
             log.error("actual message length is shorter than one in the xml");
         }
         socket.setSoTimeout(0);
-        return data;
+//
+//        int messageLength = inputStream.readInt();
+//        log.info("message length : {}", messageLength);
+//        if (messageLength <= 0) {
+//            log.error("blocked user because messageLength is negative : {}", messageLength);
+//            blockUser();
+//            return null;
+//        }
+//        int leftToRead = messageLength;
+//        String data = "";
+//        socket.setSoTimeout(1000);
+//        try {
+//            do {
+//                byte[] inputData = new byte[Integer.min(BYTE_BUFFER_SIZE, leftToRead)];
+//                leftToRead -= inputStream.read(inputData, 0, Integer.min(leftToRead, BYTE_BUFFER_SIZE));
+//                String partOfData = new String(inputData, StandardCharsets.UTF_8);
+////                log.info("read data : {}", partOfData);
+//                data += partOfData;
+//            } while (leftToRead != 0);
+//        } catch (SocketTimeoutException e) {
+//            log.error("actual message length is shorter than one in the xml");
+//        }
+//        socket.setSoTimeout(0);
+        return buffer;
     }
 }

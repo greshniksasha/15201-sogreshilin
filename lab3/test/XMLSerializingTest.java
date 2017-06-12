@@ -72,11 +72,11 @@ public class XMLSerializingTest {
         if (in.read(inputData, 0, len) != len) {
             throw new Exception("less bytes read than supposed to");
         }
-        String string = new String(inputData, StandardCharsets.UTF_8);
-        System.out.println(string);
+//        String string = new String(inputData, StandardCharsets.UTF_8);
+//        System.out.println(string);
 
         // deserializing message
-        return deserializer.deserialize(string);
+        return deserializer.deserialize(inputData);
     }
 
     @Test

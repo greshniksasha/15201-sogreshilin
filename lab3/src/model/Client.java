@@ -298,21 +298,39 @@ public class Client {
         }
     }
 
-    private String readData(DataInputStream inputStream) throws IOException {
-        int leftToRead = inputStream.readInt();
-        if (leftToRead < 0) {
+    private byte[] readData(DataInputStream inputStream) throws IOException {
+        int length = inputStream.readInt();
+        if(length < 0){
             throw new IOException();
         }
-        log.info("message length : {}", leftToRead);
-        String data = "";
-        do {
-            byte[] inputData = new byte[Integer.min(BYTE_BUFFER_SIZE, leftToRead)];
-            leftToRead -= inputStream.read(inputData, 0, Integer.min(leftToRead, BYTE_BUFFER_SIZE));
-            String partOfData = new String(inputData, StandardCharsets.UTF_8);
-//            log.info("part of data : \n {}", partOfData);
-            data += partOfData;
-        } while (leftToRead != 0);
-        return data;
+        int read = 0;
+        byte[] buffer = new byte[length];
+        socket.setSoTimeout(1000);
+        try {
+            while(read != length) {
+                int temp = inputStream.read(buffer, read, length - read);
+                read += temp;
+            }
+        } catch (SocketTimeoutException e) {
+            log.error("actual message length is shorter than one in the xml");
+        }
+        socket.setSoTimeout(0);
+        return buffer;
+//
+//        int leftToRead = inputStream.readInt();
+//        if (leftToRead < 0) {
+//            throw new IOException();
+//        }
+//        log.info("message length : {}", leftToRead);
+//        String data = "";
+//        do {
+//            byte[] inputData = new byte[Integer.min(BYTE_BUFFER_SIZE, leftToRead)];
+//            leftToRead -= inputStream.read(inputData, 0, Integer.min(leftToRead, BYTE_BUFFER_SIZE));
+//            String partOfData = new String(inputData, StandardCharsets.UTF_8);
+////            log.info("part of data : \n {}", partOfData);
+//            data += partOfData;
+//        } while (leftToRead != 0);
+//        return data;
     }
 
     private class XMLReader implements Runnable {
@@ -323,7 +341,7 @@ public class Client {
                 deserializer.setQueue(sentMessageTypes);
                 DataInputStream readerStream = new DataInputStream(socket.getInputStream());
                 while(!Thread.interrupted()) {
-                    String data = readData(readerStream);
+                    byte[] data = readData(readerStream);
                     ServerMessage message = (ServerMessage)deserializer.deserialize(data);
                     message.process(messageHandler);
                 }
