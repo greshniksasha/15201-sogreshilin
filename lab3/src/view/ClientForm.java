@@ -1,7 +1,7 @@
 package view;
 
-import model.Client;
-import model.MessageHandler;
+import model.client.Client;
+import model.client.MessageHandler;
 import model.message.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

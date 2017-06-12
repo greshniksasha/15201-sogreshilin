@@ -3,7 +3,7 @@ package model.message;
 /**
  * Created by Alexander on 06/06/2017.
  */
-import model.MessageHandler;
+import model.client.MessageHandler;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;

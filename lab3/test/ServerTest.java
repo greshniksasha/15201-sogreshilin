@@ -1,10 +1,12 @@
-import model.Client;
-import model.ClientConfigs;
-import model.Server;
-import model.ServerConfigs;
+import model.client.Client;
+import model.client.ClientConfigs;
+import model.server.Server;
+import model.server.ServerConfigs;
 import model.message.LoginRequest;
 import model.message.LogoutRequest;
 import model.message.TextMessage;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.core.config.Configurator;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -21,6 +23,7 @@ public class ServerTest {
 
     @Before
     public void setUp() throws Exception {
+        Configurator.setRootLevel(Level.OFF);
         ServerConfigs configs = new ServerConfigs();
         configs.setPortXML(PORT);
         configs.setLogOn(true);
@@ -62,5 +65,6 @@ public class ServerTest {
     @After
     public void tearDown() throws Exception {
         server.stop();
+        System.out.println("PASSED");
     }
 }

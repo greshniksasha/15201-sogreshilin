@@ -1,7 +1,10 @@
 import model.User;
 import model.message.*;
+import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.core.config.Configurator;
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -37,24 +40,20 @@ public class XMLSerializingTest {
 
     @Before
     public void setUp() throws Exception {
-        try {
-            serializer = new JAXBSerializer();
-            tmpFile = File.createTempFile("test", "txt");
-            tmpFile.deleteOnExit();
-            in = new DataInputStream(new FileInputStream(tmpFile));
-            out = new DataOutputStream(new FileOutputStream(tmpFile));
-            queue = new ArrayBlockingQueue<>(10);
-            deserializer = new DOMDeserializer();
-            deserializer.setQueue(queue);
-            for (int i = 0; i < USER_COUNT; ++i) {
-                User user = new User();
-                user.setName("name-" + i);
-                user.setType(TYPE);
-                USERS.add(user);
-            }
-
-        } catch (IOException e) {
-            e.printStackTrace();
+        Configurator.setRootLevel(Level.OFF);
+        serializer = new JAXBSerializer();
+        tmpFile = File.createTempFile("test", "txt");
+        tmpFile.deleteOnExit();
+        in = new DataInputStream(new FileInputStream(tmpFile));
+        out = new DataOutputStream(new FileOutputStream(tmpFile));
+        queue = new ArrayBlockingQueue<>(10);
+        deserializer = new DOMDeserializer();
+        deserializer.setQueue(queue);
+        for (int i = 0; i < USER_COUNT; ++i) {
+            User user = new User();
+            user.setName("name-" + i);
+            user.setType(TYPE);
+            USERS.add(user);
         }
     }
 
@@ -214,5 +213,10 @@ public class XMLSerializingTest {
         sentMessage.setName(NAME);
         UserLogoutMessage receivedMessage = (UserLogoutMessage) sendAndReceiveMessage(sentMessage);
         Assert.assertEquals(sentMessage.getName(), receivedMessage.getName());
+    }
+
+    @After
+    public void tearDown() throws Exception {
+        System.out.println("PASSED");
     }
 }

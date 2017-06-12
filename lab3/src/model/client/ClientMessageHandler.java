@@ -1,5 +1,6 @@
-package model;
+package model.client;
 
+import model.User;
 import model.message.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -21,8 +22,7 @@ public class ClientMessageHandler implements MessageHandler {
         client.notifyObservers(message);
         client.setSessionID(message.getSessionID());
         client.loggedIn(true);
-        log.info("logged in as {}", client.getName());
-        log.info("session ID is {}", client.getSessionID());
+        log.info("processing " + message.getClass());
         ListUsersRequest msg = new ListUsersRequest();
         msg.setSessionID(message.getSessionID());
         client.addOutgoingMessage(msg);
@@ -31,27 +31,27 @@ public class ClientMessageHandler implements MessageHandler {
     @Override
     public void process(LoginError message) {
         client.notifyObservers(message);
-        log.info("got LoginError message : {}", message.getError());
+        log.info("processing " + message.getClass());
     }
 
     @Override
     public void process(ListUsersSuccess message) {
         for (User user : message.getUsers()) {
             client.addUser(user);
-            log.info("add user to userlist {}", user);
+            log.info("processing " + message.getClass());
         }
         client.notifyObservers(message);
     }
 
     @Override
     public void process(ListUsersError message) {
-        log.error("got ListUsersError message : {}", message.getError());
+        log.info("processing " + message.getClass());
     }
 
     @Override
     public void process(TextSuccess message) {
         client.notifyObservers(message);
-        log.info("message delivered successfully");
+        log.info("processing " + message.getClass());
     }
 
     @Override
@@ -59,7 +59,7 @@ public class ClientMessageHandler implements MessageHandler {
         TextMessage undeliveredMessage = client.takeTextMessage();
         message.setText(undeliveredMessage.getText());
         client.notifyObservers(message);
-        log.info("message was not delivered");
+        log.info("processing " + message.getClass());
     }
 
     @Override
@@ -68,17 +68,18 @@ public class ClientMessageHandler implements MessageHandler {
         client.notifyObservers(message);
         client.finish();
         client.loggedIn(false);
-        log.info("logout succeeded");
+        log.info("processing " + message.getClass());
     }
 
     @Override
     public void process(LogoutError message) {
         client.notifyObservers(message);
-        log.error("got LogoutError message : {}", message.getError());
+        log.info("processing " + message.getClass());
     }
 
     @Override
     public void process(UserLoginMessage message) {
+        log.info("processing " + message.getClass());
         if (client.loggedIn()) {
             client.addUser(message.getUser());
             client.notifyObservers(message);
@@ -87,6 +88,7 @@ public class ClientMessageHandler implements MessageHandler {
 
     @Override
     public void process(UserLogoutMessage message) {
+        log.info("processing " + message.getClass());
         if (client.loggedIn()) {
             client.removeUser(message.getUser());
             client.notifyObservers(message);
@@ -95,7 +97,7 @@ public class ClientMessageHandler implements MessageHandler {
 
     @Override
     public void process(UserMessage message) {
-        log.info("got message from {}", message.getName());
+        log.info("processing " + message.getClass());
         if (client.loggedIn()) {
             client.notifyObservers(message);
         }

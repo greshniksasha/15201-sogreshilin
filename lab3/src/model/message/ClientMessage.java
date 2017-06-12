@@ -1,7 +1,7 @@
 package model.message;
 
-import model.ClientHandler;
-import model.Server;
+import model.server.ClientHandler;
+import model.server.Server;
 
 /**
  * Created by Alexander on 03/06/2017.

@@ -1,10 +1,7 @@
-package model;
+package model.server;
 
 import model.message.ClientMessage;
 import model.message.ServerMessage;
-import model.message.TextError;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;

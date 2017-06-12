@@ -1,13 +1,11 @@
 package model.message;
 
-import model.MessageHandler;
+import model.client.MessageHandler;
 import model.User;
-import view.ClientForm;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlType;
 import java.io.Serializable;
 
 /**

@@ -2,8 +2,8 @@
 
   <property name="client.name" value="Client"/>
   <property name="server.name" value="Server"/>
-  <property name="client.main.class" value="model.Client"/>
-  <property name="server.main.class" value="model.Server"/>
+  <property name="client.main.class" value="model.client.Client"/>
+  <property name="server.main.class" value="model.server.Server"/>
   <property name="src.dir" location="src"/>
   <property name="build.dir" location="build"/>
   <property name="lib.dir" location="lib"/>

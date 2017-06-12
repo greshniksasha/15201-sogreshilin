@@ -1,5 +1,6 @@
-package model;
+package model.server;
 
+import model.client.ClientConfigs;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

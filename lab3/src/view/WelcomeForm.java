@@ -1,7 +1,7 @@
 package view;
 
-import model.Client;
-import model.ClientConfigs;
+import model.client.Client;
+import model.client.ClientConfigs;
 
 import javax.swing.*;
 import javax.swing.border.BevelBorder;

@@ -1,5 +1,6 @@
-package model;
+package model.server;
 
+import model.User;
 import model.message.ServerMessage;
 import model.message.UserLogoutMessage;
 import org.apache.logging.log4j.LogManager;
@@ -26,7 +27,7 @@ public abstract class ClientHandler {
     protected static final Logger log = LogManager.getLogger(ClientHandler.class);
 
     protected void blockUser() throws IOException {
-        if (!server.getUsers().isEmpty()) {
+        if (user.getName() != null && server.getUsers().contains(user)) {
             server.getUsers().remove(user);
         }
         UserLogoutMessage msg = new UserLogoutMessage();

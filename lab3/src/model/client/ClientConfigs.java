@@ -1,4 +1,4 @@
-package model;
+package model.client;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -43,13 +43,13 @@ public class ClientConfigs {
         } catch (FileNotFoundException e) {
             log.info("Config file not found");
         } catch (IOException e) {
-            log.error("I/O Exception : ", e);
+            log.error("I/O Exception : ");
             System.exit(-1);
         } catch (NumberFormatException e) {
-            log.error("Could not parse config file : ", e);
+            log.error("Could not parse config file : ");
             System.exit(-1);
         } catch (IllegalArgumentException e) {
-            log.error("Config os incorrect");
+            log.error("Config is incorrect");
             System.exit(-1);
         }
     }

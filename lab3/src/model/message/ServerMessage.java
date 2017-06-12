@@ -1,6 +1,6 @@
 package model.message;
 
-import model.MessageHandler;
+import model.client.MessageHandler;
 
 /**
  * Created by Alexander on 02/06/2017.

@@ -1,8 +1,6 @@
-package model;
+package model.server;
 
 import model.message.*;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.xml.sax.SAXException;
 import serializing.DOMDeserializer;
 import serializing.JAXBSerializer;
@@ -12,15 +10,11 @@ import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Created by Alexander on 07/06/2017.
  */
 public class XMLClientHandler extends ClientHandler {
-
-    private static int BYTE_BUFFER_SIZE = 100000;
 
     XMLClientHandler(Server server, Socket socket) {
         this.server = server;
@@ -85,7 +79,6 @@ public class XMLClientHandler extends ClientHandler {
             return null;
         }
         int read = 0;
-        int fails = 0;
         byte[] buffer = new byte[length];
         socket.setSoTimeout(1000);
         try {
@@ -97,29 +90,6 @@ public class XMLClientHandler extends ClientHandler {
             log.error("actual message length is shorter than one in the xml");
         }
         socket.setSoTimeout(0);
-//
-//        int messageLength = inputStream.readInt();
-//        log.info("message length : {}", messageLength);
-//        if (messageLength <= 0) {
-//            log.error("blocked user because messageLength is negative : {}", messageLength);
-//            blockUser();
-//            return null;
-//        }
-//        int leftToRead = messageLength;
-//        String data = "";
-//        socket.setSoTimeout(1000);
-//        try {
-//            do {
-//                byte[] inputData = new byte[Integer.min(BYTE_BUFFER_SIZE, leftToRead)];
-//                leftToRead -= inputStream.read(inputData, 0, Integer.min(leftToRead, BYTE_BUFFER_SIZE));
-//                String partOfData = new String(inputData, StandardCharsets.UTF_8);
-////                log.info("read data : {}", partOfData);
-//                data += partOfData;
-//            } while (leftToRead != 0);
-//        } catch (SocketTimeoutException e) {
-//            log.error("actual message length is shorter than one in the xml");
-//        }
-//        socket.setSoTimeout(0);
         return buffer;
     }
 }

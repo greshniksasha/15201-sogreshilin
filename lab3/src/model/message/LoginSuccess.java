@@ -1,7 +1,7 @@
 package model.message;
 
 
-import model.MessageHandler;
+import model.client.MessageHandler;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;

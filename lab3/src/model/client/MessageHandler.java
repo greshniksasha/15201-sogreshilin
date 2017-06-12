@@ -1,4 +1,4 @@
-package model;
+package model.client;
 
 
 import model.message.*;

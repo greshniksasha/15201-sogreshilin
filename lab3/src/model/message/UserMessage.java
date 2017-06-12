@@ -1,7 +1,6 @@
 package model.message;
 
-import model.MessageHandler;
-import view.ClientForm;
+import model.client.MessageHandler;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;

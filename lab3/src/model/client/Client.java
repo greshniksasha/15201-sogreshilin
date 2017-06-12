@@ -1,5 +1,6 @@
-package model;
+package model.client;
 
+import model.User;
 import model.message.*;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
@@ -24,7 +25,6 @@ import java.util.concurrent.BlockingQueue;
  * Created by Alexander on 29/05/2017.
  */
 public class Client {
-    private static int BYTE_BUFFER_SIZE = 10000;
     private static int TIMEOUT = 5000;
     private static final String CONFIG_FILE_PATH = "src/client_config.properties";
     private static final String OBJ = "obj";
@@ -316,21 +316,6 @@ public class Client {
         }
         socket.setSoTimeout(0);
         return buffer;
-//
-//        int leftToRead = inputStream.readInt();
-//        if (leftToRead < 0) {
-//            throw new IOException();
-//        }
-//        log.info("message length : {}", leftToRead);
-//        String data = "";
-//        do {
-//            byte[] inputData = new byte[Integer.min(BYTE_BUFFER_SIZE, leftToRead)];
-//            leftToRead -= inputStream.read(inputData, 0, Integer.min(leftToRead, BYTE_BUFFER_SIZE));
-//            String partOfData = new String(inputData, StandardCharsets.UTF_8);
-////            log.info("part of data : \n {}", partOfData);
-//            data += partOfData;
-//        } while (leftToRead != 0);
-//        return data;
     }
 
     private class XMLReader implements Runnable {
