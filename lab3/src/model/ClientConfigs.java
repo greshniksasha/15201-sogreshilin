@@ -20,7 +20,7 @@ public class ClientConfigs {
     private String type;
     private String ip;
     private Integer port;
-//    private Boolean logOn;
+    private Boolean logOn;
 
     public static final Logger log = LogManager.getLogger(ClientConfigs.class);
 
@@ -37,9 +37,9 @@ public class ClientConfigs {
                 port = Integer.parseInt(properties.getProperty(SERVER_PORT));
             }
             ip = properties.getProperty(SERVER_IP);
-//            if (properties.getProperty(LOG_ON) != null) {
-//                logOn = Boolean.parseBoolean(properties.getProperty(LOG_ON));
-//            }
+            if (properties.getProperty(LOG_ON) != null) {
+                logOn = Boolean.parseBoolean(properties.getProperty(LOG_ON));
+            }
         } catch (FileNotFoundException e) {
             log.info("Config file not found");
         } catch (IOException e) {
@@ -66,9 +66,9 @@ public class ClientConfigs {
         this.port = port;
     }
 
-//    public void setLogOn(Boolean logOn) {
-//        this.logOn = logOn;
-//    }
+    public void setLogOn(Boolean logOn) {
+        this.logOn = logOn;
+    }
 
     public String getType() {
         return type;
@@ -82,7 +82,7 @@ public class ClientConfigs {
         return port;
     }
 
-//    public Boolean getLogOn() {
-//        return logOn;
-//    }
+    public Boolean getLogOn() {
+        return logOn;
+    }
 }

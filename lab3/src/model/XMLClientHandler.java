@@ -20,7 +20,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class XMLClientHandler extends ClientHandler {
 
-    private static int BYTE_BUFFER_SIZE = 1000;
+    private static int BYTE_BUFFER_SIZE = 100000;
 
     XMLClientHandler(Server server, Socket socket) {
         this.server = server;
@@ -49,6 +49,8 @@ public class XMLClientHandler extends ClientHandler {
             } catch (IOException e) {
                 log.info("stopped");
                 server.clientDisconnected(this);
+            } finally {
+                log.info("thread finished");
             }
         }, "XMLReader-" + sessionID);
 
@@ -66,25 +68,13 @@ public class XMLClientHandler extends ClientHandler {
                     log.info("message writen to {}", getName());
                 }
             } catch (IOException e) {
-                log.error("could not get output stream");
+                log.error("IO Exception");
             } catch (InterruptedException e) {
                 log.info("interrupted");
+            } finally {
+                log.info("thread finished");
             }
         }, "XMLWriter-" + sessionID);
-    }
-
-    private void blockUser() throws IOException {
-        if (!server.getUsers().isEmpty()) {
-            server.getUsers().remove(user);
-        }
-        UserLogoutMessage msg = new UserLogoutMessage();
-        msg.setName(getName());
-        server.getServerMessages().add(msg);
-        log.info("sent user logout message to everyone");
-        new Thread(() -> {server.removeClientHandler(this);}).start();
-        writer.interrupt();
-        log.info("blocked user");
-        closeSocket();
     }
 
     private String readData(DataInputStream inputStream) throws IOException {

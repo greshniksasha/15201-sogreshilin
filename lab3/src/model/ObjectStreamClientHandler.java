@@ -2,6 +2,7 @@ package model;
 
 import model.message.ClientMessage;
 import model.message.ServerMessage;
+import model.message.TextError;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -18,6 +19,7 @@ public class ObjectStreamClientHandler extends ClientHandler {
 
     ObjectStreamClientHandler(Server server, Socket socket) {
         this.socket = socket;
+        this.server = server;
         sessionID = sessionIDGenerator.getAndIncrement();
         messagesToSend = new ArrayBlockingQueue<ServerMessage>(QUEUE_CAPACITY);
 
@@ -26,15 +28,21 @@ public class ObjectStreamClientHandler extends ClientHandler {
                 ObjectInputStream inputStream = new ObjectInputStream(socket.getInputStream());
                 log.info("got input stream file descriptor");
                 while (!Thread.interrupted()) {
-                    ClientMessage m = (ClientMessage)inputStream.readObject();
-                    log.info("object is read");
-                    m.process(server, this);
+                    try {
+                        ClientMessage m = (ClientMessage) inputStream.readObject();
+                        log.info("object is read");
+                        m.process(server, this);
+                    } catch (ClassNotFoundException | ClassCastException e) {
+                        log.info("message of unknown type was sent");
+                        log.info("blocking this user");
+                        blockUser();
+                    }
                 }
             } catch (IOException e) {
                 log.info("socket has been closed");
                 server.clientDisconnected(this);
-            } catch (ClassNotFoundException e) {
-                log.info("class not found");
+            }  finally {
+                log.info("thread finished");
             }
         }, "ObjectReader-" + sessionID);
 
@@ -49,9 +57,11 @@ public class ObjectStreamClientHandler extends ClientHandler {
                     log.info("message written to {}", getName());
                 }
             } catch (IOException e) {
-                log.error("could not get output stream");
+                log.error("socket has been closed");
             } catch (InterruptedException e) {
                 log.info("interrupted");
+            } finally {
+                log.info("thread finished");
             }
         }, "ObjectWriter-" + sessionID);
 

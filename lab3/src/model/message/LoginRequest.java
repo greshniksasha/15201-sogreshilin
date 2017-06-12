@@ -20,6 +20,8 @@ public class LoginRequest implements ClientMessage, Serializable {
     private final String messageType = "login";
     private User user;
 
+    private static int MAX_LENGTH = 256;
+
     public LoginRequest() {
         user = new User();
     }

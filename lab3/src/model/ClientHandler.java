@@ -1,6 +1,7 @@
 package model;
 
 import model.message.ServerMessage;
+import model.message.UserLogoutMessage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -23,6 +24,18 @@ public abstract class ClientHandler {
     protected static AtomicInteger sessionIDGenerator = new AtomicInteger(0);
     protected static final int QUEUE_CAPACITY = 1000;
     protected static final Logger log = LogManager.getLogger(ClientHandler.class);
+
+    protected void blockUser() throws IOException {
+        if (!server.getUsers().isEmpty()) {
+            server.getUsers().remove(user);
+        }
+        UserLogoutMessage msg = new UserLogoutMessage();
+        msg.setName(getName());
+        server.getServerMessages().add(msg);
+        new Thread(() -> {server.removeClientHandler(this);}).start();
+        writer.interrupt();
+        closeSocket();
+    }
 
     public void addOutgoingMessage(ServerMessage message) {
         messagesToSend.add(message);

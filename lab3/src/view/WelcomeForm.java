@@ -201,7 +201,6 @@ public class WelcomeForm  extends JFrame {
     private Boolean setPort(String port) {
         try {
             int value = Integer.parseInt(port);
-            System.out.println("value : " + value);
             if (1023 < value && value < (2 << 15)) {
                 configs.setPort(value);
                 return validPort = true;

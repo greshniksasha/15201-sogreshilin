@@ -1,8 +1,10 @@
 package model;
 
 import model.message.*;
+import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.core.config.Configurator;
 import org.xml.sax.SAXException;
 import serializing.DOMDeserializer;
 import serializing.JAXBSerializer;
@@ -208,10 +210,10 @@ public class Client {
 
     public static void main(String[] args) {
         ClientConfigs clientConfigs = new ClientConfigs(CONFIG_FILE_PATH);
+        if (!clientConfigs.getLogOn()) {
+            Configurator.setRootLevel(Level.OFF);
+        }
         new WelcomeForm(clientConfigs).setVisible(true);
-//        Client client = new Client(clientConfigs);
-//        client.connectToServer();
-//        new ClientForm(client).setVisible(true);
     }
 
     private class ObjectWriter implements Runnable {
@@ -231,7 +233,9 @@ public class Client {
             } catch (InterruptedException e) {
                 log.info("interrupted");
             } catch (IOException e) {
-                log.info("could not write message");
+                log.info("socket has been closed");
+            } finally {
+                log.info("thread finished");
             }
         }
     }
@@ -243,13 +247,15 @@ public class Client {
                 ObjectInputStream readerStream = new ObjectInputStream(socket.getInputStream());
                 while(!Thread.interrupted()) {
                     ServerMessage message = (ServerMessage)readerStream.readObject();
-                    System.out.println("already read message, processing...");
+                    log.info("already read message, processing...");
                     message.process(messageHandler);
                 }
             } catch (IOException | ClassNotFoundException e) {
-                log.info("socket closed");
+                log.info("socket has been closed");
+                connectionObserver.handle(false);
+                writerThread.interrupt();
             } finally {
-                log.info("finished");
+                log.info("thread finished");
             }
         }
     }
@@ -273,11 +279,9 @@ public class Client {
                     ClientMessage message = messagesToSend.take();
                     String xmlString = serializer.messageToXMLString(message);
                     byte[] data = xmlString.getBytes(StandardCharsets.UTF_8);
-//                    log.info("data length : {}", data.length);
                     writerStream.writeInt(data.length);
                     writerStream.write(data);
                     writerStream.flush();
-//                    log.info("data : {}\n{}", data.length, xmlString);
                     sentMessageTypes.add(message.getClass());
                     if (message instanceof TextMessage) {
                         textMessages.add((TextMessage) message);
@@ -288,20 +292,24 @@ public class Client {
                 log.info("interrupted");
             } catch (IOException e) {
                 log.info("could not write message");
+            } finally {
+                log.info("thread finished");
             }
         }
     }
 
     private String readData(DataInputStream inputStream) throws IOException {
-
         int leftToRead = inputStream.readInt();
+        if (leftToRead < 0) {
+            throw new IOException();
+        }
         log.info("message length : {}", leftToRead);
         String data = "";
         do {
             byte[] inputData = new byte[Integer.min(BYTE_BUFFER_SIZE, leftToRead)];
             leftToRead -= inputStream.read(inputData, 0, Integer.min(leftToRead, BYTE_BUFFER_SIZE));
             String partOfData = new String(inputData, StandardCharsets.UTF_8);
-            log.info("part of data : \n {}", partOfData);
+//            log.info("part of data : \n {}", partOfData);
             data += partOfData;
         } while (leftToRead != 0);
         return data;
@@ -316,18 +324,18 @@ public class Client {
                 DataInputStream readerStream = new DataInputStream(socket.getInputStream());
                 while(!Thread.interrupted()) {
                     String data = readData(readerStream);
-                    log.info("data : \n{}", data);
                     ServerMessage message = (ServerMessage)deserializer.deserialize(data);
                     message.process(messageHandler);
                 }
             } catch (IOException e) {
-                log.info("socket closed");
-                connectionObserver.handle(false);
+                log.info("IO Exception");
+                disconnectFromServer();
                 writerThread.interrupt();
+                connectionObserver.handle(false);
             } catch (SAXException e) {
                 log.info("could not deserialize data from server");
             } finally {
-                log.info("finished");
+                log.info("thread finished");
             }
         }
     }

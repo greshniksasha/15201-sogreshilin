@@ -1,8 +1,10 @@
 package model;
 
 import model.message.*;
+import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.core.config.Configurator;
 
 import java.io.*;
 import java.net.ServerSocket;
@@ -185,9 +187,12 @@ public class Server {
     }
 
     public static void main(String[] args) {
+        System.out.println("to stop server write \"exit\"");
         ServerConfigs configs = new ServerConfigs(CONFIG_FILE_PATH);
+        if (!configs.getLogOn()) {
+            Configurator.setRootLevel(Level.OFF);
+        }
         Server server = new Server(configs);
-        log.info("to stop server write \"exit\"");
         server.start();
         try {
             BufferedReader br = new BufferedReader(new InputStreamReader(System.in));

@@ -86,16 +86,19 @@ public class ClientForm extends JFrame implements MessageHandler {
 
         client.setConnectionObserver(connected -> {
             if (!connected) {
-                JOptionPane.showMessageDialog(this,
-                        "Server is not available",
-                        "Error",
-                        JOptionPane.ERROR_MESSAGE);
-                loginTF.setEditable(true);
-                loginTF.requestFocus();
-                getRootPane().setDefaultButton(connectB);
-                connectB.setEnabled(false);
-                disconnectB.setEnabled(false);
-                outgoingTF.setEnabled(false);
+                SwingUtilities.invokeLater(() -> {
+                    JOptionPane.showMessageDialog(this,
+                            "Server connecting error",
+                            "Error",
+                            JOptionPane.ERROR_MESSAGE);
+
+                    loginTF.setEditable(true);
+                    loginTF.requestFocus();
+                    getRootPane().setDefaultButton(connectB);
+                    connectB.setEnabled(false);
+                    disconnectB.setEnabled(false);
+                    outgoingTF.setEnabled(false);
+                });
             }
         });
 
