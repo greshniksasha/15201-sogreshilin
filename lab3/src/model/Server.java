@@ -37,10 +37,6 @@ public class Server {
 
     private static final Logger log = LogManager.getLogger(Server.class);
 
-    static {
-        System.getProperties().setProperty("log4j.configurationFile", "src/log4j2.xml");
-    }
-
     public Server(ServerConfigs configs) {
         try {
             OS_PORT = configs.getPortObjects();
@@ -98,7 +94,7 @@ public class Server {
         messageToSend.setName(name);
         messageToSend.setMessage(text);
         this.getServerMessages().add(messageToSend);
-        log.info("text message \"{}\" sent to everyone", text);
+        log.info("text message sent to everyone");
     }
 
     public void process(ListUsersRequest message, ClientHandler handler) {
@@ -148,7 +144,9 @@ public class Server {
     }
 
     public void removeClientHandler(ClientHandler handler) {
-        clientHandlers.remove(handler);
+        synchronized (lock) {
+            clientHandlers.remove(handler);
+        }
     }
 
     public BlockingQueue<ServerMessage> getServerMessages() {
@@ -158,10 +156,8 @@ public class Server {
     public void start() {
         objectStreamAcceptor = new Thread(new ObjectStreamAcceptor(), "ObjectStreamAcceptor");
         objectStreamAcceptor.start();
-
         xmlAcceptor = new Thread(new XMLAcceptor(), "XMLAcceptor");
         xmlAcceptor.start();
-
         sender = new Thread(new Sender(), "Sender");
         sender.start();
     }
@@ -171,9 +167,11 @@ public class Server {
             ooServerSocket.close();
             xmlServerSocket.close();
             sender.interrupt();
-            for (ClientHandler h : clientHandlers) {
-                h.interruptWriter();
-                h.closeSocket();
+            synchronized (lock) {
+                for (ClientHandler h : clientHandlers) {
+                    h.interruptWriter();
+                    h.closeSocket();
+                }
             }
             objectStreamAcceptor.join();
             xmlAcceptor.join();
@@ -189,13 +187,13 @@ public class Server {
     public static void main(String[] args) {
         ServerConfigs configs = new ServerConfigs(CONFIG_FILE_PATH);
         Server server = new Server(configs);
-        log.info("to interruptWriter server write \"exit\"");
+        log.info("to stop server write \"exit\"");
         server.start();
         try {
             BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
             while (br.readLine().compareToIgnoreCase("exit") != 0);
         } catch (IOException e) {
-            log.info("io exception", e);
+            log.info("IO exception");
         }
         server.stop();
     }
@@ -267,9 +265,6 @@ public class Server {
                 }
             } catch (InterruptedException e) {
                 log.info("interrupted");
-            } catch (ConcurrentModificationException e) {
-                //TODO
-                log.error("WHY THIS EXCEPTION HAPPENS?");
             }
         }
     }

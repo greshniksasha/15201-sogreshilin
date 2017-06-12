@@ -18,18 +18,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * Created by Alexander on 07/06/2017.
  */
-public class XMLClientHandler implements ClientHandler {
-    private Thread reader;
-    private Thread writer;
-    private int sessionID;
-    private Server server;
-    private Socket socket;
-    private BlockingQueue<ServerMessage> messagesToSend;
-    private User user = new User();
+public class XMLClientHandler extends ClientHandler {
 
-    private static final Logger log = LogManager.getLogger(ObjectStreamClientHandler.class);
-    private static AtomicInteger sessionIDGenerator = new AtomicInteger(0);
-    private static final int QUEUE_CAPACITY = 1000;
     private static int BYTE_BUFFER_SIZE = 1000;
 
     XMLClientHandler(Server server, Socket socket) {
@@ -44,19 +34,17 @@ public class XMLClientHandler implements ClientHandler {
                 DataInputStream inputStream = new DataInputStream(socket.getInputStream());
                 while (!Thread.interrupted()) {
                     String data = readData(inputStream);
-//                    log.info("read data : \n {}", data);
                     if (data == null) {
                         break;
                     }
-                    ClientMessage message = null;
                     try {
-                        message = (ClientMessage) deserializer.deserialize(data);
+                        ClientMessage message = (ClientMessage) deserializer.deserialize(data);
+                        message.process(server, this);
                     } catch (SAXException e) {
                         log.error("could not deserialize : user send bad data");
                         blockUser();
                         return;
                     }
-                    message.process(server, this);
                 }
             } catch (IOException e) {
                 log.info("stopped");
@@ -71,7 +59,6 @@ public class XMLClientHandler implements ClientHandler {
                 while(!Thread.interrupted()) {
                     ServerMessage message = messagesToSend.take();
                     String xmlString = serializer.messageToXMLString(message);
-                    System.out.println(xmlString);
                     byte[] data = xmlString.getBytes(StandardCharsets.UTF_8);
                     writerStream.writeInt(data.length);
                     writerStream.write(data);
@@ -84,7 +71,6 @@ public class XMLClientHandler implements ClientHandler {
                 log.info("interrupted");
             }
         }, "XMLWriter-" + sessionID);
-
     }
 
     private void blockUser() throws IOException {
@@ -103,7 +89,7 @@ public class XMLClientHandler implements ClientHandler {
 
     private String readData(DataInputStream inputStream) throws IOException {
         int messageLength = inputStream.readInt();
-//        log.info("message length : {}", messageLength);
+        log.info("message length : {}", messageLength);
         if (messageLength <= 0) {
             log.error("blocked user because messageLength is negative : {}", messageLength);
             blockUser();
@@ -117,51 +103,13 @@ public class XMLClientHandler implements ClientHandler {
                 byte[] inputData = new byte[Integer.min(BYTE_BUFFER_SIZE, leftToRead)];
                 leftToRead -= inputStream.read(inputData, 0, Integer.min(leftToRead, BYTE_BUFFER_SIZE));
                 String partOfData = new String(inputData, StandardCharsets.UTF_8);
-//                log.info("part of data : \n {}", partOfData);
+//                log.info("read data : {}", partOfData);
                 data += partOfData;
             } while (leftToRead != 0);
         } catch (SocketTimeoutException e) {
             log.error("actual message length is shorter than one in the xml");
         }
         socket.setSoTimeout(0);
-
-
         return data;
-    }
-
-    public void addOutgoingMessage(ServerMessage message) {
-        messagesToSend.add(message);
-    }
-
-    public String getName() {
-        return user.getName();
-    }
-
-    @Override
-    public User getUser() {
-        return user;
-    }
-
-    public int getSessionID() {
-        return sessionID;
-    }
-
-    public void start() {
-        reader.start();
-        writer.start();
-    }
-
-    @Override
-    public void closeSocket() throws IOException {
-        socket.close();
-    }
-
-    @Override
-    public void setUser(User user) {
-        this.user = user;
-    }
-
-    public void interruptWriter() {
-        writer.interrupt();
     }
 }

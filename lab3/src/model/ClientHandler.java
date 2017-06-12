@@ -1,27 +1,59 @@
 package model;
 
 import model.message.ServerMessage;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
+import java.net.Socket;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Created by Alexander on 07/06/2017.
  */
-public interface ClientHandler {
+public abstract class ClientHandler {
+    protected Thread reader;
+    protected Thread writer;
+    protected int sessionID;
+    protected Server server;
+    protected Socket socket;
+    protected BlockingQueue<ServerMessage> messagesToSend;
+    protected User user = new User();
+    protected static AtomicInteger sessionIDGenerator = new AtomicInteger(0);
+    protected static final int QUEUE_CAPACITY = 1000;
+    protected static final Logger log = LogManager.getLogger(ClientHandler.class);
 
-    void addOutgoingMessage(ServerMessage message);
+    public void addOutgoingMessage(ServerMessage message) {
+        messagesToSend.add(message);
+    }
 
-    String getName();
+    public String getName() {
+        return user.getName();
+    }
 
-    int getSessionID();
+    public User getUser() {
+        return user;
+    }
 
-    void start();
+    public int getSessionID() {
+        return sessionID;
+    }
 
-    void interruptWriter();
+    public void start() {
+        reader.start();
+        writer.start();
+    }
 
-    void closeSocket() throws IOException;
+    public void interruptWriter() {
+        writer.interrupt();
+    }
 
-    void setUser(User user);
+    public void closeSocket() throws IOException {
+        socket.close();
+    }
 
-    User getUser();
+    public void setUser(User user) {
+        this.user = user;
+    }
 }

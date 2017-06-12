@@ -19,8 +19,6 @@ public class LoginRequest implements ClientMessage, Serializable {
     @XmlAttribute(name = "name")
     private final String messageType = "login";
     private User user;
-//    private String name;
-//    private String type;
 
     public LoginRequest() {
         user = new User();

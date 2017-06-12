@@ -10,24 +10,11 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Created by Alexander on 07/06/2017.
  */
-public class ObjectStreamClientHandler implements ClientHandler {
-    private Thread reader;
-    private Thread writer;
-    private int sessionID;
-//    private String name;
-    private Socket socket;
-    private BlockingQueue<ServerMessage> messagesToSend;
-    private User user;
-
-    private static final Logger log = LogManager.getLogger(ObjectStreamClientHandler.class);
-    private static AtomicInteger sessionIDGenerator = new AtomicInteger(0);
-    private static final int QUEUE_CAPACITY = 1000;
+public class ObjectStreamClientHandler extends ClientHandler {
 
     ObjectStreamClientHandler(Server server, Socket socket) {
         this.socket = socket;
@@ -40,7 +27,7 @@ public class ObjectStreamClientHandler implements ClientHandler {
                 log.info("got input stream file descriptor");
                 while (!Thread.interrupted()) {
                     ClientMessage m = (ClientMessage)inputStream.readObject();
-                    log.info("объект прочитан");
+                    log.info("object is read");
                     m.process(server, this);
                 }
             } catch (IOException e) {
@@ -59,7 +46,7 @@ public class ObjectStreamClientHandler implements ClientHandler {
                     ServerMessage m = messagesToSend.take();
                     outputStream.writeObject(m);
                     outputStream.flush();
-                    log.info("message writen to {}", getName());
+                    log.info("message written to {}", getName());
                 }
             } catch (IOException e) {
                 log.error("could not get output stream");
@@ -68,46 +55,6 @@ public class ObjectStreamClientHandler implements ClientHandler {
             }
         }, "ObjectWriter-" + sessionID);
 
-    }
-
-    public void addOutgoingMessage(ServerMessage message) {
-        messagesToSend.add(message);
-    }
-
-    public String getName() {
-        return user.getName();
-    }
-
-//    public void setName(String name) {
-//        this.name = name;
-//    }
-
-    @Override
-    public User getUser() {
-        return user;
-    }
-
-    public int getSessionID() {
-        return sessionID;
-    }
-
-    public void start() {
-        reader.start();
-        writer.start();
-    }
-
-    public void interruptWriter() {
-        writer.interrupt();
-    }
-
-    @Override
-    public void closeSocket() throws IOException {
-        socket.close();
-    }
-
-    @Override
-    public void setUser(User user) {
-        this.user = user;
     }
 }
 

@@ -95,7 +95,7 @@ public class ClientMessageHandler implements MessageHandler {
 
     @Override
     public void process(UserMessage message) {
-        log.info("got message \"{}\" from {}", message.getMessage(), message.getName());
+        log.info("got message from {}", message.getName());
         if (client.loggedIn()) {
             client.notifyObservers(message);
         }
