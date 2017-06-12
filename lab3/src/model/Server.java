@@ -134,6 +134,15 @@ public class Server {
         log.info("sent user logout message to everyone");
     }
 
+    public void clientDisconnected(ClientHandler handler) {
+        handler.interruptWriter();
+        getUsers().remove(handler.getUser());
+        removeClientHandler(handler);
+        UserLogoutMessage msg = new UserLogoutMessage();
+        msg.setName(handler.getName());
+        this.getServerMessages().add(msg);
+    }
+
     public List<User> getUsers() {
         return users;
     }

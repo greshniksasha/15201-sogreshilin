@@ -13,6 +13,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.StringReader;
@@ -32,20 +33,19 @@ public class DOMDeserializer {
 
     private static final String USERLOGIN = "userlogin";
     private static final String USERLOGOUT = "userlogout";
-    private static final String SESSION = "session";
     private static final String NAME = "name";
 
     private String data;
     private DocumentBuilder documentBuilder;
     private BlockingQueue<Class> sentMessageTypes;
-    private static final Logger log = LogManager.getLogger(Client.class);
+    private static final Logger log = LogManager.getLogger(DOMDeserializer.class);
 
     public DOMDeserializer() {
         try {
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             documentBuilder = factory.newDocumentBuilder();
-        } catch (Exception e) {
-            log.error("creating deserializer error", e);
+        } catch (ParserConfigurationException e) {
+            log.error("parsing : creating deserializer error");
         }
     }
 
@@ -53,21 +53,16 @@ public class DOMDeserializer {
         this.sentMessageTypes = sentMessageTypes;
     }
 
-    public Message unmarshallMessage(Class c) {
-        Message message = null;
+    private Message unmarshallMessage(Class c) {
         try {
             JAXBContext context = JAXBContext.newInstance(c);
             Unmarshaller unmarshaller = context.createUnmarshaller();
-            message = (Message) unmarshaller.unmarshal(new StringReader(data));
+            return (Message) unmarshaller.unmarshal(new StringReader(data));
         } catch (JAXBException e) {
-            log.error("jaxb serializing message error");
+            log.error("parsing : JAXB deserializing error");
         }
-        return message;
+        return null;
     }
-
-//    public TextMessage deserializeTextMessage() {
-//        return null;
-//    }
 
     private Class getAppropriateClass(String type, Class sentMessage) {
         if (sentMessage.equals(TextMessage.class)) {
@@ -88,21 +83,19 @@ public class DOMDeserializer {
     private Message parse(Document doc) {
         Element root = doc.getDocumentElement();
         try {
-            log.info("root element : {}", root.getNodeName());
+            log.info("parsing : root element={}", root.getNodeName());
             switch (root.getNodeName()) {
-
                 case COMMAND:
+                    log.info("parsing : root attribute={}", root.getAttribute(NAME));
                     switch (root.getAttribute(NAME)) {
                         case LIST: return unmarshallMessage(ListUsersRequest.class);
                         case LOGIN: return unmarshallMessage(LoginRequest.class);
                         case LOGOUT: return unmarshallMessage(LogoutRequest.class);
                         case MESSAGE: return unmarshallMessage(TextMessage.class);
-//                        case MESSAGE: return deserializeTextMessage();
                     }
                 case EVENT:
-                  log.info("root attribute : {}", root.getAttribute(NAME));
+                  log.info("parsing : root attribute={}", root.getAttribute(NAME));
                     switch (root.getAttribute(NAME)) {
-
                         case MESSAGE: return unmarshallMessage(UserMessage.class);
                         case USERLOGIN: return unmarshallMessage(UserLoginMessage.class);
                         case USERLOGOUT: return unmarshallMessage(UserLogoutMessage.class);
@@ -111,7 +104,7 @@ public class DOMDeserializer {
                 case SUCCESS: return unmarshallMessage(getAppropriateClass(SUCCESS, sentMessageTypes.take()));
             }
         } catch (InterruptedException e) {
-            log.error("interrupted while taking message from sentMessageTypes queue");
+            log.error("parsing : interrupted");
         }
         return null;
     }
@@ -121,6 +114,4 @@ public class DOMDeserializer {
         Document doc = documentBuilder.parse(new ByteArrayInputStream(data.getBytes()));
         return parse(doc);
     }
-
-
 }

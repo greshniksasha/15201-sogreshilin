@@ -273,11 +273,11 @@ public class Client {
                     ClientMessage message = messagesToSend.take();
                     String xmlString = serializer.messageToXMLString(message);
                     byte[] data = xmlString.getBytes(StandardCharsets.UTF_8);
-                    log.info("data length : {}", data.length);
+//                    log.info("data length : {}", data.length);
                     writerStream.writeInt(data.length);
                     writerStream.write(data);
                     writerStream.flush();
-                    log.info("data : {}\n{}", data.length, xmlString);
+//                    log.info("data : {}\n{}", data.length, xmlString);
                     sentMessageTypes.add(message.getClass());
                     if (message instanceof TextMessage) {
                         textMessages.add((TextMessage) message);

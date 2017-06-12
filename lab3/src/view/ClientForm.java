@@ -10,11 +10,9 @@ import javax.swing.*;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.EtchedBorder;
-import javax.swing.border.LineBorder;
 import javax.swing.text.DefaultCaret;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.InputEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 
@@ -23,9 +21,6 @@ import java.awt.event.KeyEvent;
  */
 public class ClientForm extends JFrame implements MessageHandler {
     private Client client;
-    private static final Logger log = LogManager.getLogger(Client.class);
-
-
     private JLabel loginL;
     private JTextField loginTF;
     private JButton connectB;
@@ -34,21 +29,34 @@ public class ClientForm extends JFrame implements MessageHandler {
     private JButton sendB;
     private JTextArea incomingTA;
     private OnlineUsersPanel usersP;
+    private static final String CONNECT = "CONNECT";
+    private static final String DISCONNECT = "DISCONNECT";
+    private static final String SEND = "SEND";
 
+    private static final Logger log = LogManager.getLogger(ClientForm.class);
 
     public ClientForm(Client client) throws HeadlessException {
         super("Chat");
         this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         this.client = client;
+        usersP = new OnlineUsersPanel();
 
         client.addObserver((message -> {
             message.process(this);
         }));
 
-        JPanel northP = setNorthPanel();
-        JPanel southP = setSouthPanel();
+        JPanel mainPanel = new JPanel();
+        mainPanel.setLayout(new BorderLayout());
+        mainPanel.add(setNorthPanel(), BorderLayout.NORTH);
+        mainPanel.add(setCenterPanel(), BorderLayout.CENTER);
+        mainPanel.add(usersP, BorderLayout.EAST);
+        mainPanel.add(setSouthPanel(), BorderLayout.SOUTH);
+        this.setContentPane(mainPanel);
+        this.pack();
+        this.setMinimumSize(new Dimension(450, 300));
+    }
 
-        //***** CENTER PANEL *****/
+    private JScrollPane setCenterPanel() {
         incomingTA = new JTextArea();
         incomingTA.setLineWrap(true);
         incomingTA.setWrapStyleWord(true);
@@ -61,35 +69,20 @@ public class ClientForm extends JFrame implements MessageHandler {
         scroller.setBorder(new CompoundBorder(emptyBorder,etchedBorder));
         DefaultCaret caret = (DefaultCaret) incomingTA.getCaret();
         caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
-
-        usersP = new OnlineUsersPanel();
-
-        //***** ALL FORM *****/
-
-        JPanel mainPanel = new JPanel();
-        mainPanel.setLayout(new BorderLayout());
-        mainPanel.add(northP, BorderLayout.NORTH);
-        mainPanel.add(scroller, BorderLayout.CENTER);
-        mainPanel.add(usersP, BorderLayout.EAST);
-        mainPanel.add(southP, BorderLayout.SOUTH);
-//        this.getRootPane().setDefaultButton(sendB);
-        this.setContentPane(mainPanel);
-        this.pack();
-        this.setMinimumSize(new Dimension(450, 300));
+        return scroller;
     }
 
     private JPanel setNorthPanel() {
         JPanel northP = new JPanel(new GridLayout(1,4));
         loginL = new JLabel("Enter username");
+        loginL.setHorizontalAlignment(SwingConstants.CENTER);
         loginTF = new JTextField();
-        connectB = new JButton("CONNECT");
-        disconnectB = new JButton("DISCONNECT");
+        connectB = new JButton(CONNECT);
+        disconnectB = new JButton(DISCONNECT);
         northP.add(loginL);
         northP.add(loginTF);
         northP.add(connectB);
         northP.add(disconnectB);
-
-        loginL.setHorizontalAlignment(SwingConstants.CENTER);
 
         client.setConnectionObserver(connected -> {
             if (!connected) {
@@ -97,6 +90,12 @@ public class ClientForm extends JFrame implements MessageHandler {
                         "Server is not available",
                         "Error",
                         JOptionPane.ERROR_MESSAGE);
+                loginTF.setEditable(true);
+                loginTF.requestFocus();
+                getRootPane().setDefaultButton(connectB);
+                connectB.setEnabled(false);
+                disconnectB.setEnabled(false);
+                outgoingTF.setEnabled(false);
             }
         });
 
@@ -112,7 +111,6 @@ public class ClientForm extends JFrame implements MessageHandler {
             client.addOutgoingMessage(msg);
             log.info("trying to log in as {}", name);
         });
-
         connectB.setEnabled(false);
         getRootPane().setDefaultButton(connectB);
 
@@ -144,7 +142,7 @@ public class ClientForm extends JFrame implements MessageHandler {
 
     private JPanel setSouthPanel() {
         JPanel southP = new JPanel(new BorderLayout());
-        sendB = new JButton("SEND");
+        sendB = new JButton(SEND);
         outgoingTF = new JTextArea(4,10);
         outgoingTF.setLineWrap(true);
         outgoingTF.setWrapStyleWord(true);
@@ -154,7 +152,6 @@ public class ClientForm extends JFrame implements MessageHandler {
         scroller.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
         scroller.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         southP.add(scroller, BorderLayout.CENTER);
-
 
         sendB.setEnabled(false);
 
@@ -188,7 +185,7 @@ public class ClientForm extends JFrame implements MessageHandler {
 
         outgoingTF.getActionMap().put("shift+enter", new AbstractAction() {
             @Override
-            public void actionPerformed(ActionEvent ae) {
+            public void actionPerformed(ActionEvent e) {
                 outgoingTF.append("\n");
             }
         });
@@ -199,25 +196,9 @@ public class ClientForm extends JFrame implements MessageHandler {
             }
         });
 
-//        add(outgoingTF);
-
-
         outgoingTF.setEditable(false);
         southP.setBorder(new EmptyBorder(0,6,3,6));
         return southP;
-    }
-
-
-
-
-
-
-    public void appendText(String text) {
-        incomingTA.append(text + "\n");
-    }
-
-    public void clear() {
-        incomingTA.setText("");
     }
 
     public void process(LoginSuccess message) {
@@ -230,21 +211,21 @@ public class ClientForm extends JFrame implements MessageHandler {
         getRootPane().setDefaultButton(sendB);
         disconnectB.setEnabled(true);
         connectB.setEnabled(false);
-        log.info("view is ready to exchange messages");
+        log.info("form is ready to exchange messages");
     }
 
     public void process(LoginError message) {
         JOptionPane.showMessageDialog(this, message.getError());
-        log.info("view informed user about error");
+        log.info("user informed about login error");
     }
 
     public void process(ListUsersSuccess message) {
         usersP.refreshUsersList(client.getUsers());
-        log.info("view displayed online users");
+        log.info("refreshed online users");
     }
 
     public void process(ListUsersError message) {
-        log.info("view could not display online users");
+        log.info("online users cannot be displayed");
     }
 
     public void process(TextSuccess message) {
@@ -258,7 +239,6 @@ public class ClientForm extends JFrame implements MessageHandler {
     }
 
     public void process(LogoutSuccess message) {
-        //TODO
         loginL.setText("Last logged in as");
         usersP.refreshUsersList(client.getUsers());
         loginTF.setEditable(true);
@@ -280,18 +260,26 @@ public class ClientForm extends JFrame implements MessageHandler {
     public void process(UserLoginMessage message) {
         usersP.refreshUsersList(client.getUsers());
         appendMessage(message);
-        log.info("user {} added to userList", message.getName());
+        log.info("user [{}] added to userList", message.getName());
     }
 
     public void process(UserLogoutMessage message) {
         usersP.refreshUsersList(client.getUsers());
         appendMessage(message);
-        log.info("user {} removed from userList", message.getName());
+        log.info("user [{}] removed from userList", message.getName());
     }
 
     public void process(UserMessage message) {
         appendMessage(message);
-        log.info("displayed message \"{}\" from {}", message.getMessage(), message.getName());
+        log.info("message \"{}\" from {} displayed", message.getMessage(), message.getName());
+    }
+
+    private void appendText(String text) {
+        incomingTA.append(text + "\n");
+    }
+
+    private void clear() {
+        incomingTA.setText("");
     }
 
     public void appendMessage(DisplayMessage message) {

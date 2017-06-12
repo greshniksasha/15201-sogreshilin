@@ -44,7 +44,7 @@ public class XMLClientHandler implements ClientHandler {
                 DataInputStream inputStream = new DataInputStream(socket.getInputStream());
                 while (!Thread.interrupted()) {
                     String data = readData(inputStream);
-                    log.info("read data : \n {}", data);
+//                    log.info("read data : \n {}", data);
                     if (data == null) {
                         break;
                     }
@@ -60,7 +60,7 @@ public class XMLClientHandler implements ClientHandler {
                 }
             } catch (IOException e) {
                 log.info("stopped");
-
+                server.clientDisconnected(this);
             }
         }, "XMLReader-" + sessionID);
 
@@ -103,7 +103,7 @@ public class XMLClientHandler implements ClientHandler {
 
     private String readData(DataInputStream inputStream) throws IOException {
         int messageLength = inputStream.readInt();
-        log.info("message length : {}", messageLength);
+//        log.info("message length : {}", messageLength);
         if (messageLength <= 0) {
             log.error("blocked user because messageLength is negative : {}", messageLength);
             blockUser();
@@ -117,7 +117,7 @@ public class XMLClientHandler implements ClientHandler {
                 byte[] inputData = new byte[Integer.min(BYTE_BUFFER_SIZE, leftToRead)];
                 leftToRead -= inputStream.read(inputData, 0, Integer.min(leftToRead, BYTE_BUFFER_SIZE));
                 String partOfData = new String(inputData, StandardCharsets.UTF_8);
-                log.info("part of data : \n {}", partOfData);
+//                log.info("part of data : \n {}", partOfData);
                 data += partOfData;
             } while (leftToRead != 0);
         } catch (SocketTimeoutException e) {

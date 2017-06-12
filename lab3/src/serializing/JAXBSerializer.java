@@ -16,7 +16,7 @@ import java.io.StringWriter;
  * Created by Alexander on 03/06/2017.
  */
 public class JAXBSerializer {
-    private static final Logger log = LogManager.getLogger(Client.class);
+    private static final Logger log = LogManager.getLogger(JAXBSerializer.class);
 
     public String messageToXMLString(Message message) {
         try {

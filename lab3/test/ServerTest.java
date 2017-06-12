@@ -31,7 +31,6 @@ public class ServerTest {
     @Test
     public void messageAttack() throws Exception {
         ClientConfigs clientConfigs = new ClientConfigs();
-//        clientConfigs.setLogOn(true);
         clientConfigs.setPort(PORT);
         clientConfigs.setIp(IP);
         clientConfigs.setType(TYPE);

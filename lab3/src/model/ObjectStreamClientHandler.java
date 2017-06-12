@@ -45,6 +45,7 @@ public class ObjectStreamClientHandler implements ClientHandler {
                 }
             } catch (IOException e) {
                 log.info("socket has been closed");
+                server.clientDisconnected(this);
             } catch (ClassNotFoundException e) {
                 log.info("class not found");
             }
