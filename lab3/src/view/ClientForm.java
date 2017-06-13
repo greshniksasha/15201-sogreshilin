@@ -237,7 +237,7 @@ public class ClientForm extends JFrame implements MessageHandler {
     }
 
     public void process(TextError message) {
-        appendText("your message was not delivered : \"" + message.getText() + "\"");
+        appendText(message.getText() + "\nThis message was not delivered : " + message.getError());
         log.info("message marked as undelivered");
     }
 
