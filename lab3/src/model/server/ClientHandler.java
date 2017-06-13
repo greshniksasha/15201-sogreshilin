@@ -2,6 +2,7 @@ package model.server;
 
 import model.User;
 import model.message.ServerMessage;
+import model.message.TextError;
 import model.message.UserLogoutMessage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -65,6 +66,12 @@ public abstract class ClientHandler {
 
     public void closeSocket() throws IOException {
         socket.close();
+    }
+
+    public void sendOutOfMemoryError() {
+        TextError errorMessage = new TextError();
+        errorMessage.setError("Message was not sent : too big");
+        messagesToSend.add(errorMessage);
     }
 
     public void setUser(User user) {

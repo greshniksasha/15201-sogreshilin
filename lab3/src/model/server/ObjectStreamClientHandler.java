@@ -33,6 +33,9 @@ public class ObjectStreamClientHandler extends ClientHandler {
                         log.info("message of unknown type was sent");
                         log.info("blocking this user");
                         blockUser();
+                    }  catch (OutOfMemoryError e) {
+                        sendOutOfMemoryError();
+                        log.error("Message is too big");
                     }
                 }
             } catch (IOException e) {

@@ -38,6 +38,9 @@ public class XMLClientHandler extends ClientHandler {
                         log.error("could not deserialize : user send bad data");
                         blockUser();
                         return;
+                    } catch (OutOfMemoryError e) {
+                        sendOutOfMemoryError();
+                        log.error("Message is too big");
                     }
                 }
             } catch (IOException e) {
