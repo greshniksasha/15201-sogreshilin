@@ -71,6 +71,7 @@ public class Client {
         try {
             log.info("IP = {}; PORT = {}", ip, port);
             socket = new Socket();
+            socket.setKeepAlive(true);
             socket.connect(new InetSocketAddress(ip, port), TIMEOUT);
         } catch (SocketTimeoutException e) {
             log.error("timeout expired");

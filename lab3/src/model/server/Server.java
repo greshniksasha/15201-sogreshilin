@@ -210,6 +210,7 @@ public class Server {
             try {
                 while (true) {
                     Socket socket = xmlServerSocket.accept();
+                    socket.setKeepAlive(true);
                     XMLClientHandler handler = new XMLClientHandler(Server.this, socket);
                     handler.start();
                     synchronized (lock) {
@@ -230,6 +231,7 @@ public class Server {
             try {
                 while (true) {
                     Socket socket = ooServerSocket.accept();
+                    socket.setKeepAlive(true);
                     ObjectStreamClientHandler handler = new ObjectStreamClientHandler(Server.this, socket);
                     handler.start();
                     synchronized (lock) {
