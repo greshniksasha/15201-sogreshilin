@@ -215,6 +215,7 @@ public class Client {
             Configurator.setRootLevel(Level.OFF);
         }
         new WelcomeForm(clientConfigs).setVisible(true);
+
     }
 
     private class ObjectWriter implements Runnable {

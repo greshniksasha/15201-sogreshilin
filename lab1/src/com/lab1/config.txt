@@ -1,0 +1,8 @@
+.java
+|(.c .cpp .h .hpp)
+.c
+.cpp
+.hpp
+.h
+.txt
+|(&(.java &(.java &(.java &(.java &(.java))))) .java)

@@ -1,0 +1,14 @@
+INFO  12:21:49,897 AWT-EventQueue-0     configs : obj, localhost, 53551 
+INFO  12:21:49,918 Thread-1             IP = localhost; PORT = 53551 
+INFO  12:21:50,054 Thread-1             connected to server 
+INFO  12:21:50,055 Thread-1             Connected to ObjectStream Server 
+INFO  12:21:55,988 AWT-EventQueue-0     message added to the messagesToSend 
+INFO  12:21:55,989 AWT-EventQueue-0     trying to log in as alex 
+INFO  12:21:56,005 ObjectWriter         client message written to server 
+INFO  12:22:29,510 AWT-EventQueue-0     message added to the messagesToSend 
+INFO  12:22:29,510 ObjectWriter         client message written to server 
+INFO  12:22:29,510 AWT-EventQueue-0     trying to log in as alex 
+INFO  12:22:34,875 AWT-EventQueue-0     message added to the messagesToSend 
+INFO  12:22:34,875 ObjectWriter         client message written to server 
+INFO  12:22:34,875 AWT-EventQueue-0     trying to log in as alex 
+INFO  12:24:50,273 AWT-EventQueue-0     exiting 
