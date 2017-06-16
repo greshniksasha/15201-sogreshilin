@@ -6,7 +6,7 @@
   <property name="server.main.class" value="model.server.Server"/>
   <property name="src.dir" location="src"/>
   <property name="build.dir" location="build"/>
-  <property name="lib.dir" location="lib"/>
+  <property name="lib.dir" location="../lib"/>
   <property name="test.dir" location="test"/>
   <property name="test-build.dir" location="test-build"/>
 
