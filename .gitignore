@@ -9,6 +9,7 @@ out/
 *.jar
 
 # IDE files
+.idea/
 *.iml
 
 # MacOS .DS_Store file
