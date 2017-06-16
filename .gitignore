@@ -1,7 +1,15 @@
+# Compiled class file
+out/
+*.class
+
+# Log file
+*.log
+
+# Package files
+*.jar
+
+# IDE files
+*.iml
+
+# MacOS .DS_Store file
 .DS_Store
-.idea
-!hamcresp/*
-!junit/*
-!lab1/src/*
-!lab1/test/*
-!lab1/build.xml
